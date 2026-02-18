@@ -1,0 +1,2798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You're a Changemaker — Rainier Scholars</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #2d6a4f;
+            --accent-green: #52b788;
+            --light-green: #95d5b2;
+            --pale-green: #d8f3dc;
+            --warm-white: #fffef9;
+            --soft-gray: #f5f5f5;
+            --text-dark: #1b4332;
+            --text-medium: #40916c;
+            --text-gray: #666;
+            --border-light: #e0e0e0;
+            --shadow-soft: 0 4px 20px rgba(45, 106, 79, 0.1);
+            --shadow-medium: 0 8px 30px rgba(45, 106, 79, 0.15);
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fffef9 0%, #f5fef9 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ── Intro Slides ── */
+        .intro-screen {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            animation: fadeIn 0.7s ease;
+        }
+
+        .intro-slide {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .intro-slide.active {
+            display: flex;
+        }
+
+        .intro-slide .slide-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 24px;
+        }
+
+        .intro-slide h2 {
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 18px;
+            line-height: 1.25;
+            max-width: 560px;
+        }
+
+        .intro-slide p {
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            color: var(--text-medium);
+            max-width: 520px;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+        .intro-slide p em {
+            color: var(--primary-green);
+            font-style: normal;
+            font-weight: 700;
+        }
+
+        .intro-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 32px 0 24px;
+        }
+
+        .intro-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--light-green);
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .intro-dot.active {
+            background: var(--primary-green);
+            transform: scale(1.3);
+        }
+
+        .intro-nav {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ── Homepage ── */
+        .homepage {
+            text-align: center;
+            padding: 60px 20px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .rs-badge {
+            display: inline-block;
+            background: var(--pale-green);
+            color: var(--primary-green);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 20px;
+            margin-bottom: 18px;
+        }
+
+        .homepage h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .homepage .subheading {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: var(--text-medium);
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .time-estimate {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+
+        /* Why-box on homepage */
+        .why-box {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 30px;
+            margin: 30px 0;
+            box-shadow: var(--shadow-soft);
+            text-align: left;
+            border-left: 5px solid var(--accent-green);
+        }
+
+        .why-box h2 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 12px;
+        }
+
+        .why-box p {
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            line-height: 1.7;
+        }
+
+        .why-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .ticker-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticker-container::before {
+            content: '🌱';
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.05;
+            right: 20px;
+            bottom: 10px;
+        }
+
+        .ticker-header {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .ticker-item {
+            font-size: 1.15rem;
+            color: var(--primary-green);
+            font-weight: 700;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-green) 100%);
+            color: white;
+            border: none;
+            padding: 18px 48px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: var(--shadow-medium);
+            transition: all 0.3s ease;
+            font-family: 'Nunito', sans-serif;
+            margin: 16px 0;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(45, 106, 79, 0.25);
+        }
+
+        .cta-secondary {
+            background: white;
+            color: var(--primary-green);
+            border: 2px solid var(--accent-green);
+            padding: 12px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Nunito', sans-serif;
+            margin: 8px;
+        }
+
+        .cta-secondary:hover {
+            background: var(--pale-green);
+        }
+
+        .teacher-link {
+            margin-top: 36px;
+            font-size: 0.9rem;
+        }
+
+        .teacher-link a {
+            color: var(--text-medium);
+            text-decoration: none;
+            border-bottom: 1px solid var(--accent-green);
+            transition: color 0.3s ease;
+        }
+
+        .teacher-link a:hover {
+            color: var(--primary-green);
+        }
+
+        /* ── Activity Screens ── */
+        .activity-screen {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow-medium);
+            animation: fadeIn 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-screen::before {
+            content: '🌿';
+            position: absolute;
+            font-size: 120px;
+            opacity: 0.03;
+            right: -20px;
+            top: -20px;
+            transform: rotate(15deg);
+        }
+
+        .step-indicator {
+            text-align: center;
+            margin-bottom: 28px;
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .main-question {
+            font-size: clamp(1.35rem, 4vw, 1.75rem);
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .subheading-text {
+            font-size: 1rem;
+            color: var(--text-medium);
+            margin-bottom: 24px;
+        }
+
+        /* ── Peer Talk Panel ── */
+        .peer-talk {
+            background: #fff8e6;
+            border: 1.5px solid #f0c040;
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin: 24px 0;
+        }
+
+        .peer-talk-header {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #7a5c00;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .peer-talk ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .peer-talk li {
+            padding: 4px 0;
+            font-size: 0.95rem;
+            color: #5c4300;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .peer-talk li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #c49a00;
+        }
+
+        /* ── Form Elements ── */
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--light-green);
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-dark);
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.12);
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        /* ── Ideas panel (need ideas?) ── */
+        .ideas-trigger {
+            display: inline-block;
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            cursor: pointer;
+            text-decoration: underline;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .ideas-trigger:hover {
+            color: var(--primary-green);
+        }
+
+        .ideas-panel {
+            display: none;
+            background: #fff;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 12px 0;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .ideas-panel.open {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .ideas-panel-close {
+            float: right;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--text-gray);
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .ideas-panel-close:hover {
+            color: var(--text-dark);
+        }
+
+        .idea-category {
+            margin-bottom: 18px;
+        }
+
+        .idea-category h4 {
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            background: white;
+            border: 1.5px solid var(--light-green);
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-dark);
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .chip:hover {
+            background: var(--pale-green);
+            border-color: var(--accent-green);
+            transform: translateY(-1px);
+        }
+
+        .edit-hint {
+            font-size: 0.85rem;
+            color: #ff8c00;
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        /* ── Step 1 phase 2: peer talk reveal ── */
+        .phase-divider {
+            border: none;
+            border-top: 2px dashed var(--light-green);
+            margin: 30px 0;
+        }
+
+        .phase-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        /* ── Trait Card Carousel (renamed from skill-carousel) ── */
+        .skill-carousel {
+            position: relative;
+            margin: 24px 0;
+        }
+
+        .skill-card-stage {
+            overflow: hidden;
+            border-radius: 20px;
+        }
+
+        .skill-card-inner {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .skill-card-slide {
+            min-width: 100%;
+            background: white;
+            border: 2px solid #e8e8e8;
+            border-radius: 20px;
+            padding: 32px 28px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .skill-card-slide.selected {
+            border-color: var(--accent-green);
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+        }
+
+        .skill-card-slide .card-icon {
+            font-size: 3.5rem;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .skill-card-slide h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
+
+        .skill-card-slide .card-desc {
+            font-size: 1rem;
+            color: var(--text-medium);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .skill-card-slide .card-story {
+            background: var(--pale-green);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            line-height: 1.6;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .skill-card-slide .card-story::before {
+            content: '🌱 ';
+        }
+
+        .carousel-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            gap: 12px;
+        }
+
+        .carousel-arrow {
+            background: white;
+            border: 2px solid var(--light-green);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .carousel-arrow:hover:not(:disabled) {
+            background: var(--pale-green);
+            border-color: var(--accent-green);
+        }
+
+        .carousel-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .carousel-counter {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-select-skill {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-green) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-select-skill:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-select-skill.already-selected {
+            background: var(--accent-green);
+        }
+
+        /* ── Step 2B: Connection Reflection ── */
+        .connection-banner {
+            background: linear-gradient(135deg, var(--pale-green), #e8f8ef);
+            border: 2px solid var(--accent-green);
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin: 0 0 28px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            line-height: 1.5;
+        }
+
+        .connection-banner .banner-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-medium);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .connection-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px 18px;
+            border: 2px solid var(--light-green);
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background: white;
+            resize: vertical;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .connection-textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.12);
+        }
+
+        .hint-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 14px 0 0;
+        }
+
+        .hint-chip {
+            background: #f0fdf4;
+            border: 1.5px solid var(--light-green);
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.83rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-dark);
+            font-family: 'Nunito', sans-serif;
+            line-height: 1.4;
+            max-width: 100%;
+            text-align: left;
+        }
+
+        .hint-chip:hover {
+            background: var(--pale-green);
+            border-color: var(--accent-green);
+            transform: translateY(-1px);
+        }
+
+        .hint-chips-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-medium);
+            margin-top: 16px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* ── Goal banner (step 3A) ── */
+        .goal-context-banner {
+            background: var(--pale-green);
+            border: 2px solid var(--accent-green);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            line-height: 1.55;
+        }
+
+        /* ── Why-this-skill box (kept for compat) ── */
+        .skill-explain-box {
+            background: #f4fdf7;
+            border: 2px solid var(--light-green);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 16px 0;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .skill-explain-box h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
+
+        .skill-explain-box textarea {
+            min-height: 90px;
+            border-color: var(--light-green);
+        }
+
+        .sentence-starters {
+            background: rgba(245, 245, 245, 0.6);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        .sentence-starters strong {
+            color: #555;
+            font-weight: 600;
+        }
+
+        .sentence-starters ul {
+            margin: 6px 0 0 0;
+            padding-left: 18px;
+        }
+
+        .sentence-starters li {
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+
+        /* ── Step 3: Measurable Goal ── */
+        .goal-builder {
+            background: #f4fdf7;
+            border: 2px solid var(--light-green);
+            border-radius: 14px;
+            padding: 22px;
+            margin: 20px 0;
+        }
+
+        .goal-builder h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 14px;
+        }
+
+        .goal-template {
+            font-size: 1rem;
+            color: var(--text-dark);
+            line-height: 1.8;
+            margin-bottom: 16px;
+            background: white;
+            border-radius: 10px;
+            padding: 14px 16px;
+            border: 1.5px solid #ddf0e0;
+            font-style: italic;
+        }
+
+        .goal-checklist {
+            list-style: none;
+            padding: 0;
+            margin-top: 16px;
+        }
+
+        .goal-checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        .goal-checklist li .check-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--light-green);
+            border-radius: 5px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .goal-checklist li.checked .check-box {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        .checklist-hint {
+            font-size: 0.82rem;
+            color: var(--text-medium);
+            margin-top: 12px;
+            font-style: italic;
+        }
+
+        /* ── Scaffold prompts ── */
+        .scaffold-prompts {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 14px 0;
+            border-left: 2px solid #ddd;
+        }
+
+        .scaffold-prompts p {
+            margin: 6px 0;
+            font-size: 0.88rem;
+            color: #888;
+        }
+
+        .scaffold-prompts strong {
+            color: #666;
+            font-weight: 600;
+        }
+
+        /* ── Buttons ── */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 36px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-green) 100%);
+            color: white;
+            box-shadow: var(--shadow-soft);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-green);
+            border: 2px solid var(--accent-green);
+        }
+
+        .btn-secondary:hover {
+            background: var(--pale-green);
+        }
+
+        /* ── Error messages ── */
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 14px 0;
+            font-size: 0.9rem;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ── Completion ── */
+        .completion-screen {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .completion-screen h1 {
+            font-size: clamp(1.8rem, 5vw, 2.4rem);
+            color: var(--primary-green);
+            margin-bottom: 18px;
+            font-weight: 800;
+        }
+
+        .completion-screen .celebration {
+            font-size: 4rem;
+            margin: 18px 0;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            margin: 26px 0;
+            box-shadow: var(--shadow-medium);
+            text-align: left;
+        }
+
+        .summary-card h3 {
+            color: var(--primary-green);
+            font-size: 1.15rem;
+            margin-bottom: 14px;
+            font-weight: 700;
+        }
+
+        .summary-card p {
+            margin: 12px 0;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .summary-card strong {
+            color: var(--primary-green);
+            font-weight: 700;
+        }
+
+        /* ── Dashboard ── */
+        .dashboard {
+            padding: 30px 20px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .dashboard h1 {
+            color: var(--primary-green);
+            font-size: 2rem;
+            margin-bottom: 28px;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 220px;
+            padding: 12px 18px;
+            border: 2px solid var(--light-green);
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--primary-green);
+            color: white;
+            padding: 15px 16px;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 13px 16px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        tr:hover {
+            background: var(--pale-green);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-medium);
+            font-size: 1rem;
+        }
+
+        /* ── Reflection Screen ── */
+        .reflection-screen {
+            padding: 30px 20px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .reflection-screen h1 {
+            color: var(--primary-green);
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .goal-recap-card {
+            background: var(--pale-green);
+            border: 2px solid var(--accent-green);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .goal-recap-card .recap-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .goal-recap-card .recap-value {
+            font-size: 1rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+
+        .goal-recap-card .recap-value:last-child {
+            margin-bottom: 0;
+        }
+
+        .reflection-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-soft);
+            margin: 20px 0;
+        }
+
+        .reflection-section h3 {
+            color: var(--primary-green);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        /* Numeric check-in */
+        .numeric-checkin {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .checkin-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .checkin-row label {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .checkin-counter {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 2px solid var(--light-green);
+            border-radius: 40px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .checkin-counter button {
+            background: none;
+            border: none;
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--primary-green);
+            font-family: 'Nunito', sans-serif;
+            transition: background 0.2s;
+        }
+
+        .checkin-counter button:hover {
+            background: var(--pale-green);
+        }
+
+        .checkin-counter span {
+            min-width: 36px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .progress-bar-wrap {
+            background: #e8f5ef;
+            border-radius: 20px;
+            height: 12px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--primary-green));
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-fraction {
+            font-size: 0.88rem;
+            color: var(--text-medium);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Checkpoint list */
+        .checkpoint-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkpoint-item {
+            background: #f8fdf9;
+            border: 1.5px solid var(--light-green);
+            border-radius: 12px;
+            padding: 14px 16px;
+            transition: all 0.2s ease;
+        }
+
+        .checkpoint-item.checked {
+            background: var(--pale-green);
+            border-color: var(--accent-green);
+        }
+
+        .checkpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkpoint-item:hover .checkpoint-header {
+            opacity: 0.85;
+        }
+
+        .checkpoint-box {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--light-green);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .checkpoint-item.checked .checkpoint-box {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        .checkpoint-header span {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .checkpoint-detail {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddf0e0;
+        }
+
+        .checkpoint-detail input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--light-green);
+            border-radius: 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .checkpoint-detail input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(82,183,136,0.12);
+        }
+
+        .checkpoint-detail label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* Testimonial section */
+        .testimonial-section {
+            border-top: 3px solid var(--accent-green);
+            position: relative;
+        }
+
+        .testimonial-week-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-green), var(--primary-green));
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        .testimonial-prompt-text {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            line-height: 1.5;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        /* Qualitative text box */
+        .reflection-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 14px 18px;
+            border: 2px solid var(--light-green);
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background: white;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .reflection-textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.12);
+        }
+
+        .reflection-prompt {
+            font-size: 0.88rem;
+            color: var(--text-medium);
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .reflection-saved-banner {
+            display: none;
+            background: var(--pale-green);
+            border: 2px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            text-align: center;
+            margin-top: 16px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .reflection-saved-banner.visible {
+            display: block;
+        }
+
+        /* Clickable row in progress table */
+        .goal-row {
+            cursor: pointer;
+        }
+
+        .goal-row:hover td {
+            background: var(--pale-green);
+        }
+
+        .reflect-badge {
+            display: inline-block;
+            background: var(--pale-green);
+            color: var(--primary-green);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--accent-green);
+            white-space: nowrap;
+        }
+
+        /* ── Utilities ── */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+
+            .activity-screen {
+                padding: 28px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ══════════════════════════════════
+             INTRO SLIDES
+        ══════════════════════════════════ -->
+        <div id="intro-screen" class="intro-screen hidden">
+            <div class="rs-badge" style="margin-bottom: 32px;">Rainier Scholars</div>
+
+            <!-- Slide 1 -->
+            <div class="intro-slide active" id="intro-slide-1">
+                <div class="slide-emoji">🤔</div>
+                <h2>Have you ever thought to yourself… "when am I ever going to use this?"</h2>
+            </div>
+
+            <!-- Slide 2 — UPDATED -->
+            <div class="intro-slide" id="intro-slide-2">
+                <div class="slide-emoji">🌍</div>
+                <h2>The kind of person you become in school is the kind of changemaker you'll be in the world.</h2>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="intro-slide" id="intro-slide-3">
+                <div class="slide-emoji">🔗</div>
+                <h2>Today, you'll connect what you learn in class to something you actually care about.</h2>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="intro-slide" id="intro-slide-4">
+                <div class="slide-emoji">🌱</div>
+                <h2>Let's find your <em>why.</em></h2>
+            </div>
+
+            <div class="intro-dots">
+                <div class="intro-dot active" id="dot-1"></div>
+                <div class="intro-dot" id="dot-2"></div>
+                <div class="intro-dot" id="dot-3"></div>
+                <div class="intro-dot" id="dot-4"></div>
+            </div>
+
+            <div class="intro-nav">
+                <button class="btn btn-secondary" id="intro-back-btn" onclick="app.introPrev()" style="display:none;">← Back</button>
+                <button class="btn btn-primary" id="intro-next-btn" onclick="app.introNext()">Next →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             HOMEPAGE
+        ══════════════════════════════════ -->
+        <div id="homepage" class="homepage">
+            <div class="rs-badge">Rainier Scholars</div>
+            <h1>You're a Changemaker.</h1>
+            <p class="subheading">Set a goal that connects who you're becoming to something that matters.</p>
+            <p class="time-estimate">Takes about 15–20 minutes.</p>
+
+            <div class="ticker-container">
+                <div class="ticker-header">Rainier Scholars care about…</div>
+                <div id="ticker" class="ticker-item"></div>
+            </div>
+
+            <button class="cta-primary" onclick="app.startActivity()">Let's Start →</button>
+            <br>
+            <button class="cta-secondary" onclick="app.showNameLogin()">View My Goals</button>
+
+            <div class="teacher-link">
+                <a href="#" onclick="app.showDashboard(); return false;">For Teachers → View Dashboard</a>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             SETUP: Name Entry
+        ══════════════════════════════════ -->
+        <div id="setup-screen" class="activity-screen hidden">
+            <h2 class="main-question">First, what's your full name?</h2>
+            <p class="subheading-text">Use your first and last name — you'll need to enter it <strong>exactly the same way</strong> to find your goals later.</p>
+            <div class="input-group">
+                <label for="student-name">Full name</label>
+                <input type="text" id="student-name" placeholder="e.g. Maria Gonzalez" autocomplete="off">
+            </div>
+            <div id="setup-error" class="error-message hidden"></div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.goHome()">← Back</button>
+                <button class="btn btn-primary" onclick="app.submitName()">Let's Go →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             NAME LOGIN: View My Goals gate
+        ══════════════════════════════════ -->
+        <div id="name-login-screen" class="activity-screen hidden">
+            <div style="text-align:center; margin-bottom: 28px;">
+                <div style="font-size:2.5rem; margin-bottom:12px;">🔒</div>
+                <h2 class="main-question" style="text-align:center;">Enter your full name to view your goals</h2>
+                <p class="subheading-text" style="text-align:center;">Your goals are private — only you can see them.</p>
+            </div>
+            <div class="input-group">
+                <label for="name-login-input">Full name (exactly as you entered it before)</label>
+                <input type="text" id="name-login-input" placeholder="e.g. Maria Gonzalez" autocomplete="off">
+            </div>
+            <div id="name-login-error" class="error-message hidden">No goals found for that name. Check your spelling and try again.</div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.goHome()">← Back</button>
+                <button class="btn btn-primary" onclick="app.submitNameLogin()">View My Goals →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             STEP 1A: Write the issue
+        ══════════════════════════════════ -->
+        <div id="step1-screen" class="activity-screen hidden">
+            <div class="step-indicator">Step 1 of 3 — My Issue</div>
+            <h2 class="main-question">What's one problem in the world I want to help with?</h2>
+
+            <div class="input-group">
+                <label>
+                    I want to help with…
+                    <span class="ideas-trigger" onclick="app.toggleIdeas()">💡 Need ideas?</span>
+                </label>
+                <textarea id="problem-text" placeholder="I want to help with…" oninput="app.onProblemInput()"></textarea>
+                <div id="edit-hint" class="edit-hint hidden">Make it yours — edit the blanks!</div>
+            </div>
+
+            <div id="ideas-panel" class="ideas-panel">
+                <span class="ideas-panel-close" onclick="app.toggleIdeas()">×</span>
+                <div class="idea-category">
+                    <h4>Environment</h4>
+                    <div class="chip-container">
+                        <div class="chip" onclick="app.insertChip('Litter around my school or park')">Litter around my school / park</div>
+                        <div class="chip" onclick="app.insertChip('Too much plastic waste at school')">Too much plastic at school</div>
+                        <div class="chip" onclick="app.insertChip('Ocean plastic pollution')">Ocean plastic pollution</div>
+                        <div class="chip" onclick="app.insertChip('Animals losing their homes')">Animals losing their homes</div>
+                        <div class="chip" onclick="app.insertChip('Food waste in the cafeteria')">Food waste in the cafeteria</div>
+                        <div class="chip" onclick="app.insertChip('Recycling not being used enough')">Recycling not being used enough</div>
+                    </div>
+                </div>
+                <div class="idea-category">
+                    <h4>Community &amp; Social Justice</h4>
+                    <div class="chip-container">
+                        <div class="chip" onclick="app.insertChip('Homelessness in my city')">Homelessness in my city</div>
+                        <div class="chip" onclick="app.insertChip('Helping immigrants find jobs and support')">Helping immigrants find support</div>
+                        <div class="chip" onclick="app.insertChip('People being judged for how they look')">People being judged for how they look</div>
+                        <div class="chip" onclick="app.insertChip('Bullying or hate toward certain groups')">Bullying toward certain groups</div>
+                        <div class="chip" onclick="app.insertChip('Families not having enough food or supplies')">Families without enough food</div>
+                        <div class="chip" onclick="app.insertChip('Access to mental health support for teens')">Access to mental health support</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step1-error" class="error-message hidden"></div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.goHome()">← Back</button>
+                <button class="btn btn-primary" id="step1-continue" disabled onclick="app.submitStep1()">Next →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             STEP 1B: Peer talk
+        ══════════════════════════════════ -->
+        <div id="step1b-screen" class="activity-screen hidden">
+            <div class="step-indicator">Step 1 of 3 — My Issue</div>
+            <h2 class="main-question">Now turn and talk with a partner. 💬</h2>
+
+            <div style="background: var(--pale-green); border-radius: 12px; padding: 14px 18px; margin: 20px 0; font-size: 1rem; color: var(--text-dark);">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-medium); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 6px;">You said:</span>
+                <span id="step1b-problem-display" style="font-weight: 600;"></span>
+            </div>
+
+            <div class="peer-talk">
+                <div class="peer-talk-header">Ask each other:</div>
+                <ul>
+                    <li>Why do you care about this issue?</li>
+                    <li>Where does this happen?</li>
+                    <li>Who does it affect most?</li>
+                </ul>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.showScreen('step1-screen'); app.currentStep = 'step1';">← Back</button>
+                <button class="btn btn-primary" onclick="app.submitStep1b()">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             STEP 2A: Pick a character trait (carousel)
+        ══════════════════════════════════ -->
+        <div id="step2-screen" class="activity-screen hidden">
+            <div class="step-indicator">Step 2 of 3 — My Character Trait</div>
+            <h2 class="main-question">What do I want to be like in the future?</h2>
+            <p class="subheading-text">Browse through the traits. When one feels right, tap "This is who I want to be."</p>
+
+            <div class="skill-carousel">
+                <div class="skill-card-stage">
+                    <div class="skill-card-inner" id="skill-card-inner"></div>
+                </div>
+                <div class="carousel-nav">
+                    <button class="carousel-arrow" id="carousel-prev" onclick="app.carouselPrev()">←</button>
+                    <span class="carousel-counter" id="carousel-counter">1 of 8</span>
+                    <button class="carousel-arrow" id="carousel-next" onclick="app.carouselNext()">→</button>
+                </div>
+            </div>
+
+            <div id="step2-error" class="error-message hidden"></div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.previousStep()">← Back</button>
+                <button class="btn btn-primary" id="step2-continue" disabled onclick="app.submitStep2()">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             STEP 2B: Connection reflection
+        ══════════════════════════════════ -->
+        <div id="step2b-screen" class="activity-screen hidden">
+            <div class="step-indicator">Step 2 of 3 — My Character Trait</div>
+
+            <div class="connection-banner">
+                <span class="banner-label">Your changemaker identity</span>
+                <span id="step2b-connection-summary"></span>
+            </div>
+
+            <h2 class="main-question">Why does being <span id="step2b-trait-name"></span> matter to you — and to the change you want to make?</h2>
+
+            <div class="input-group">
+                <label for="trait-connection-text" id="trait-connection-label" class="hidden"></label>
+                <textarea
+                    id="trait-connection-text"
+                    placeholder="Write your response here…"
+                    oninput="app.onTraitConnectionInput()"
+                ></textarea>
+                <span class="hint-chips-label">Tap a sentence starter to use it as a hint:</span>
+                <div class="hint-chips" id="trait-hint-chips"></div>
+            </div>
+
+            <div id="step2b-error" class="error-message hidden"></div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.showScreen('step2-screen'); app.currentStep = 'step2';">← Back</button>
+                <button class="btn btn-primary" id="step2b-continue" disabled onclick="app.submitStep2b()">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             STEP 3A: Pick a goal (carousel)
+        ══════════════════════════════════ -->
+        <div id="step3a-screen" class="activity-screen hidden">
+            <div class="step-indicator">Step 3 of 3 — My Goal</div>
+            <h2 class="main-question">Pick a goal for math class this week.</h2>
+
+            <!-- Trait + issue reminder banner -->
+            <div class="goal-context-banner" id="step3-context-banner"></div>
+
+            <p class="subheading-text">Each goal helps you practice that trait in math class. Pick the one that feels right.</p>
+
+            <div class="skill-carousel">
+                <div class="skill-card-stage">
+                    <div class="skill-card-inner" id="goal-card-inner"></div>
+                </div>
+                <div class="carousel-nav">
+                    <button class="carousel-arrow" id="goal-carousel-prev" onclick="app.goalCarouselPrev()">←</button>
+                    <span class="carousel-counter" id="goal-carousel-counter">1 of 4</span>
+                    <button class="carousel-arrow" id="goal-carousel-next" onclick="app.goalCarouselNext()">→</button>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.previousStep()">← Back</button>
+                <button class="btn btn-primary" id="step3a-continue" disabled onclick="app.submitStep3a()">Continue →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             STEP 3B: Final peer talk
+        ══════════════════════════════════ -->
+        <div id="step3b-screen" class="activity-screen hidden">
+            <div class="step-indicator">Step 3 of 3 — My Goal</div>
+            <h2 class="main-question">Share your goal with your partner.</h2>
+
+            <div style="background: var(--pale-green); border-radius: 12px; padding: 14px 18px; margin: 0 0 24px; font-size: 1rem; color: var(--text-dark);">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-medium); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 6px;">Your goal:</span>
+                <span id="step3b-goal-display" style="font-weight: 600;"></span>
+            </div>
+
+            <div class="peer-talk">
+                <div class="peer-talk-header">Ask each other:</div>
+                <ul>
+                    <li>What is your goal this week?</li>
+                    <li>How does practicing this connect to the change you want to see in the world?</li>
+                    <li>How will you know when you've done it?</li>
+                </ul>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.showScreen('step3a-screen'); app.currentStep='step3';">← Back</button>
+                <button class="btn btn-primary" onclick="app.submitStep3()">Finish →</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             COMPLETION
+        ══════════════════════════════════ -->
+        <div id="completion-screen" class="completion-screen hidden">
+            <div class="celebration">🌱✨</div>
+            <h1 id="completion-title"></h1>
+
+            <div class="summary-card" id="summary-card"></div>
+
+            <button class="cta-primary" onclick="app.startActivity()">Set Another Goal</button>
+            <button class="cta-secondary" onclick="app.showProgress()">View My Goals</button>
+
+            <div class="teacher-link">
+                <a href="#" onclick="app.showDashboard(); return false;">For Teachers → View Dashboard</a>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             STUDENT PROGRESS VIEW
+        ══════════════════════════════════ -->
+        <div id="progress-screen" class="dashboard hidden">
+            <h1>My Goals</h1>
+            <div class="dashboard-controls">
+                <button class="btn btn-secondary" onclick="app.goHome()">← Back to Home</button>
+            </div>
+            <div class="data-table" id="progress-table"></div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             REFLECTION SCREEN
+        ══════════════════════════════════ -->
+        <div id="reflection-screen" class="reflection-screen hidden">
+            <h1>Goal Reflection 🌱</h1>
+            <p style="color:var(--text-medium); margin-bottom: 4px; font-size:0.95rem;">How did it go this week?</p>
+
+            <div class="goal-recap-card" id="reflection-recap"></div>
+
+            <div class="reflection-section" id="reflection-input-section">
+                <h3 id="reflection-question"></h3>
+                <div id="reflection-input-area"></div>
+            </div>
+
+            <!-- Testimonial Section -->
+            <div class="reflection-section testimonial-section">
+                <div class="testimonial-week-badge" id="testimonial-week-badge"></div>
+                <h3 id="testimonial-prompt-heading">Pass It On ✉️</h3>
+                <p class="testimonial-prompt-text" id="testimonial-prompt-text"></p>
+                <p class="reflection-prompt">Write 2–4 sentences. Don't worry about spelling — just get your ideas across.</p>
+                <textarea class="reflection-textarea" id="testimonial-text" placeholder="Write your message here…"></textarea>
+            </div>
+
+            <div class="reflection-saved-banner" id="reflection-saved">✅ Reflection saved!</div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.showProgress()">← Back to My Goals</button>
+                <button class="btn btn-primary" id="save-reflection-btn" onclick="app.saveReflection()">Save Reflection</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             TEACHER DASHBOARD
+        ══════════════════════════════════ -->
+        <div id="dashboard-screen" class="dashboard hidden">
+            <h1>Teacher Dashboard</h1>
+            <div class="dashboard-controls">
+                <input type="text" class="search-input" id="search-input" placeholder="Search by name, issue, or goal…">
+                <button class="btn btn-primary" onclick="app.exportCSV()">Export CSV</button>
+                <button class="btn btn-secondary" onclick="app.clearAllData()">Clear All Data</button>
+                <button class="btn btn-secondary" onclick="app.goHome()">← Back to Home</button>
+            </div>
+            <div class="data-table" id="dashboard-table"></div>
+        </div>
+
+    </div><!-- /.container -->
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, doc, addDoc, getDocs, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA9Td-71dAC07JvmX1FnDdacbfK1PSt1w8",
+            authDomain: "tangle-thrive.firebaseapp.com",
+            projectId: "tangle-thrive",
+            storageBucket: "tangle-thrive.firebasestorage.app",
+            messagingSenderId: "941982036365",
+            appId: "1:941982036365:web:172002b3ede46f9fc28dc4"
+        };
+
+        const firebaseApp = initializeApp(firebaseConfig);
+        const db = getFirestore(firebaseApp);
+
+        const app = {
+            currentStep: 'home',
+            data: {
+                studentName: '',
+                problem: '',
+                trait: '',
+                traitConnection: '',
+                goal: '',
+                timestamp: ''
+            },
+
+            traits: [
+                {
+                    id: 'curious',
+                    icon: '🔍',
+                    title: 'Curious',
+                    description: 'I keep asking questions until I understand why things are the way they are.',
+                    story: 'A 6th grader kept asking "why does our cafeteria throw away so much food?" — and her questions led her classmates to start a food donation program.',
+                    starters: [
+                        '…need to understand the root causes, not just the surface of the problem.',
+                        '…have to keep asking "why?" even when the first answer isn\'t enough.',
+                        '…can\'t fix what they don\'t fully understand first.'
+                    ],
+                    goals: [
+                        'By Friday, I will write down 2 questions I have during math class when I don\'t understand something.',
+                        'By Thursday, I will ask my teacher or a classmate one question every day in math class.',
+                        'By Wednesday, I will write a "why" or "what if" question about the math topic we\'re learning.',
+                        'By Friday, I will notice one thing that confuses me in math and write it down each day.'
+                    ]
+                },
+                {
+                    id: 'persistent',
+                    icon: '💪',
+                    title: 'Persistent',
+                    description: 'I keep trying when things are hard and don\'t give up when my first plan fails.',
+                    story: 'A student tried three different ways to reduce bullying in his school — two didn\'t work, but the third one did, and he learned something important from each attempt.',
+                    starters: [
+                        '…can\'t give up when things get hard because the people they\'re trying to help are counting on them.',
+                        '…have to keep going even when progress feels invisible or slow.',
+                        '…know that change rarely happens on the first try — you have to stay in it.'
+                    ],
+                    goals: [
+                        'By Thursday, I will try a second strategy whenever my first approach doesn\'t work on a math problem.',
+                        'By Friday, I will attempt at least one problem a different way after I get the answer to check myself.',
+                        'By Wednesday, I will test two different methods on 3 math problems and see which one I prefer.',
+                        'By Friday, I will not erase my first attempt — I will cross it out, try again, and compare both tries.'
+                    ]
+                },
+                {
+                    id: 'organized',
+                    icon: '🗂️',
+                    title: 'Organized',
+                    description: 'I break big problems into smaller steps so I can actually make progress.',
+                    story: 'Homelessness felt too big to one student — until he broke it down: first understand the numbers, then learn what shelters need, then take one small action.',
+                    starters: [
+                        '…have to break the problem into steps they can actually act on, or it stays overwhelming.',
+                        '…need a plan, because good intentions without structure don\'t create change.',
+                        '…can\'t tackle everything at once — choosing where to start is part of the work.'
+                    ],
+                    goals: [
+                        'By Thursday, I will break every multi-step word problem into smaller steps before I start solving it.',
+                        'By Friday, I will write out each step of my work instead of trying to do it all in my head.',
+                        'By Wednesday, I will identify the first step of a hard math problem before I try to solve the whole thing.',
+                        'By Friday, I will split each math problem into parts and label what I need to find first.'
+                    ]
+                },
+                {
+                    id: 'creative',
+                    icon: '💡',
+                    title: 'Creative',
+                    description: 'I try new approaches when things don\'t work and look for unexpected solutions.',
+                    story: 'One student estimated how many plastic bottles his school used per year — the number was so big it shocked his teachers and helped start a reusable bottle campaign.',
+                    starters: [
+                        '…sometimes need to find an unexpected angle that others haven\'t tried yet.',
+                        '…have to imagine solutions that don\'t exist yet — not just copy what\'s already been done.',
+                        '…need creativity because the obvious solutions have often already failed.'
+                    ],
+                    goals: [
+                        'By Friday, I will estimate my answer before solving each problem to check if my answer makes sense.',
+                        'By Thursday, I will look for a pattern in at least 5 math problems to see if there is a shortcut.',
+                        'By Wednesday, I will use rounding to predict the answer to 5 math problems before calculating the exact answer.',
+                        'By Friday, I will sort a set of math problems by what they have in common before solving them.'
+                    ]
+                },
+                {
+                    id: 'precise',
+                    icon: '✓',
+                    title: 'Precise',
+                    description: 'I double-check my work so that people can trust what I say and do.',
+                    story: 'A student researching ocean pollution double-checked her statistics before presenting — her accuracy made people trust her, and they actually listened.',
+                    starters: [
+                        '…need to get the facts right, or people won\'t trust what they\'re saying.',
+                        '…have to be careful and exact because errors give people a reason to dismiss the issue.',
+                        '…know that being precise is a form of respect for the people they\'re trying to help.'
+                    ],
+                    goals: [
+                        'By Friday, I will go back and check every answer before turning in my math work each day.',
+                        'By Thursday, I will redo at least 2 problems I got wrong and find my mistake.',
+                        'By Wednesday, I will read each problem again after solving it to make sure my answer makes sense.',
+                        'By Friday, I will catch and correct at least one error in my work each day before I turn it in.'
+                    ]
+                },
+                {
+                    id: 'communicative',
+                    icon: '💬',
+                    title: 'Communicative',
+                    description: 'I explain my ideas clearly so others can understand and join me.',
+                    story: 'A student who cared about immigrant families practiced explaining their struggles in math class — then used those same communication skills to present to the city council.',
+                    starters: [
+                        '…need to explain the problem in a way that makes others actually care.',
+                        '…can\'t create change alone — they have to bring other people along with them.',
+                        '…have to be able to say clearly what\'s wrong and why it matters, so people want to help.'
+                    ],
+                    goals: [
+                        'By Friday, I will explain out loud how I solved a problem to a partner at least 2 times in math class.',
+                        'By Thursday, I will write out my thinking step by step so someone else could follow it.',
+                        'By Wednesday, I will describe to my table group how I got my answer on at least one problem each day.',
+                        'By Friday, I will use words and numbers together to show my full thinking on every problem.'
+                    ]
+                },
+                {
+                    id: 'brave',
+                    icon: '🦁',
+                    title: 'Brave',
+                    description: 'I speak up and take action even when it feels uncomfortable or uncertain.',
+                    story: 'A student noticed litter piling up near certain school exits — even though she was nervous, she brought it up in class, and her courage convinced her principal to add more trash cans.',
+                    starters: [
+                        '…often have to say something uncomfortable that others are afraid to say.',
+                        '…need the courage to act even when they don\'t know exactly how things will turn out.',
+                        '…know that staying silent doesn\'t make things better — only speaking up does.'
+                    ],
+                    goals: [
+                        'By Friday, I will raise my hand to share an answer or ask a question in math class at least once each day.',
+                        'By Thursday, I will attempt at least one problem I think might be too hard for me without giving up first.',
+                        'By Wednesday, I will tell my teacher when I don\'t understand something instead of pretending I do.',
+                        'By Friday, I will try a problem I\'ve been avoiding and show my full attempt, even if I\'m not sure it\'s right.'
+                    ]
+                },
+                {
+                    id: 'collaborative',
+                    icon: '🤝',
+                    title: 'Collaborative',
+                    description: 'I learn from others and bring people together around a shared goal.',
+                    story: 'A student who cared about mental health built a peer support group — not by doing it all herself, but by finding others who cared about the same thing and working together.',
+                    starters: [
+                        '…can do far more together than any one person can do alone.',
+                        '…need to build coalitions, because real change requires more than one voice.',
+                        '…have to be willing to learn from others, because no one person has all the answers.'
+                    ],
+                    goals: [
+                        'By Friday, I will work with at least one classmate to solve a math problem and explain our thinking together.',
+                        'By Thursday, I will compare my math approach with a partner\'s and write down what was the same and what was different.',
+                        'By Wednesday, I will give a classmate specific feedback on one of their math problems and ask for feedback on mine.',
+                        'By Friday, I will listen carefully when a classmate explains their thinking and write down one thing I learned from them.'
+                    ]
+                }
+            ],
+
+            tickerItems: [
+                'Reducing litter at school',
+                'Helping immigrants find jobs',
+                'Homelessness in my city',
+                'Ocean plastic pollution',
+                'Fairness in their community',
+                'Animals losing their homes',
+                'Mental health for teens',
+                'Making school feel safer for everyone'
+            ],
+
+            testimonialPrompts: [
+                { theme: 'Week 1 - Why It Matters', prompt: 'You just set your first goal. Imagine a future Rainier Scholar who cares about the same issue you do. Why does this issue matter? Why is it worth their time to do something about it?' },
+                { theme: 'Week 2 - Why It Matters', prompt: 'Think about the trait you chose — {trait}. Why did you pick it? What would you tell a future scholar about why becoming this kind of person is worth it?' },
+                { theme: 'Week 3 - Why It Matters', prompt: 'You\'ve been working on being {trait} for a few weeks now. How does growing into this trait connect to the change you want to see in the world? Write to a future scholar who isn\'t sure it matters.' },
+                { theme: 'Week 4 - Trait in Action', prompt: 'Describe a specific moment this week where you practiced being {trait}. What did you actually do? Why did that moment matter even if it felt small?' },
+                { theme: 'Week 5 - Trait in Action', prompt: 'What does it look like when someone is truly {trait}? Give a future scholar a concrete example from your own experience this week.' },
+                { theme: 'Week 6 - Trait in Action', prompt: 'How has practicing being {trait} in math class changed how you think about your issue? What connection have you noticed that surprised you?' },
+                { theme: 'Week 7 - Hard Moments', prompt: 'Be honest: what was hard this week? What made you want to skip it or give up? What would you tell a future scholar who feels the same way?' },
+                { theme: 'Week 8 - Hard Moments', prompt: 'Think of a time this semester when things didn\'t go the way you planned. What did you do? What did that teach you about yourself?' },
+                { theme: 'Week 9 - Hard Moments', prompt: 'What\'s one thing about being {trait} that\'s still hard for you? Why do you keep showing up anyway? Write to a future scholar who is struggling with the same thing.' },
+                { theme: 'Week 10 - Growth', prompt: 'Compare yourself now to who you were at the start of the semester. What\'s one thing you can do now that you could not do before in school or in how you think about your issue?' },
+                { theme: 'Week 11 - Growth', prompt: 'What has practicing being {trait} taught you about how change actually happens? What do you know now that you did not know before?' },
+                { theme: 'Week 12 - Growth', prompt: 'Think about the issue you care about: {issue}. Have you changed how you think about it since the beginning of the semester? What shifted and why?' },
+                { theme: 'Week 13 - Impact', prompt: 'Has anything you have done this semester, even something small, made a difference for someone else? Tell a future scholar about it and why it mattered.' },
+                { theme: 'Week 14 - Impact', prompt: 'What kind of person do you want to be in 10 years? How does what you are doing right now in math class — practicing being {trait} — connect to that future version of you?' },
+                { theme: 'Week 15 - Impact', prompt: 'You have been at this for most of a semester. Write to a future Rainier Scholar who is just starting out. What do you most want them to know about why this work matters?' },
+                { theme: 'Week 16 - Looking Back', prompt: 'If you could send one message to yourself from the very first week of this semester, what would you say? What do you know now that would have helped you then?' }
+            ],
+
+            init() {
+                this.startTicker();
+                this.renderCarousel();
+
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.addEventListener('input', () => this.filterDashboard());
+                }
+
+                document.getElementById('problem-text').addEventListener('input', () => this.saveDraft());
+            },
+
+            startTicker() {
+                let index = 0;
+                const ticker = document.getElementById('ticker');
+
+                const update = () => {
+                    ticker.style.animation = 'none';
+                    setTimeout(() => {
+                        ticker.textContent = this.tickerItems[index];
+                        ticker.style.animation = 'slideUp 0.5s ease';
+                        index = (index + 1) % this.tickerItems.length;
+                    }, 50);
+                };
+
+                update();
+                setInterval(update, 3200);
+            },
+
+            showScreen(id) {
+                ['intro-screen','homepage','setup-screen','name-login-screen','step1-screen','step1b-screen','step2-screen',
+                 'step2b-screen','step3a-screen','step3b-screen','completion-screen','progress-screen','reflection-screen','dashboard-screen']
+                    .forEach(s => document.getElementById(s).classList.add('hidden'));
+                document.getElementById(id).classList.remove('hidden');
+                window.scrollTo(0, 0);
+            },
+
+            goHome() {
+                this.showScreen('homepage');
+                this.currentStep = 'home';
+            },
+
+            startActivity() {
+                this.resetData();
+                this.introSlide = 1;
+                this.showIntroSlide(1);
+                this.showScreen('intro-screen');
+                this.currentStep = 'intro';
+            },
+
+            introSlide: 1,
+            totalIntroSlides: 4,
+
+            showIntroSlide(n) {
+                for (let i = 1; i <= this.totalIntroSlides; i++) {
+                    document.getElementById(`intro-slide-${i}`).classList.toggle('active', i === n);
+                    document.getElementById(`dot-${i}`).classList.toggle('active', i === n);
+                }
+                document.getElementById('intro-back-btn').style.display = n === 1 ? 'none' : 'inline-block';
+                const nextBtn = document.getElementById('intro-next-btn');
+                nextBtn.textContent = n === this.totalIntroSlides ? "Let's Start →" : 'Next →';
+            },
+
+            introNext() {
+                if (this.introSlide < this.totalIntroSlides) {
+                    this.introSlide++;
+                    this.showIntroSlide(this.introSlide);
+                } else {
+                    this.showScreen('setup-screen');
+                    this.currentStep = 'setup';
+                    document.getElementById('student-name').focus();
+                }
+            },
+
+            introPrev() {
+                if (this.introSlide > 1) {
+                    this.introSlide--;
+                    this.showIntroSlide(this.introSlide);
+                }
+            },
+
+            resetData() {
+                this.data = {
+                    studentName: '',
+                    problem: '',
+                    trait: '',
+                    traitConnection: '',
+                    goal: '',
+                    timestamp: ''
+                };
+
+                ['student-name','problem-text','trait-connection-text'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+
+                this.carouselIndex = 0;
+                this.renderCarousel();
+                document.getElementById('step1-continue').disabled = true;
+                document.getElementById('step2-continue').disabled = true;
+            },
+
+            // ── Setup ──
+            submitName() {
+                const name = document.getElementById('student-name').value.trim();
+                const err = document.getElementById('setup-error');
+
+                if (!name || name.split(' ').filter(w => w.length > 0).length < 2) {
+                    err.textContent = 'Please enter your first and last name so you can find your goals later.';
+                    err.classList.remove('hidden');
+                    return;
+                }
+
+                this.data.studentName = name;
+                err.classList.add('hidden');
+                this.showScreen('step1-screen');
+                this.currentStep = 'step1';
+            },
+
+            // ── Step 1 ──
+            toggleIdeas() {
+                document.getElementById('ideas-panel').classList.toggle('open');
+            },
+
+            insertChip(text) {
+                const ta = document.getElementById('problem-text');
+                const hint = document.getElementById('edit-hint');
+                ta.value = `I want to help with ${text} because I notice ____ at ____.`;
+                hint.classList.remove('hidden');
+                document.getElementById('ideas-panel').classList.remove('open');
+                ta.focus();
+
+                const pos = ta.value.indexOf('____');
+                if (pos !== -1) ta.setSelectionRange(pos, pos + 4);
+
+                this.onProblemInput();
+            },
+
+            onProblemInput() {
+                const text = document.getElementById('problem-text').value.trim();
+                document.getElementById('step1-continue').disabled = text.length < 10;
+            },
+
+            submitStep1() {
+                const problem = document.getElementById('problem-text').value.trim();
+                const err = document.getElementById('step1-error');
+
+                if (!problem || problem.length < 10) {
+                    err.textContent = 'Please describe the issue you care about before continuing.';
+                    err.classList.remove('hidden');
+                    return;
+                }
+
+                this.data.problem = problem;
+                err.classList.add('hidden');
+                document.getElementById('step1b-problem-display').textContent = problem;
+                this.showScreen('step1b-screen');
+                this.currentStep = 'step1b';
+            },
+
+            submitStep1b() {
+                this.showScreen('step2-screen');
+                this.currentStep = 'step2';
+            },
+
+            // ── Step 2: Trait Carousel ──
+            carouselIndex: 0,
+
+            renderCarousel() {
+                const inner = document.getElementById('skill-card-inner');
+                inner.innerHTML = this.traits.map((trait, i) => `
+                    <div class="skill-card-slide${this.data.trait === trait.id ? ' selected' : ''}" id="slide-${trait.id}">
+                        <span class="card-icon">${trait.icon}</span>
+                        <h3>${trait.title}</h3>
+                        <p class="card-desc">${trait.description}</p>
+                        <button class="btn-select-skill${this.data.trait === trait.id ? ' already-selected' : ''}"
+                            onclick="app.selectTrait('${trait.id}')">
+                            ${this.data.trait === trait.id ? '✓ Selected' : 'This is who I want to be →'}
+                        </button>
+                    </div>
+                `).join('');
+                this.updateCarouselPosition();
+            },
+
+            updateCarouselPosition() {
+                const inner = document.getElementById('skill-card-inner');
+                inner.style.transform = `translateX(-${this.carouselIndex * 100}%)`;
+                const total = this.traits.length;
+                document.getElementById('carousel-counter').textContent =
+                    `${this.carouselIndex + 1} of ${total}`;
+                document.getElementById('carousel-prev').disabled = this.carouselIndex === 0;
+                document.getElementById('carousel-next').disabled = this.carouselIndex === total - 1;
+            },
+
+            carouselNext() {
+                if (this.carouselIndex < this.traits.length - 1) {
+                    this.carouselIndex++;
+                    this.updateCarouselPosition();
+                }
+            },
+
+            carouselPrev() {
+                if (this.carouselIndex > 0) {
+                    this.carouselIndex--;
+                    this.updateCarouselPosition();
+                }
+            },
+
+            selectTrait(traitId) {
+                this.data.trait = traitId;
+                this.renderCarousel();
+                document.getElementById('step2-continue').disabled = false;
+            },
+
+            // ── Step 2B: Connection reflection ──
+            onTraitConnectionInput() {
+                const text = document.getElementById('trait-connection-text').value.trim();
+                document.getElementById('step2b-continue').disabled = text.length < 20;
+            },
+
+            submitStep2() {
+                const err = document.getElementById('step2-error');
+                if (!this.data.trait) {
+                    err.textContent = 'Please pick a character trait before continuing.';
+                    err.classList.remove('hidden');
+                    return;
+                }
+                err.classList.add('hidden');
+
+                const trait = this.traits.find(t => t.id === this.data.trait);
+                const issueSummary = this.data.problem.length > 60
+                    ? this.data.problem.substring(0, 60) + '…'
+                    : this.data.problem;
+
+                // Update connection banner
+                document.getElementById('step2b-connection-summary').textContent =
+                    `You care about ${issueSummary}. You want to be ${trait.title}.`;
+
+                // Update trait name in question heading
+                document.getElementById('step2b-trait-name').textContent = trait.title.toLowerCase();
+
+                // Clear textarea
+                document.getElementById('trait-connection-text').value = '';
+                document.getElementById('step2b-continue').disabled = true;
+
+                // Render hint chips
+                const chipsContainer = document.getElementById('trait-hint-chips');
+                chipsContainer.innerHTML = trait.starters.map(s =>
+                    `<button class="hint-chip" onclick="app.useHintChip(this, '${s.replace(/'/g, "\\'")}')">${s}</button>`
+                ).join('');
+
+                this.showScreen('step2b-screen');
+                this.currentStep = 'step2b';
+            },
+
+            useHintChip(btn, text) {
+                const ta = document.getElementById('trait-connection-text');
+                ta.value = text;
+                ta.focus();
+                this.onTraitConnectionInput();
+            },
+
+            submitStep2b() {
+                const conn = document.getElementById('trait-connection-text').value.trim();
+                const err = document.getElementById('step2b-error');
+                if (conn.length < 20) {
+                    err.textContent = 'Please write a bit more — at least 20 characters — before continuing.';
+                    err.classList.remove('hidden');
+                    return;
+                }
+                err.classList.add('hidden');
+
+                this.data.traitConnection = conn;
+
+                // Populate Step 3a context banner and reset goal selection
+                const trait = this.traits.find(t => t.id === this.data.trait);
+                const issueSummary = this.data.problem.length > 60
+                    ? this.data.problem.substring(0, 60) + '…'
+                    : this.data.problem;
+
+                document.getElementById('step3-context-banner').innerHTML =
+                    `<strong>You care about</strong> ${issueSummary}. <strong>You want to be</strong> ${trait ? trait.icon + ' ' + trait.title : ''}. Here are ways to practice that in math class this week.`;
+
+                this.data.goal = '';
+                this.goalCarouselIndex = 0;
+                this.renderGoalCarousel();
+                document.getElementById('step3a-continue').disabled = true;
+                this.showScreen('step3a-screen');
+                this.currentStep = 'step3';
+            },
+
+            // ── Step 3: Goal Carousel ──
+            goalCarouselIndex: 0,
+
+            renderGoalCarousel() {
+                const trait = this.traits.find(t => t.id === this.data.trait);
+                if (!trait) return;
+                const goals = trait.goals;
+                const inner = document.getElementById('goal-card-inner');
+                inner.innerHTML = goals.map((goal, i) => `
+                    <div class="skill-card-slide${this.data.goal === goal ? ' selected' : ''}">
+                        <span class="card-icon">${trait.icon}</span>
+                        <p style="font-size: 1.1rem; font-weight: 700; color: var(--text-dark); line-height: 1.5; margin-bottom: 24px;">${goal}</p>
+                        <button class="btn-select-skill${this.data.goal === goal ? ' already-selected' : ''}"
+                            onclick="app.selectGoal(${i})">
+                            ${this.data.goal === goal ? '✓ This is my goal' : 'This is my goal →'}
+                        </button>
+                    </div>
+                `).join('');
+                this.updateGoalCarouselPosition();
+            },
+
+            updateGoalCarouselPosition() {
+                const trait = this.traits.find(t => t.id === this.data.trait);
+                if (!trait) return;
+                const total = trait.goals.length;
+                const inner = document.getElementById('goal-card-inner');
+                inner.style.transform = `translateX(-${this.goalCarouselIndex * 100}%)`;
+                document.getElementById('goal-carousel-counter').textContent = `${this.goalCarouselIndex + 1} of ${total}`;
+                document.getElementById('goal-carousel-prev').disabled = this.goalCarouselIndex === 0;
+                document.getElementById('goal-carousel-next').disabled = this.goalCarouselIndex === total - 1;
+            },
+
+            goalCarouselNext() {
+                const trait = this.traits.find(t => t.id === this.data.trait);
+                if (trait && this.goalCarouselIndex < trait.goals.length - 1) {
+                    this.goalCarouselIndex++;
+                    this.updateGoalCarouselPosition();
+                }
+            },
+
+            goalCarouselPrev() {
+                if (this.goalCarouselIndex > 0) {
+                    this.goalCarouselIndex--;
+                    this.updateGoalCarouselPosition();
+                }
+            },
+
+            selectGoal(index) {
+                const trait = this.traits.find(t => t.id === this.data.trait);
+                if (!trait) return;
+                this.data.goal = trait.goals[index];
+                this.renderGoalCarousel();
+                document.getElementById('step3a-continue').disabled = false;
+            },
+
+            // ── Step 3 ──
+            submitStep3a() {
+                if (!this.data.goal) return;
+                document.getElementById('step3b-goal-display').textContent = this.data.goal;
+                this.showScreen('step3b-screen');
+                this.currentStep = 'step3b';
+            },
+
+            async submitStep3() {
+                if (!this.data.goal) return;
+                this.data.timestamp = new Date().toISOString();
+                await this.saveGoal();
+                this.showCompletion();
+            },
+
+            // ── Data ──
+            async saveGoal() {
+                try {
+                    const docRef = await addDoc(collection(db, 'goals'), this.data);
+                    this._lastSavedDocId = docRef.id;
+                } catch (e) {
+                    console.error('Error saving goal:', e);
+                }
+            },
+
+            saveDraft() {
+                const p = document.getElementById('problem-text');
+                if (p) this.data.problem = p.value;
+            },
+
+            // ── Completion ──
+            showCompletion() {
+                document.getElementById('completion-title').textContent =
+                    `You've got a goal, ${this.data.studentName}! 🌱`;
+
+                const trait = this.traits.find(t => t.id === this.data.trait);
+                const traitName = trait ? `${trait.icon} ${trait.title}` : this.data.trait;
+
+                document.getElementById('summary-card').innerHTML = `
+                    <h3>Your Goal Summary</h3>
+                    <p><strong>Issue I care about:</strong> ${this.data.problem}</p>
+                    <p><strong>Trait I'm building:</strong> ${traitName}</p>
+                    <p><strong>Why it connects:</strong> ${this.data.traitConnection}</p>
+                    <p><strong>My goal this week:</strong> ${this.data.goal}</p>
+                `;
+
+                this.showScreen('completion-screen');
+                this.createConfetti();
+            },
+
+            createConfetti() {
+                const colors = ['#2d6a4f','#52b788','#95d5b2','#f0c040'];
+                for (let i = 0; i < 30; i++) {
+                    setTimeout(() => {
+                        const c = document.createElement('div');
+                        c.style.cssText = `
+                            position: fixed; width: 10px; height: 10px;
+                            background: ${colors[Math.floor(Math.random() * colors.length)]};
+                            left: ${Math.random() * 100}%;
+                            top: -10px;
+                            border-radius: 2px;
+                            animation: confetti-fall 3s linear forwards;
+                            z-index: 1000;
+                        `;
+                        document.body.appendChild(c);
+                        setTimeout(() => c.remove(), 3200);
+                    }, i * 80);
+                }
+            },
+
+            previousStep() {
+                if (this.currentStep === 'step2') {
+                    this.showScreen('step1b-screen');
+                    this.currentStep = 'step1b';
+                } else if (this.currentStep === 'step3') {
+                    this.showScreen('step2b-screen');
+                    this.currentStep = 'step2b';
+                }
+            },
+
+            // ── Progress / Dashboard ──
+            showNameLogin() {
+                document.getElementById('name-login-input').value = '';
+                document.getElementById('name-login-error').classList.add('hidden');
+                this.showScreen('name-login-screen');
+            },
+
+            async submitNameLogin() {
+                const input = document.getElementById('name-login-input').value.trim();
+                const error = document.getElementById('name-login-error');
+                if (!input) {
+                    error.textContent = 'Please enter your full name.';
+                    error.classList.remove('hidden');
+                    return;
+                }
+                try {
+                    const q = query(collection(db, 'goals'), where('studentName', '==', input));
+                    const snap = await getDocs(q);
+                    if (snap.empty) {
+                        error.textContent = 'No goals found for that name. Check your spelling and try again.';
+                        error.classList.remove('hidden');
+                        return;
+                    }
+                    error.classList.add('hidden');
+                    this.data.studentName = input;
+                    this.showProgress();
+                } catch (e) {
+                    console.error('Error looking up name:', e);
+                }
+            },
+
+            async showProgress() {
+                if (!this.data.studentName) {
+                    this.showNameLogin();
+                    return;
+                }
+
+                const name = this.data.studentName;
+                const table = document.getElementById('progress-table');
+                table.innerHTML = '<div class="no-data">Loading…</div>';
+                this.showScreen('progress-screen');
+
+                try {
+                    const q = query(collection(db, 'goals'), where('studentName', '==', name));
+                    const snap = await getDocs(q);
+                    this._myGoals = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+                    const mine = this._myGoals;
+
+                    if (mine.length === 0) {
+                        table.innerHTML = '<div class="no-data">You haven\'t set any goals yet. Go ahead and set your first one!</div>';
+                    } else {
+                        table.innerHTML = `
+                            <p style="font-size:0.88rem;color:var(--text-medium);padding:14px 16px 0;font-style:italic;">Click a goal row to do a reflection check-in.</p>
+                            <table>
+                                <thead><tr><th>Date</th><th>Issue</th><th>Trait</th><th>Goal</th><th></th></tr></thead>
+                                <tbody>
+                                    ${mine.map((g, i) => {
+                                        const trait = this.traits.find(t => t.id === g.trait);
+                                        const traitName = trait ? `${trait.icon} ${trait.title}` : (g.trait || '');
+                                        const hasReflection = g.reflection && (g.reflection.text || g.reflection.count !== undefined || (g.reflection.checks && g.reflection.checks.some(Boolean)));
+                                        return `<tr class="goal-row" onclick="app.openReflection(${i})">
+                                            <td>${new Date(g.timestamp).toLocaleDateString()}</td>
+                                            <td>${(g.problem || '').substring(0, 50)}${(g.problem || '').length > 50 ? '…' : ''}</td>
+                                            <td>${traitName}</td>
+                                            <td>${(g.goal || '').substring(0, 50)}${(g.goal || '').length > 50 ? '…' : ''}</td>
+                                            <td style="white-space:nowrap">${hasReflection ? '<span class="reflect-badge">✓ Reflected</span>' : '<span class="reflect-badge" style="opacity:0.5;border-style:dashed;">Reflect →</span>'}</td>
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>`;
+                    }
+                } catch (e) {
+                    table.innerHTML = '<div class="no-data">Error loading goals. Please try again.</div>';
+                    console.error(e);
+                }
+            },
+
+            openReflection(index) {
+                const mine = this._myGoals || [];
+                const goal = mine[index];
+                if (!goal) return;
+
+                this.currentReflectionIndex = index;
+
+                // Build recap card
+                const trait = this.traits.find(t => t.id === goal.trait);
+                const traitName = trait ? `${trait.icon} ${trait.title}` : (goal.trait || '');
+                document.getElementById('reflection-recap').innerHTML = `
+                    <span class="recap-label">My Goal</span>
+                    <div class="recap-value">${goal.goal || ''}</div>
+                    <span class="recap-label">Trait I'm Building</span>
+                    <div class="recap-value">${traitName}</div>
+                    <span class="recap-label">Issue I Care About</span>
+                    <div class="recap-value">${goal.problem || ''}</div>
+                `;
+
+                // Detect goal type and render input
+                const goalText = goal.goal || '';
+                const numberMatch = goalText.match(/\b(\d+)\b/);
+                const isQuantifiable = numberMatch !== null;
+
+                document.getElementById('reflection-saved').classList.remove('visible');
+
+                if (isQuantifiable) {
+                    this.renderQuantifiableReflection(goal, goalText, parseInt(numberMatch[1]));
+                } else {
+                    this.renderQualitativeReflection(goal);
+                }
+
+                // Render testimonial prompt
+                const allGoals = this._myGoals || [];
+                const reflectionCount = allGoals.filter(g => g.reflectedAt).length;
+                const promptIndex = Math.min(reflectionCount, this.testimonialPrompts.length - 1);
+                const promptData = this.testimonialPrompts[promptIndex];
+
+                const issueSummary = (goal.problem || 'your issue').substring(0, 60);
+
+                const promptText = promptData.prompt
+                    .replace(/{trait}/g, traitName)
+                    .replace(/{issue}/g, issueSummary);
+
+                document.getElementById('testimonial-week-badge').textContent = promptData.theme;
+                document.getElementById('testimonial-prompt-text').textContent = '"' + promptText + '"';
+
+                document.getElementById('testimonial-text').value = (goal.reflection && goal.reflection.testimonial) ? goal.reflection.testimonial : '';
+
+                this.showScreen('reflection-screen');
+            },
+
+            renderQuantifiableReflection(goal, goalText, target) {
+                document.getElementById('reflection-question').textContent = 'Track your progress toward your goal:';
+
+                const saved = (goal.reflection && goal.reflection.count !== undefined) ? goal.reflection.count : 0;
+
+                const labelFromGoal = (() => {
+                    const lower = goalText.toLowerCase();
+                    const afterNumber = lower.match(/\b\d+\b\s+(?:more\s+)?([a-z]+)/);
+                    const afterOne = lower.match(/\bone\s+([a-z]+)/);
+                    const raw = (afterNumber && afterNumber[1]) || (afterOne && afterOne[1]) || null;
+                    const skip = new Set(['more','of','a','an','the','times','time','per','each','day','week']);
+                    if (raw && !skip.has(raw)) {
+                        return raw.charAt(0).toUpperCase() + raw.slice(1);
+                    }
+                    const words = lower.split(/\s+/);
+                    for (const w of words) {
+                        if (w.length > 3 && !skip.has(w) && !/^\d+$/.test(w)) {
+                            return w.charAt(0).toUpperCase() + w.slice(1);
+                        }
+                    }
+                    return 'Instance';
+                })();
+
+                let html = '';
+                if (target <= 7) {
+                    const checks = (goal.reflection && goal.reflection.checks) ? goal.reflection.checks : Array(target).fill(false);
+                    const details = (goal.reflection && goal.reflection.details) ? goal.reflection.details : Array(target).fill('');
+                    html = `<p class="reflection-prompt">Check off each ${labelFromGoal.toLowerCase()} as you complete it, and write what it was.</p>
+                        <div class="checkpoint-list" id="checkpoint-list">
+                        ${Array.from({length: target}, (_, i) => `
+                            <div class="checkpoint-item${checks[i] ? ' checked' : ''}" id="chk-${i}">
+                                <div class="checkpoint-header" onclick="app.toggleCheckpoint(${i})">
+                                    <div class="checkpoint-box">${checks[i] ? '✓' : ''}</div>
+                                    <span>${labelFromGoal} ${i + 1}</span>
+                                </div>
+                                <div class="checkpoint-detail">
+                                    <label>What was it?</label>
+                                    <input type="text" id="chk-detail-${i}" placeholder="Write it here…" value="${(details[i] || '').replace(/"/g, '&quot;')}">
+                                </div>
+                            </div>
+                        `).join('')}
+                        </div>
+                        <div class="progress-bar-wrap" style="margin-top:14px">
+                            <div class="progress-bar-fill" id="chk-bar" style="width:${(checks.filter(Boolean).length/target*100)}%"></div>
+                        </div>
+                        <div class="progress-fraction" id="chk-fraction">${checks.filter(Boolean).length} / ${target} ${labelFromGoal.toLowerCase()}s completed</div>`;
+                    this._reflectionMode = 'checkpoints';
+                    this._reflectionTarget = target;
+                    this._reflectionChecks = [...checks];
+                    this._reflectionDetails = [...details];
+                } else {
+                    html = `<p class="reflection-prompt">Enter how many ${labelFromGoal.toLowerCase()}s you've done so far (goal: ${target}).</p>
+                        <div class="checkin-row">
+                            <label>How many ${labelFromGoal.toLowerCase()}s did you do?</label>
+                            <div class="checkin-counter">
+                                <button onclick="app.adjustCounter(-1)">−</button>
+                                <span id="counter-val">${saved}</span>
+                                <button onclick="app.adjustCounter(1)">+</button>
+                            </div>
+                        </div>
+                        <div class="progress-bar-wrap" style="margin-top:14px">
+                            <div class="progress-bar-fill" id="counter-bar" style="width:${Math.min(saved/target*100,100)}%"></div>
+                        </div>
+                        <div class="progress-fraction" id="counter-fraction">${saved} / ${target} ${labelFromGoal.toLowerCase()}s completed</div>`;
+                    this._reflectionMode = 'counter';
+                    this._reflectionTarget = target;
+                    this._counterVal = saved;
+                }
+
+                document.getElementById('reflection-input-area').innerHTML = html;
+            },
+
+            adjustCounter(delta) {
+                this._counterVal = Math.max(0, (this._counterVal || 0) + delta);
+                const target = this._reflectionTarget;
+                document.getElementById('counter-val').textContent = this._counterVal;
+                document.getElementById('counter-bar').style.width = Math.min(this._counterVal / target * 100, 100) + '%';
+                document.getElementById('counter-fraction').textContent = `${this._counterVal} / ${target} completed`;
+            },
+
+            toggleCheckpoint(i) {
+                this._reflectionChecks[i] = !this._reflectionChecks[i];
+                const item = document.getElementById(`chk-${i}`);
+                item.classList.toggle('checked', this._reflectionChecks[i]);
+                item.querySelector('.checkpoint-box').textContent = this._reflectionChecks[i] ? '✓' : '';
+                const done = this._reflectionChecks.filter(Boolean).length;
+                const target = this._reflectionTarget;
+                document.getElementById('chk-bar').style.width = (done / target * 100) + '%';
+                document.getElementById('chk-fraction').textContent = `${done} / ${target} completed`;
+            },
+
+            renderQualitativeReflection(goal) {
+                document.getElementById('reflection-question').textContent = 'How did it go this week?';
+                const saved = (goal.reflection && goal.reflection.text) ? goal.reflection.text : '';
+                document.getElementById('reflection-input-area').innerHTML = `
+                    <p class="reflection-prompt">Answer one or more of these:</p>
+                    <ul style="font-size:0.88rem;color:var(--text-medium);margin:0 0 12px 18px;line-height:1.9;">
+                        <li>What did you actually do toward your goal?</li>
+                        <li>What felt hard or easy?</li>
+                        <li>How does it connect to the issue you care about?</li>
+                        <li>What would you do differently next time?</li>
+                    </ul>
+                    <textarea class="reflection-textarea" id="qualitative-text" placeholder="Write your reflection here…">${saved}</textarea>
+                `;
+                this._reflectionMode = 'qualitative';
+            },
+
+            async saveReflection() {
+                const mine = this._myGoals || [];
+                const g = mine[this.currentReflectionIndex];
+                if (!g) return;
+
+                let reflection;
+                if (this._reflectionMode === 'counter') {
+                    reflection = { count: this._counterVal, target: this._reflectionTarget };
+                } else if (this._reflectionMode === 'checkpoints') {
+                    const details = this._reflectionChecks.map((_, i) => {
+                        const input = document.getElementById(`chk-detail-${i}`);
+                        return input ? input.value.trim() : '';
+                    });
+                    reflection = { checks: this._reflectionChecks, details, target: this._reflectionTarget };
+                } else {
+                    const text = document.getElementById('qualitative-text').value;
+                    reflection = { text };
+                }
+
+                const testimonial = document.getElementById('testimonial-text').value.trim();
+                reflection.testimonial = testimonial;
+
+                const reflectedAt = new Date().toISOString();
+
+                try {
+                    await updateDoc(doc(db, 'goals', g._id), { reflection, reflectedAt });
+                    g.reflection = reflection;
+                    g.reflectedAt = reflectedAt;
+                } catch (e) {
+                    console.error('Error saving reflection:', e);
+                }
+
+                document.getElementById('reflection-saved').classList.add('visible');
+                document.getElementById('save-reflection-btn').textContent = '✓ Saved!';
+                setTimeout(() => {
+                    document.getElementById('save-reflection-btn').textContent = 'Save Reflection';
+                }, 2500);
+            },
+
+            async showDashboard() {
+                this.showScreen('dashboard-screen');
+                await this.loadDashboard();
+            },
+
+            async loadDashboard() {
+                const table = document.getElementById('dashboard-table');
+                table.innerHTML = '<div class="no-data">Loading…</div>';
+
+                try {
+                    const snap = await getDocs(collection(db, 'goals'));
+                    this._allGoals = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+                    const goals = this._allGoals;
+
+                    if (goals.length === 0) {
+                        table.innerHTML = '<div class="no-data">No student goals yet. Goals will appear here after students complete the activity.</div>';
+                        return;
+                    }
+
+                    table.innerHTML = `
+                        <table>
+                            <thead>
+                                <tr><th>Date</th><th>Student</th><th>Issue</th><th>Trait</th><th>Why This Trait</th><th>Goal</th></tr>
+                            </thead>
+                            <tbody id="dashboard-tbody">
+                                ${this.renderDashboardRows(goals)}
+                            </tbody>
+                        </table>`;
+                } catch (e) {
+                    table.innerHTML = '<div class="no-data">Error loading data.</div>';
+                    console.error(e);
+                }
+            },
+
+            renderDashboardRows(goals) {
+                return goals.map(g => {
+                    const trait = this.traits.find(t => t.id === g.trait);
+                    const traitName = trait ? `${trait.icon} ${trait.title}` : (g.trait || '');
+                    return `<tr>
+                        <td>${new Date(g.timestamp).toLocaleDateString()}</td>
+                        <td>${g.studentName || ''}</td>
+                        <td>${g.problem || ''}</td>
+                        <td>${traitName}</td>
+                        <td>${g.traitConnection || ''}</td>
+                        <td>${g.goal || ''}</td>
+                    </tr>`;
+                }).join('');
+            },
+
+            filterDashboard() {
+                const q = document.getElementById('search-input').value.toLowerCase();
+                const goals = this._allGoals || [];
+                const filtered = goals.filter(g =>
+                    (g.studentName || '').toLowerCase().includes(q) ||
+                    (g.problem || '').toLowerCase().includes(q) ||
+                    (g.goal || '').toLowerCase().includes(q)
+                );
+                const tbody = document.getElementById('dashboard-tbody');
+                if (tbody) tbody.innerHTML = this.renderDashboardRows(filtered);
+            },
+
+            exportCSV() {
+                const goals = this._allGoals || [];
+                if (!goals.length) { alert('No data to export yet.'); return; }
+
+                const headers = ['Date','Student Name','Issue','Trait','Why This Trait','Goal'];
+                const rows = goals.map(g => {
+                    const trait = this.traits.find(t => t.id === g.trait);
+                    return [
+                        new Date(g.timestamp).toLocaleDateString(),
+                        g.studentName,
+                        g.problem,
+                        trait ? trait.title : g.trait,
+                        g.traitConnection,
+                        g.goal
+                    ];
+                });
+
+                let csv = headers.join(',') + '\n';
+                rows.forEach(row => {
+                    csv += row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(',') + '\n';
+                });
+
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+                a.download = `rs_changemaker_goals_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+            },
+
+            clearAllData() {
+                alert('To delete data, please go to the Firebase console at console.firebase.google.com and delete documents from the "goals" collection.');
+            }
+        };
+
+        /* Add confetti keyframes dynamically */
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes confetti-fall {
+                to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        window.app = app;
+        app.init();
+    </script>
+</body>
+</html>
