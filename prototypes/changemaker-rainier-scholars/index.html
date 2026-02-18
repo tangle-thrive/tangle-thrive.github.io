@@ -2689,6 +2689,11 @@
             },
 
             async showDashboard() {
+                const password = prompt('Enter the teacher password:');
+                if (password !== 'tangleandthrive') {
+                    alert('Incorrect password.');
+                    return;
+                }
                 this.showScreen('dashboard-screen');
                 await this.loadDashboard();
             },
