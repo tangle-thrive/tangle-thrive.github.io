@@ -1061,6 +1061,24 @@
             font-size: 1rem;
         }
 
+        .btn-delete {
+            background: none;
+            border: 1px solid #d9534f;
+            color: #d9534f;
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-delete:hover {
+            background: #d9534f;
+            color: white;
+        }
+
         /* ── Reflection Screen ── */
         .reflection-screen {
             padding: 30px 20px;
@@ -1785,7 +1803,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, doc, addDoc, getDocs, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, addDoc, getDocs, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA9Td-71dAC07JvmX1FnDdacbfK1PSt1w8",
@@ -2715,7 +2733,7 @@
                     table.innerHTML = `
                         <table>
                             <thead>
-                                <tr><th>Date</th><th>Student</th><th>Issue</th><th>Trait</th><th>Why This Trait</th><th>Goal</th></tr>
+                                <tr><th>Date</th><th>Student</th><th>Issue</th><th>Trait</th><th>Why This Trait</th><th>Goal</th><th></th></tr>
                             </thead>
                             <tbody id="dashboard-tbody">
                                 ${this.renderDashboardRows(goals)}
@@ -2738,6 +2756,7 @@
                         <td>${traitName}</td>
                         <td>${g.traitConnection || ''}</td>
                         <td>${g.goal || ''}</td>
+                        <td><button class="btn-delete" onclick="app.deleteEntry('${g._id}')">Delete</button></td>
                     </tr>`;
                 }).join('');
             },
@@ -2780,6 +2799,19 @@
                 a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
                 a.download = `rs_changemaker_goals_${new Date().toISOString().split('T')[0]}.csv`;
                 a.click();
+            },
+
+            async deleteEntry(id) {
+                if (!confirm('Delete this entry? This cannot be undone.')) return;
+                try {
+                    await deleteDoc(doc(db, 'goals', id));
+                    this._allGoals = (this._allGoals || []).filter(g => g._id !== id);
+                    const tbody = document.getElementById('dashboard-tbody');
+                    if (tbody) tbody.innerHTML = this.renderDashboardRows(this._allGoals);
+                } catch (e) {
+                    alert('Error deleting entry. Please try again.');
+                    console.error(e);
+                }
             },
 
             clearAllData() {
