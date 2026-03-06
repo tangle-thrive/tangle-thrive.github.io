@@ -1406,6 +1406,172 @@
             white-space: nowrap;
         }
 
+        /* ── Trait Grid (Step 2) ── */
+        .trait-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 24px 0;
+        }
+
+        @media (min-width: 520px) {
+            .trait-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        .trait-grid-card {
+            background: white;
+            border: 2px solid #e8e8e8;
+            border-radius: 16px;
+            padding: 20px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .trait-grid-card:hover {
+            border-color: var(--accent-green);
+            background: #f8fdf9;
+            transform: translateY(-2px);
+        }
+
+        .trait-grid-card.selected {
+            border-color: var(--accent-green);
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            box-shadow: 0 0 0 2px var(--accent-green);
+        }
+
+        .trait-grid-card .tgc-checkmark {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 22px;
+            height: 22px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            color: white;
+            font-size: 0.75rem;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .trait-grid-card.selected .tgc-checkmark {
+            display: flex;
+        }
+
+        .trait-grid-card .tgc-icon {
+            font-size: 2.4rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .trait-grid-card .tgc-name {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 6px;
+        }
+
+        .trait-grid-card .tgc-desc {
+            font-size: 0.78rem;
+            color: var(--text-medium);
+            line-height: 1.4;
+        }
+
+        /* ── Goal Grid (Step 3) ── */
+        .goal-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin: 20px 0;
+        }
+
+        @media (min-width: 520px) {
+            .goal-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .goal-grid-card {
+            background: white;
+            border: 2px solid #e8e8e8;
+            border-radius: 16px;
+            padding: 20px 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .goal-grid-card:hover {
+            border-color: var(--accent-green);
+            background: #f8fdf9;
+            transform: translateY(-2px);
+        }
+
+        .goal-grid-card.selected {
+            border-color: var(--accent-green);
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            box-shadow: 0 0 0 2px var(--accent-green);
+        }
+
+        .goal-grid-card .ggc-checkmark {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 22px;
+            height: 22px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            color: white;
+            font-size: 0.75rem;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .goal-grid-card.selected .ggc-checkmark {
+            display: flex;
+        }
+
+        .goal-grid-card .ggc-icon {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .goal-grid-card .ggc-text {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        .goal-grid-card.custom-goal-card .ggc-input {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border: 1.5px solid var(--light-green);
+            border-radius: 10px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .goal-grid-card.custom-goal-card .ggc-input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.12);
+        }
+
         /* ── Utilities ── */
         .hidden {
             display: none !important;
@@ -1444,7 +1610,7 @@
             <!-- Slide 1 -->
             <div class="intro-slide active" id="intro-slide-1">
                 <div class="slide-emoji">🤔</div>
-                <h2>Have you ever thought to yourself… "when am I ever going to use this?"</h2>
+                <h2>Have you ever thought to yourself… how is school related to my real life?</h2>
             </div>
 
             <!-- Slide 2 — UPDATED -->
@@ -1456,7 +1622,7 @@
             <!-- Slide 3 -->
             <div class="intro-slide" id="intro-slide-3">
                 <div class="slide-emoji">🔗</div>
-                <h2>Today, you'll connect what you learn in class to something you actually care about.</h2>
+                <h2>Today, you'll see how becoming who you want to be starts right here in math class.</h2>
             </div>
 
             <!-- Slide 4 -->
@@ -1616,23 +1782,14 @@
         </div>
 
         <!-- ══════════════════════════════════
-             STEP 2A: Pick a character trait (carousel)
+             STEP 2A: Pick a character trait (grid)
         ══════════════════════════════════ -->
         <div id="step2-screen" class="activity-screen hidden">
             <div class="step-indicator">Step 2 of 3 — My Character Trait</div>
             <h2 class="main-question">What do I want to be like in the future?</h2>
-            <p class="subheading-text">Browse through the traits. When one feels right, tap "This is who I want to be."</p>
+            <p class="subheading-text">Tap the one that feels most like you.</p>
 
-            <div class="skill-carousel">
-                <div class="skill-card-stage">
-                    <div class="skill-card-inner" id="skill-card-inner"></div>
-                </div>
-                <div class="carousel-nav">
-                    <button class="carousel-arrow" id="carousel-prev" onclick="app.carouselPrev()">←</button>
-                    <span class="carousel-counter" id="carousel-counter">1 of 8</span>
-                    <button class="carousel-arrow" id="carousel-next" onclick="app.carouselNext()">→</button>
-                </div>
-            </div>
+            <div class="trait-grid" id="trait-grid"></div>
 
             <div id="step2-error" class="error-message hidden"></div>
 
@@ -1675,7 +1832,7 @@
         </div>
 
         <!-- ══════════════════════════════════
-             STEP 3A: Pick a goal (carousel)
+             STEP 3A: Pick a goal (grid)
         ══════════════════════════════════ -->
         <div id="step3a-screen" class="activity-screen hidden">
             <div class="step-indicator">Step 3 of 3 — My Goal</div>
@@ -1684,18 +1841,9 @@
             <!-- Trait + issue reminder banner -->
             <div class="goal-context-banner" id="step3-context-banner"></div>
 
-            <p class="subheading-text">Each goal helps you practice that trait in math class. Pick the one that feels right.</p>
+            <p class="subheading-text">Pick the goal that feels most doable for you this week.</p>
 
-            <div class="skill-carousel">
-                <div class="skill-card-stage">
-                    <div class="skill-card-inner" id="goal-card-inner"></div>
-                </div>
-                <div class="carousel-nav">
-                    <button class="carousel-arrow" id="goal-carousel-prev" onclick="app.goalCarouselPrev()">←</button>
-                    <span class="carousel-counter" id="goal-carousel-counter">1 of 4</span>
-                    <button class="carousel-arrow" id="goal-carousel-next" onclick="app.goalCarouselNext()">→</button>
-                </div>
-            </div>
+            <div class="goal-grid" id="goal-grid"></div>
 
             <div class="button-group">
                 <button class="btn btn-secondary" onclick="app.previousStep()">← Back</button>
@@ -1845,10 +1993,10 @@
                         '…can\'t fix what they don\'t fully understand first.'
                     ],
                     goals: [
-                        'By Friday, I will write down 2 questions I have during math class when I don\'t understand something.',
-                        'By Thursday, I will ask my teacher or a classmate one question every day in math class.',
-                        'By Wednesday, I will write a "why" or "what if" question about the math topic we\'re learning.',
-                        'By Friday, I will notice one thing that confuses me in math and write it down each day.'
+                        'I will write down 2 questions I have during math class when I don\'t understand something.',
+                        'I will ask my teacher or a classmate at least one genuine question each day in math class.',
+                        'I will write a "why" or "what if" question about the math topic we\'re learning.',
+                        'I will notice one thing that confuses me in math each day and write it down.'
                     ]
                 },
                 {
@@ -1863,10 +2011,10 @@
                         '…know that change rarely happens on the first try — you have to stay in it.'
                     ],
                     goals: [
-                        'By Thursday, I will try a second strategy whenever my first approach doesn\'t work on a math problem.',
-                        'By Friday, I will attempt at least one problem a different way after I get the answer to check myself.',
-                        'By Wednesday, I will test two different methods on 3 math problems and see which one I prefer.',
-                        'By Friday, I will not erase my first attempt — I will cross it out, try again, and compare both tries.'
+                        'I will try at least one different strategy whenever my first approach doesn\'t work.',
+                        'I will not erase my first attempt — I will cross it out, try again, and compare both tries.',
+                        'I will go back to one problem I gave up on and try it again before the end of class.',
+                        'I will write down what I tried and what I\'ll do differently on any problem I didn\'t finish.'
                     ]
                 },
                 {
@@ -1881,10 +2029,10 @@
                         '…can\'t tackle everything at once — choosing where to start is part of the work.'
                     ],
                     goals: [
-                        'By Thursday, I will break every multi-step word problem into smaller steps before I start solving it.',
-                        'By Friday, I will write out each step of my work instead of trying to do it all in my head.',
-                        'By Wednesday, I will identify the first step of a hard math problem before I try to solve the whole thing.',
-                        'By Friday, I will split each math problem into parts and label what I need to find first.'
+                        'I will break every multi-step word problem into smaller steps before I start solving it.',
+                        'I will write out each step of my work instead of trying to do it all in my head.',
+                        'I will make a quick plan — what do I need to find first? — before starting each problem.',
+                        'I will keep my scratch work organized so I can follow my own thinking if I need to go back.'
                     ]
                 },
                 {
@@ -1899,46 +2047,10 @@
                         '…need creativity because the obvious solutions have often already failed.'
                     ],
                     goals: [
-                        'By Friday, I will estimate my answer before solving each problem to check if my answer makes sense.',
-                        'By Thursday, I will look for a pattern in at least 5 math problems to see if there is a shortcut.',
-                        'By Wednesday, I will use rounding to predict the answer to 5 math problems before calculating the exact answer.',
-                        'By Friday, I will sort a set of math problems by what they have in common before solving them.'
-                    ]
-                },
-                {
-                    id: 'precise',
-                    icon: '✓',
-                    title: 'Precise',
-                    description: 'I double-check my work so that people can trust what I say and do.',
-                    story: 'A student researching ocean pollution double-checked her statistics before presenting — her accuracy made people trust her, and they actually listened.',
-                    starters: [
-                        '…need to get the facts right, or people won\'t trust what they\'re saying.',
-                        '…have to be careful and exact because errors give people a reason to dismiss the issue.',
-                        '…know that being precise is a form of respect for the people they\'re trying to help.'
-                    ],
-                    goals: [
-                        'By Friday, I will go back and check every answer before turning in my math work each day.',
-                        'By Thursday, I will redo at least 2 problems I got wrong and find my mistake.',
-                        'By Wednesday, I will read each problem again after solving it to make sure my answer makes sense.',
-                        'By Friday, I will catch and correct at least one error in my work each day before I turn it in.'
-                    ]
-                },
-                {
-                    id: 'communicative',
-                    icon: '💬',
-                    title: 'Communicative',
-                    description: 'I explain my ideas clearly so others can understand and join me.',
-                    story: 'A student who cared about immigrant families practiced explaining their struggles in math class — then used those same communication skills to present to the city council.',
-                    starters: [
-                        '…need to explain the problem in a way that makes others actually care.',
-                        '…can\'t create change alone — they have to bring other people along with them.',
-                        '…have to be able to say clearly what\'s wrong and why it matters, so people want to help.'
-                    ],
-                    goals: [
-                        'By Friday, I will explain out loud how I solved a problem to a partner at least 2 times in math class.',
-                        'By Thursday, I will write out my thinking step by step so someone else could follow it.',
-                        'By Wednesday, I will describe to my table group how I got my answer on at least one problem each day.',
-                        'By Friday, I will use words and numbers together to show my full thinking on every problem.'
+                        'I will try solving at least one problem in a different way than I normally would.',
+                        'I will look for a pattern in a set of math problems and describe it in my own words.',
+                        'I will draw a picture or diagram to represent a math problem in a new way.',
+                        'I will connect one math idea we\'re learning to something I\'ve noticed outside of school.'
                     ]
                 },
                 {
@@ -1953,10 +2065,10 @@
                         '…know that staying silent doesn\'t make things better — only speaking up does.'
                     ],
                     goals: [
-                        'By Friday, I will raise my hand to share an answer or ask a question in math class at least once each day.',
-                        'By Thursday, I will attempt at least one problem I think might be too hard for me without giving up first.',
-                        'By Wednesday, I will tell my teacher when I don\'t understand something instead of pretending I do.',
-                        'By Friday, I will try a problem I\'ve been avoiding and show my full attempt, even if I\'m not sure it\'s right.'
+                        'I will raise my hand to share an answer or ask a question in math class at least once each day.',
+                        'I will attempt at least one problem I think might be too hard for me without giving up first.',
+                        'I will tell my teacher when I don\'t understand something instead of pretending I do.',
+                        'I will try a problem I\'ve been avoiding and show my full attempt, even if I\'m not sure it\'s right.'
                     ]
                 },
                 {
@@ -1971,10 +2083,10 @@
                         '…have to be willing to learn from others, because no one person has all the answers.'
                     ],
                     goals: [
-                        'By Friday, I will work with at least one classmate to solve a math problem and explain our thinking together.',
-                        'By Thursday, I will compare my math approach with a partner\'s and write down what was the same and what was different.',
-                        'By Wednesday, I will give a classmate specific feedback on one of their math problems and ask for feedback on mine.',
-                        'By Friday, I will listen carefully when a classmate explains their thinking and write down one thing I learned from them.'
+                        'I will work with at least one classmate to solve a math problem and explain our thinking together.',
+                        'I will compare my approach with a partner\'s and write down one thing that was different.',
+                        'I will give a classmate specific feedback on one of their math problems.',
+                        'I will listen carefully when a classmate explains their thinking and write down one thing I learned.'
                     ]
                 }
             ],
@@ -2011,7 +2123,7 @@
 
             init() {
                 this.startTicker();
-                this.renderCarousel();
+                this.renderTraitGrid();
 
                 const searchInput = document.getElementById('search-input');
                 if (searchInput) {
@@ -2105,8 +2217,7 @@
                     if (el) el.value = '';
                 });
 
-                this.carouselIndex = 0;
-                this.renderCarousel();
+                this.renderTraitGrid();
                 document.getElementById('step1-continue').disabled = true;
                 document.getElementById('step2-continue').disabled = true;
             },
@@ -2174,52 +2285,24 @@
                 this.currentStep = 'step2';
             },
 
-            // ── Step 2: Trait Carousel ──
-            carouselIndex: 0,
-
-            renderCarousel() {
-                const inner = document.getElementById('skill-card-inner');
-                inner.innerHTML = this.traits.map((trait, i) => `
-                    <div class="skill-card-slide${this.data.trait === trait.id ? ' selected' : ''}" id="slide-${trait.id}">
-                        <span class="card-icon">${trait.icon}</span>
-                        <h3>${trait.title}</h3>
-                        <p class="card-desc">${trait.description}</p>
-                        <button class="btn-select-skill${this.data.trait === trait.id ? ' already-selected' : ''}"
-                            onclick="app.selectTrait('${trait.id}')">
-                            ${this.data.trait === trait.id ? '✓ Selected' : 'This is who I want to be →'}
-                        </button>
+            // ── Step 2: Trait Grid ──
+            renderTraitGrid() {
+                const grid = document.getElementById('trait-grid');
+                if (!grid) return;
+                grid.innerHTML = this.traits.map(trait => `
+                    <div class="trait-grid-card${this.data.trait === trait.id ? ' selected' : ''}"
+                         onclick="app.selectTrait('${trait.id}')">
+                        <span class="tgc-checkmark">✓</span>
+                        <span class="tgc-icon">${trait.icon}</span>
+                        <div class="tgc-name">${trait.title}</div>
+                        <div class="tgc-desc">${trait.description}</div>
                     </div>
                 `).join('');
-                this.updateCarouselPosition();
-            },
-
-            updateCarouselPosition() {
-                const inner = document.getElementById('skill-card-inner');
-                inner.style.transform = `translateX(-${this.carouselIndex * 100}%)`;
-                const total = this.traits.length;
-                document.getElementById('carousel-counter').textContent =
-                    `${this.carouselIndex + 1} of ${total}`;
-                document.getElementById('carousel-prev').disabled = this.carouselIndex === 0;
-                document.getElementById('carousel-next').disabled = this.carouselIndex === total - 1;
-            },
-
-            carouselNext() {
-                if (this.carouselIndex < this.traits.length - 1) {
-                    this.carouselIndex++;
-                    this.updateCarouselPosition();
-                }
-            },
-
-            carouselPrev() {
-                if (this.carouselIndex > 0) {
-                    this.carouselIndex--;
-                    this.updateCarouselPosition();
-                }
             },
 
             selectTrait(traitId) {
                 this.data.trait = traitId;
-                this.renderCarousel();
+                this.renderTraitGrid();
                 document.getElementById('step2-continue').disabled = false;
             },
 
@@ -2293,66 +2376,70 @@
                     `<strong>You care about</strong> ${issueSummary}. <strong>You want to be</strong> ${trait ? trait.icon + ' ' + trait.title : ''}. Here are ways to practice that in math class this week.`;
 
                 this.data.goal = '';
-                this.goalCarouselIndex = 0;
-                this.renderGoalCarousel();
+                this.renderGoalGrid();
                 document.getElementById('step3a-continue').disabled = true;
                 this.showScreen('step3a-screen');
                 this.currentStep = 'step3';
             },
 
-            // ── Step 3: Goal Carousel ──
-            goalCarouselIndex: 0,
-
-            renderGoalCarousel() {
+            // ── Step 3: Goal Grid ──
+            renderGoalGrid() {
                 const trait = this.traits.find(t => t.id === this.data.trait);
                 if (!trait) return;
-                const goals = trait.goals;
-                const inner = document.getElementById('goal-card-inner');
-                inner.innerHTML = goals.map((goal, i) => `
-                    <div class="skill-card-slide${this.data.goal === goal ? ' selected' : ''}">
-                        <span class="card-icon">${trait.icon}</span>
-                        <p style="font-size: 1.1rem; font-weight: 700; color: var(--text-dark); line-height: 1.5; margin-bottom: 24px;">${goal}</p>
-                        <button class="btn-select-skill${this.data.goal === goal ? ' already-selected' : ''}"
-                            onclick="app.selectGoal(${i})">
-                            ${this.data.goal === goal ? '✓ This is my goal' : 'This is my goal →'}
-                        </button>
+                const grid = document.getElementById('goal-grid');
+                if (!grid) return;
+
+                const prewrittenCards = trait.goals.map((goal, i) => `
+                    <div class="goal-grid-card${this.data.goal === goal ? ' selected' : ''}"
+                         onclick="app.selectGoal(${i})">
+                        <span class="ggc-checkmark">✓</span>
+                        <span class="ggc-icon">${trait.icon}</span>
+                        <div class="ggc-text">${goal}</div>
                     </div>
                 `).join('');
-                this.updateGoalCarouselPosition();
-            },
 
-            updateGoalCarouselPosition() {
-                const trait = this.traits.find(t => t.id === this.data.trait);
-                if (!trait) return;
-                const total = trait.goals.length;
-                const inner = document.getElementById('goal-card-inner');
-                inner.style.transform = `translateX(-${this.goalCarouselIndex * 100}%)`;
-                document.getElementById('goal-carousel-counter').textContent = `${this.goalCarouselIndex + 1} of ${total}`;
-                document.getElementById('goal-carousel-prev').disabled = this.goalCarouselIndex === 0;
-                document.getElementById('goal-carousel-next').disabled = this.goalCarouselIndex === total - 1;
-            },
+                const customSelected = this.data.goal && !trait.goals.includes(this.data.goal);
+                const customCard = `
+                    <div class="goal-grid-card custom-goal-card${customSelected ? ' selected' : ''}"
+                         id="custom-goal-card">
+                        <span class="ggc-checkmark">✓</span>
+                        <span class="ggc-icon">✏️</span>
+                        <div class="ggc-text">Write your own goal</div>
+                        <input class="ggc-input" id="custom-goal-input" type="text"
+                               placeholder="I will…"
+                               value="${customSelected ? this.data.goal.replace(/"/g, '&quot;') : ''}"
+                               oninput="app.onCustomGoalInput(event)"
+                               onclick="event.stopPropagation()">
+                    </div>
+                `;
 
-            goalCarouselNext() {
-                const trait = this.traits.find(t => t.id === this.data.trait);
-                if (trait && this.goalCarouselIndex < trait.goals.length - 1) {
-                    this.goalCarouselIndex++;
-                    this.updateGoalCarouselPosition();
-                }
-            },
-
-            goalCarouselPrev() {
-                if (this.goalCarouselIndex > 0) {
-                    this.goalCarouselIndex--;
-                    this.updateGoalCarouselPosition();
-                }
+                grid.innerHTML = prewrittenCards + customCard;
             },
 
             selectGoal(index) {
                 const trait = this.traits.find(t => t.id === this.data.trait);
                 if (!trait) return;
                 this.data.goal = trait.goals[index];
-                this.renderGoalCarousel();
+                this.renderGoalGrid();
                 document.getElementById('step3a-continue').disabled = false;
+            },
+
+            onCustomGoalInput(event) {
+                const val = event.target.value.trim();
+                const card = document.getElementById('custom-goal-card');
+                if (val.length >= 5) {
+                    this.data.goal = val;
+                    // Deselect all pre-written cards
+                    document.querySelectorAll('.goal-grid-card:not(.custom-goal-card)').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    document.getElementById('step3a-continue').disabled = false;
+                } else {
+                    card.classList.remove('selected');
+                    if (this.data.goal === event.target.value || !document.querySelector('.goal-grid-card:not(.custom-goal-card).selected')) {
+                        this.data.goal = '';
+                        document.getElementById('step3a-continue').disabled = true;
+                    }
+                }
             },
 
             // ── Step 3 ──
