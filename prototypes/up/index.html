@@ -457,7 +457,7 @@
         .goal-option-cards { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
         .goal-connection-reveal {
             background: var(--green-pale); border-radius: 12px;
-            padding: 14px 18px; font-size: .95rem; color: var(--text-dark);
+            padding: 14px 18px; font-size: 1rem; font-weight: 600; color: var(--text-dark);
             margin: 4px 0 16px; animation: slideDown .3s ease; line-height: 1.6;
         }
         .goal-connection-reveal.purple { background: var(--purple-pale); color: var(--purple-dark); }
@@ -589,6 +589,156 @@
         .testimonial-week-badge { display: inline-block; background: linear-gradient(135deg, var(--green-mid), var(--green-dark)); color: white; font-size: .73rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 10px; }
         .testimonial-prompt-text { font-size: 1rem; font-weight: 700; color: var(--green-dark); line-height: 1.5; margin-bottom: 10px; font-style: italic; }
 
+        /* ── Fixed goal box ── */
+        .fixed-goal-box {
+            background: var(--green-pale);
+            border: 2px solid var(--green-light);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin: 16px 0;
+        }
+        .fg-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--text-mid);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .fg-text {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        /* ── Strategy section ── */
+        /* ── Goal reminder bar ── */
+        .goal-reminder-bar {
+            background: var(--green-pale);
+            border: 2px solid var(--green-light);
+            border-radius: 16px;
+            padding: 14px 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        .grb-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--text-mid);
+            margin-bottom: 4px;
+        }
+
+        .strategy-section { margin-top: 20px; }
+        .strategy-prompt {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .strategy-sub {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+        }
+        .strategy-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .strategy-chip {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 24px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .strategy-chip.selected {
+            background: var(--green-pale);
+            border-color: var(--green-mid);
+            color: var(--green-dark);
+        }
+        .strategy-custom-wrap { margin-top: 4px; }
+        .strategy-custom-input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .strategy-custom-input:focus { border-color: var(--green-mid); }
+
+        /* ── Peer traits ── */
+        .peer-traits {
+            background: white;
+            border: 1.5px solid var(--border-light);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+        .peer-trait-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .peer-trait-row:last-child { border-bottom: none; }
+        .ptr-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-mid);
+        }
+        .ptr-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* ── Completion bridge ── */
+        .completion-bridge {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--green-pale), var(--purple-pale));
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* ── Text-to-speech button ── */
+        .tts-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 2px 4px;
+            opacity: 0.5;
+            vertical-align: middle;
+            border-radius: 6px;
+            transition: opacity 0.2s;
+        }
+        .tts-btn:hover { opacity: 1; background: rgba(0,0,0,0.05); }
+        .card-tts { position: absolute; top: 6px; right: 6px; font-size: 0.8rem; padding: 2px 4px; }
+
         /* ── Utilities ── */
         .hidden { display: none !important; }
         @media (max-width: 600px) {
@@ -609,7 +759,7 @@
         <!-- Slide 1 -->
         <div class="intro-slide active" id="intro-slide-1">
             <div class="slide-emoji">🌍</div>
-            <h2>Are you a changemaker?</h2>
+            <h2>You can be a changemaker.</h2>
             <div class="definition-box">
                 <strong>What's a changemaker?</strong>
                 A changemaker is someone who sees a problem and does something about it.
@@ -711,7 +861,7 @@
     ══════════════════════════════════ -->
     <div id="step1-screen" class="activity-screen hidden">
         <div class="step-indicator">Step 1 of 3 — What I Care About</div>
-        <h2 class="main-question">What's one problem in the world you want to help with?</h2>
+        <h2 class="main-question">What's one problem in the world you want to help with? <button class="tts-btn" data-speak="What's one problem in the world you want to help with?" onclick="app.speakFromBtn(this)" title="Read aloud">🔊</button></h2>
         <p class="subheading-text"><span class="ideas-trigger" onclick="app.toggleIdeas()">💡 Need ideas?</span></p>
 
         <div id="ideas-panel" class="ideas-panel">
@@ -719,22 +869,17 @@
             <div class="idea-category">
                 <h4>Environment</h4>
                 <div class="chip-container">
-                    <div class="chip" onclick="app.insertChip('litter around my school or park')">Litter around my school / park</div>
-                    <div class="chip" onclick="app.insertChip('too much plastic waste at school')">Too much plastic at school</div>
-                    <div class="chip" onclick="app.insertChip('ocean plastic pollution')">Ocean plastic pollution</div>
-                    <div class="chip" onclick="app.insertChip('animals losing their homes')">Animals losing their homes</div>
-                    <div class="chip" onclick="app.insertChip('food waste in the cafeteria')">Food waste in the cafeteria</div>
+                    <div class="chip" onclick="app.insertChip('litter around my school or park')">Litter around my school / park <button class="tts-btn chip-tts" data-speak="Litter around my school or park" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
+                    <div class="chip" onclick="app.insertChip('too much plastic waste at school')">Too much plastic at school <button class="tts-btn chip-tts" data-speak="Too much plastic at school" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
+                    <div class="chip" onclick="app.insertChip('animals losing their homes')">Animals losing their homes <button class="tts-btn chip-tts" data-speak="Animals losing their homes" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
                 </div>
             </div>
             <div class="idea-category">
                 <h4>Community &amp; Social Justice</h4>
                 <div class="chip-container">
-                    <div class="chip" onclick="app.insertChip('homelessness in my city')">Homelessness in my city</div>
-                    <div class="chip" onclick="app.insertChip('helping immigrants find jobs and support')">Helping immigrants find support</div>
-                    <div class="chip" onclick="app.insertChip('people being judged for how they look')">People judged for how they look</div>
-                    <div class="chip" onclick="app.insertChip('bullying or hate toward certain groups')">Bullying toward certain groups</div>
-                    <div class="chip" onclick="app.insertChip('families not having enough food')">Families without enough food</div>
-                    <div class="chip" onclick="app.insertChip('access to mental health support for teens')">Mental health support for teens</div>
+                    <div class="chip" onclick="app.insertChip('homelessness in my city')">Homelessness in my city <button class="tts-btn chip-tts" data-speak="Homelessness in my city" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
+                    <div class="chip" onclick="app.insertChip('bullying or hate toward certain groups')">Bullying toward certain groups <button class="tts-btn chip-tts" data-speak="Bullying toward certain groups" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
+                    <div class="chip" onclick="app.insertChip('families not having enough food')">Families without enough food <button class="tts-btn chip-tts" data-speak="Families without enough food" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
                 </div>
             </div>
         </div>
@@ -762,7 +907,7 @@
     <div id="step2-screen" class="activity-screen hidden">
         <div class="step-indicator">Step 2 of 3 — Who I Am</div>
         <p id="step2-context" class="subheading-text" style="margin-bottom:12px;"></p>
-        <h2 class="main-question">Which of these is already your strength?</h2>
+        <h2 class="main-question">I am…</h2>
 
         <div class="trait-grid" id="trait-grid-step2"></div>
         <div id="step2-desc-reveal" class="trait-desc-reveal hidden"></div>
@@ -808,31 +953,56 @@
     </div>
 
     <!-- ══════════════════════════════════
-         GOAL: CLASSROOM
+         GOAL: CLASSROOM — Page 1 (goal display)
     ══════════════════════════════════ -->
     <div id="goal-classroom-screen" class="activity-screen hidden">
         <div class="step-indicator">My Goal — In Class</div>
-        <p id="classroom-goal-intro" class="subheading-text" style="margin-bottom:12px;"></p>
-        <h2 class="main-question">What will you do differently in class?</h2>
+        <p id="classroom-goal-intro" class="subheading-text" style="margin-bottom:4px;"></p>
+        <div id="classroom-trait-connection" class="goal-connection-reveal hidden" style="margin-bottom:16px;"></div>
+        <h2 class="main-question">Your class goal this week</h2>
 
-        <div class="goal-option-cards" id="classroom-goal-cards">
-            <div class="goal-option-card" onclick="app.selectClassroomGoal('initiation')">
-                <span class="goal-option-check">✓</span>
+        <div class="fixed-goal-box">
+            <div class="fg-label">YOUR CLASS GOAL THIS WEEK</div>
+            <div class="fg-text">
                 After my teacher gives instructions, I will start working right away — without being asked again.
-            </div>
-            <div class="goal-option-card" onclick="app.selectClassroomGoal('participation')">
-                <span class="goal-option-check">✓</span>
-                I will raise my hand or share my thinking at least once during class discussion.
-            </div>
-            <div class="goal-option-card" onclick="app.selectClassroomGoal('focus')">
-                <span class="goal-option-check">✓</span>
-                During independent reading or writing time, I will stay on task for the full time.
+                <button class="tts-btn" data-speak="After my teacher gives instructions, I will start working right away — without being asked again." onclick="app.speakFromBtn(this)" title="Read aloud">🔊</button>
             </div>
         </div>
-        <div id="classroom-goal-connection" class="goal-connection-reveal hidden"></div>
 
         <div class="button-group">
             <button class="btn btn-secondary" onclick="app.showScreen('step3-screen'); app.currentStep='step3';">← Back</button>
+            <button class="btn btn-primary" onclick="app.showScreen('goal-strategy-screen'); app.currentStep='goal-strategy';">Next →</button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         GOAL: CLASSROOM — Page 2 (strategy)
+    ══════════════════════════════════ -->
+    <div id="goal-strategy-screen" class="activity-screen hidden">
+        <div class="step-indicator">My Goal — In Class</div>
+
+        <!-- Compact goal reminder -->
+        <div class="goal-reminder-bar">
+            <span class="grb-label">Your goal:</span>
+            After my teacher gives instructions, I will start working right away — without being asked again.
+        </div>
+
+        <h2 class="main-question" style="margin-top:16px;">How will <em>you</em> do this?</h2>
+        <p class="strategy-sub">Pick all that apply.</p>
+
+        <div class="strategy-chips" id="strategy-chips">
+            <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Read the instructions before starting')">Read the instructions before starting <button class="tts-btn chip-tts" data-speak="Read the instructions before starting" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
+            <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Get my materials out right away')">Get my materials out right away <button class="tts-btn chip-tts" data-speak="Get my materials out right away" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
+            <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Start writing even if I\'m not totally sure')">Start writing even if I'm not totally sure <button class="tts-btn chip-tts" data-speak="Start writing even if I am not totally sure" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
+            <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Take a breath and focus before I begin')">Take a breath and focus before I begin <button class="tts-btn chip-tts" data-speak="Take a breath and focus before I begin" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
+            <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Ignore distractions and keep my eyes on my work')">Ignore distractions and keep my eyes on my work <button class="tts-btn chip-tts" data-speak="Ignore distractions and keep my eyes on my work" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
+        </div>
+        <div class="strategy-custom-wrap" id="strategy-custom-wrap">
+            <input type="text" class="strategy-custom-input" id="strategy-custom-input" placeholder="Or write your own…" oninput="app.onStrategyCustomInput()" autocomplete="off">
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="app.showScreen('goal-classroom-screen'); app.currentStep='goal-classroom';">← Back</button>
             <button class="btn btn-primary" id="classroom-goal-continue" disabled onclick="app.submitClassroomGoal()">Continue →</button>
         </div>
     </div>
@@ -873,6 +1043,17 @@
         <div class="step-indicator">Share With a Partner</div>
         <h2 class="main-question">Tell your partner about your goal. 💬</h2>
 
+        <div class="peer-traits">
+            <div class="peer-trait-row">
+                <span class="ptr-label">A strength I have</span>
+                <span class="ptr-value" id="peer-existing-trait"></span>
+            </div>
+            <div class="peer-trait-row">
+                <span class="ptr-label">A strength I'm building</span>
+                <span class="ptr-value" id="peer-growth-trait"></span>
+            </div>
+        </div>
+
         <div class="goal-display-box">
             <span class="gd-label">Class goal</span>
             <span class="gd-value" id="peer-classroom-goal-display"></span>
@@ -880,6 +1061,10 @@
         <div class="goal-display-box" style="margin-top:10px;">
             <span class="gd-label">Home goal</span>
             <span class="gd-value" id="peer-home-goal-display"></span>
+        </div>
+        <div class="goal-display-box" style="margin-top:10px;" id="peer-strategies-box">
+            <span class="gd-label">My strategies</span>
+            <span class="gd-value" id="peer-strategies-display"></span>
         </div>
 
         <div class="peer-talk">
@@ -991,8 +1176,9 @@
             existingTraitDesc: '',
             growthTrait:       '',
             growthTraitDesc:   '',
-            classroomGoal:     '',   // full text of classroom goal
-            classroomGoalKey:  '',   // 'initiation' | 'participation' | 'focus'
+            classroomGoal:     'initiation',   // fixed goal key
+            classroomGoalKey:  'initiation',
+            strategies:        [],
             homeGoalMinutes:   0,
             timestamp:         ''
         },
@@ -1231,7 +1417,7 @@
 
         showScreen(id) {
             ['intro-screen','homepage','setup-screen','name-login-screen',
-             'step1-screen','step2-screen','step3-screen','goal-classroom-screen','goal-home-screen',
+             'step1-screen','step2-screen','step3-screen','goal-classroom-screen','goal-strategy-screen','goal-home-screen',
              'peer-screen','completion-screen','progress-screen','reflection-screen','dashboard-screen']
                 .forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
@@ -1282,7 +1468,8 @@
                 studentName: '', problem: '',
                 existingTrait: '', existingTraitDesc: '',
                 growthTrait: '', growthTraitDesc: '',
-                classroomGoal: '', classroomGoalKey: '',
+                classroomGoal: 'initiation', classroomGoalKey: 'initiation',
+                strategies: [],
                 homeGoalMinutes: 0,
                 timestamp: ''
             };
@@ -1344,8 +1531,9 @@
             // Save just the topic text; summary will read "You care about: X"
             this.data.problem = val;
             this.renderStep2Grid();
+            const contextText = `These traits can all help you make a difference with ${val}.`;
             document.getElementById('step2-context').innerHTML =
-                `These traits can all help you make a difference with <strong>${val}</strong>.`;
+                `These traits can all help you make a difference with <strong>${val}</strong>. <button class="tts-btn" data-speak="${contextText.replace(/"/g,'&quot;')}" onclick="app.speakFromBtn(this)" title="Read aloud">🔊</button>`;
             this.showScreen('step2-screen');
             this.currentStep = 'step2';
         },
@@ -1357,6 +1545,7 @@
                 <div class="trait-card${this.data.existingTrait === trait.id ? ' selected' : ''}"
                      onclick="app.selectExistingTrait('${trait.id}')">
                     <span class="tc-checkmark">✓</span>
+                    <button class="tts-btn card-tts" data-speak="${trait.title}. ${trait.description}" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
                     <span class="tc-icon">${trait.icon}</span>
                     <div class="tc-name">${trait.title}</div>
                 </div>
@@ -1376,15 +1565,16 @@
 
             // Description reveal
             const descEl = document.getElementById('step2-desc-reveal');
-            descEl.textContent = trait.description;
+            const descText = trait.description;
+            descEl.innerHTML = `${descText} <button class="tts-btn" onclick="app.speakFromBtn(this)" title="Read aloud">🔊</button>`;
+            descEl.querySelector('.tts-btn').dataset.speak = descText;
             descEl.classList.remove('hidden');
 
-            // Connection message referencing their issue
-            const issueTrunc = this.data.problem.length > 50
-                ? this.data.problem.substring(0, 50) + '…'
-                : this.data.problem;
+            // Connection message
+            const connText = `${trait.connection} Being ${trait.grammarName} can help you make a difference.`;
             const connEl = document.getElementById('step2-connection');
-            connEl.innerHTML = `<span class="cm-label">Why this matters for your issue</span>${trait.connection} Being ${trait.grammarName} already puts you in a position to make a difference in <em>${issueTrunc}</em>.`;
+            connEl.innerHTML = `<span class="cm-label">Why this matters for your issue</span>${connText} <button class="tts-btn" onclick="app.speakFromBtn(this)" title="Read aloud">🔊</button>`;
+            connEl.querySelector('.tts-btn').dataset.speak = connText;
 
             const box = document.getElementById('step2-writein');
             box.classList.remove('hidden');
@@ -1419,6 +1609,7 @@
                      ${!isExisting ? `onclick="app.selectGrowthTrait('${trait.id}')"` : ''}>
                     <span class="tc-checkmark">✓</span>
                     <span class="tc-already">Already mine ✓</span>
+                    ${!isExisting ? `<button class="tts-btn card-tts" data-speak="${trait.title}. ${trait.description}" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>` : ''}
                     <span class="tc-icon">${trait.icon}</span>
                     <div class="tc-name">${trait.title}</div>
                 </div>`;
@@ -1439,15 +1630,16 @@
 
             // Description reveal
             const descEl = document.getElementById('step3-desc-reveal');
-            descEl.textContent = trait.description;
+            const descText3 = trait.description;
+            descEl.innerHTML = `${descText3} <button class="tts-btn" onclick="app.speakFromBtn(this)" title="Read aloud">🔊</button>`;
+            descEl.querySelector('.tts-btn').dataset.speak = descText3;
             descEl.classList.remove('hidden');
 
             // Connection message
-            const issueTrunc = this.data.problem.length > 50
-                ? this.data.problem.substring(0, 50) + '…'
-                : this.data.problem;
+            const connText3 = `${trait.connection} Being ${trait.grammarName} can help you make a difference.`;
             const connEl = document.getElementById('step3-connection');
-            connEl.innerHTML = `<span class="cm-label">Why this matters for your issue</span>${trait.connection} Building ${trait.buildingPhrase} will help you make an even bigger difference in <em>${issueTrunc}</em>.`;
+            connEl.innerHTML = `<span class="cm-label">Why this matters for your issue</span>${connText3} <button class="tts-btn" onclick="app.speakFromBtn(this)" title="Read aloud">🔊</button>`;
+            connEl.querySelector('.tts-btn').dataset.speak = connText3;
 
             const box = document.getElementById('step3-writein');
             box.classList.remove('hidden');
@@ -1456,15 +1648,25 @@
         },
 
         submitStep3() {
-            // Reset classroom goal screen state
-            document.querySelectorAll('#classroom-goal-cards .goal-option-card').forEach(c => c.classList.remove('selected'));
-            document.getElementById('classroom-goal-connection').classList.add('hidden');
+            // Reset strategy chips
+            document.querySelectorAll('.strategy-chip').forEach(c => c.classList.remove('selected'));
+            const customInput = document.getElementById('strategy-custom-input');
+            if (customInput) customInput.value = '';
+            this.data.strategies = [];
             document.getElementById('classroom-goal-continue').disabled = true;
             // Populate intro line with growth trait name
             const growth = this.traits.find(t => t.id === this.data.growthTrait);
             if (growth) {
                 document.getElementById('classroom-goal-intro').textContent =
                     `There are different ways to practice being ${growth.grammarName}.`;
+            }
+            // Show trait connection for initiation goal
+            const conn = this.goalConnections[this.data.growthTrait];
+            if (conn) {
+                const el = document.getElementById('classroom-trait-connection');
+                el.innerHTML = `${conn.initiation} <button class="tts-btn" onclick="app.speakFromBtn(this)" title="Read aloud">🔊</button>`;
+                el.querySelector('.tts-btn').dataset.speak = conn.initiation;
+                el.classList.remove('hidden');
             }
             this.showScreen('goal-classroom-screen');
             this.currentStep = 'goal-classroom';
@@ -1478,6 +1680,29 @@
             ta.focus();
             ta.setSelectionRange(ta.value.length, ta.value.length);
             ta.dispatchEvent(new Event('input'));
+        },
+
+        // ── Strategy selection ─────────────────────────
+        toggleStrategy(el, text) {
+            el.classList.toggle('selected');
+            this.updateStrategies();
+        },
+
+        onStrategyCustomInput() {
+            this.updateStrategies();
+        },
+
+        updateStrategies() {
+            const selected = [...document.querySelectorAll('.strategy-chip.selected')].map(c => {
+                // Get only the text node content, ignoring the 🔊 button
+                return [...c.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim();
+            });
+            const custom = (document.getElementById('strategy-custom-input')?.value || '').trim();
+            if (custom) selected.push(custom);
+            this.data.strategies = selected;
+            // Enable continue if at least one strategy selected
+            const hasSomething = selected.length > 0;
+            document.getElementById('classroom-goal-continue').disabled = !hasSomething;
         },
 
         // ── Goal: Classroom ────────────────────────────
@@ -1507,7 +1732,8 @@
         },
 
         submitClassroomGoal() {
-            if (!this.data.classroomGoal) return;
+            this.data.classroomGoal = 'initiation';
+            this.data.classroomGoalKey = 'initiation';
             // Populate home connection sentence
             const conn = this.goalConnections[this.data.growthTrait];
             if (conn) document.getElementById('home-goal-connection').textContent = conn.home;
@@ -1533,9 +1759,27 @@
 
         submitHomeGoal() {
             if (!this.data.homeGoalMinutes) return;
-            document.getElementById('peer-classroom-goal-display').textContent = this.data.classroomGoal;
+            // Class goal — fixed initiation text
+            document.getElementById('peer-classroom-goal-display').textContent =
+                'After my teacher gives instructions, I will start working right away — without being asked again.';
             document.getElementById('peer-home-goal-display').textContent =
                 `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week.`;
+            // Strategies
+            const strategiesBox = document.getElementById('peer-strategies-box');
+            const strategiesDisplay = document.getElementById('peer-strategies-display');
+            if (this.data.strategies && this.data.strategies.length > 0) {
+                strategiesDisplay.textContent = this.data.strategies.join(', ');
+                strategiesBox.classList.remove('hidden');
+            } else {
+                strategiesBox.classList.add('hidden');
+            }
+            // Trait info
+            const existing = this.traits.find(t => t.id === this.data.existingTrait);
+            const growth = this.traits.find(t => t.id === this.data.growthTrait);
+            const peEl = document.getElementById('peer-existing-trait');
+            const pgEl = document.getElementById('peer-growth-trait');
+            if (peEl && existing) peEl.textContent = `${existing.icon} ${existing.title}`;
+            if (pgEl && growth) pgEl.textContent = `${growth.icon} ${growth.title}`;
             this.showScreen('peer-screen');
             this.currentStep = 'peer';
         },
@@ -1561,6 +1805,14 @@
 
             const existing = this.traits.find(t => t.id === this.data.existingTrait);
             const growth   = this.traits.find(t => t.id === this.data.growthTrait);
+            const issue    = this.data.problem || 'the issues you care about';
+
+            const strategiesRow = (this.data.strategies && this.data.strategies.length > 0)
+                ? `<div class="summary-row">
+                    <span class="sr-label">My strategies</span>
+                    <span class="sr-value">${this.data.strategies.join(', ')}</span>
+                </div>`
+                : '';
 
             document.getElementById('summary-card').innerHTML = `
                 <h3>Your Goal Summary</h3>
@@ -1577,11 +1829,15 @@
                 </div>
                 <div class="summary-row">
                     <span class="sr-label">Class goal</span>
-                    <span class="sr-value">${this.data.classroomGoal}</span>
+                    <span class="sr-value">After my teacher gives instructions, I will start working right away — without being asked again.</span>
                 </div>
+                ${strategiesRow}
                 <div class="summary-row">
                     <span class="sr-label">Home goal</span>
                     <span class="sr-value">Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week</span>
+                </div>
+                <div class="completion-bridge">
+                    Once you're more ${growth ? growth.grammarName : 'skilled'} day-to-day, you'll be more ${growth ? growth.grammarName : 'skilled'} when it comes to big problems like <strong>${issue}</strong>.
                 </div>
             `;
             this.showScreen('completion-screen');
@@ -1924,6 +2180,32 @@
 
         clearAllData() {
             alert('To delete data, go to console.firebase.google.com and delete documents from the "goals-up" collection.');
+        },
+
+        speakFromBtn(btn) {
+            this.speak(btn.dataset.speak || '');
+        },
+
+        speak(text) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const doSpeak = () => {
+                const utt = new SpeechSynthesisUtterance(text);
+                utt.rate = 0.88;
+                utt.pitch = 1.05;
+                const voices = window.speechSynthesis.getVoices();
+                const preferred =
+                    voices.find(v => v.name === 'Google US English') ||
+                    voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) ||
+                    voices.find(v => v.name.includes('Samantha')) ||
+                    voices.find(v => v.lang === 'en-US' && !v.name.includes('Microsoft')) ||
+                    voices.find(v => v.lang.startsWith('en'));
+                if (preferred) utt.voice = preferred;
+                window.speechSynthesis.speak(utt);
+            };
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length) { doSpeak(); }
+            else { window.speechSynthesis.onvoiceschanged = doSpeak; }
         }
     };
 
