@@ -1577,6 +1577,7 @@
                     })
                 });
                 const data = await res.json();
+                console.log('Claude proxy response:', data);
                 return data.content?.[0]?.text?.trim() || null;
             } catch (e) {
                 return null;
