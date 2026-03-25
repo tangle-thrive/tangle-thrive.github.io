@@ -518,6 +518,15 @@
             padding: 12px 16px; border-radius: 8px; margin: 12px 0; font-size: .9rem;
         }
 
+        /* ── Issue suggestion ── */
+        .issue-suggestion {
+            background: var(--green-pale); border: 1.5px solid var(--green-light);
+            border-radius: 12px; padding: 16px 18px; margin: 12px 0;
+        }
+        .suggestion-label { font-size: .85rem; color: var(--green-dark); font-weight: 600; margin: 0 0 6px; text-transform: uppercase; letter-spacing: .04em; }
+        .suggestion-text { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin: 0 0 14px; }
+        .suggestion-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
         /* ── Completion ── */
         .completion-screen { text-align: center; padding: 40px 20px; animation: fadeIn .6s ease; }
         .completion-screen h1 { font-size: clamp(1.7rem, 5vw, 2.3rem); color: var(--green-dark); margin-bottom: 16px; font-weight: 800; }
@@ -919,6 +928,14 @@
         </div>
 
         <div id="step1-error" class="error-message hidden"></div>
+        <div id="step1-suggestion" class="issue-suggestion hidden">
+            <p class="suggestion-label">Here's a clearer way to say that:</p>
+            <p class="suggestion-text" id="suggestion-text"></p>
+            <div class="suggestion-actions">
+                <button class="btn btn-primary" onclick="app.acceptSuggestion()">Use this →</button>
+                <button class="btn btn-secondary" onclick="app.rewriteIssue()">Let me rewrite ↩</button>
+            </div>
+        </div>
         <div class="button-group">
             <button class="btn btn-secondary" onclick="app.goHome()">← Back</button>
             <button class="btn btn-primary" id="step1-continue" disabled onclick="app.submitStep1()">Continue →</button>
@@ -1510,23 +1527,100 @@
         toggleIdeas() { document.getElementById('ideas-panel').classList.toggle('open'); },
 
         insertChip(topicLower) {
-            // Insert just the topic text — the "I want to help with" prefix is shown in the UI label
             const input = document.getElementById('problem-text');
             input.value = topicLower;
+            this.data.usedChip = true;
             document.getElementById('ideas-panel').classList.remove('open');
+            document.getElementById('step1-suggestion').classList.add('hidden');
             input.focus();
             this.onProblemInput();
         },
 
         onProblemInput() {
             const text = document.getElementById('problem-text').value.trim();
+            this.data.usedChip = false;
+            document.getElementById('step1-suggestion').classList.add('hidden');
+            document.getElementById('step1-error').classList.add('hidden');
             document.getElementById('step1-continue').disabled = text.length < 3;
         },
 
-        submitStep1() {
+        async submitStep1() {
             const val = document.getElementById('problem-text').value.trim();
             if (val.length < 3) return;
-            // Save just the topic text; summary will read "You care about: X"
+
+            // Chips are pre-validated — skip AI check
+            if (this.data.usedChip) {
+                this.proceedToStep2(val);
+                return;
+            }
+
+            // Show loading state
+            const btn = document.getElementById('step1-continue');
+            btn.textContent = 'Checking…';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/.netlify/functions/claude-proxy', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-haiku-4-5-20251001',
+                        max_tokens: 150,
+                        messages: [{
+                            role: 'user',
+                            content: `A student wrote this as a world issue they care about: "${val}".
+Is this a real social, environmental, or community issue a student might genuinely care about?
+If yes and it's clear enough, respond: {"valid":true,"needsRevision":false}
+If yes but it's vague or unclear, rewrite it as a clear 3-8 word issue and respond: {"valid":true,"needsRevision":true,"suggestion":"your rewrite here"}
+If no (nonsense, off-topic, inappropriate), respond: {"valid":false,"message":"A short friendly message telling them to try again"}
+Respond with JSON only, no explanation.`
+                        }]
+                    })
+                });
+                const data = await res.json();
+                const text = data.content?.[0]?.text?.trim() || '';
+                const result = JSON.parse(text);
+
+                if (!result.valid) {
+                    document.getElementById('step1-error').textContent = result.message || 'That doesn\'t look like a world issue. Try something like "pollution in my neighborhood" or "kids not having enough to eat."';
+                    document.getElementById('step1-error').classList.remove('hidden');
+                    btn.textContent = 'Continue →';
+                    btn.disabled = false;
+                    return;
+                }
+
+                if (result.needsRevision && result.suggestion) {
+                    document.getElementById('suggestion-text').textContent = result.suggestion;
+                    document.getElementById('step1-suggestion').classList.remove('hidden');
+                    btn.textContent = 'Continue →';
+                    btn.disabled = false;
+                    return;
+                }
+
+                this.proceedToStep2(val);
+            } catch (e) {
+                // If AI check fails, just proceed
+                this.proceedToStep2(val);
+            }
+        },
+
+        acceptSuggestion() {
+            const suggestion = document.getElementById('suggestion-text').textContent;
+            document.getElementById('problem-text').value = suggestion;
+            this.data.usedChip = true;
+            document.getElementById('step1-suggestion').classList.add('hidden');
+            this.proceedToStep2(suggestion);
+        },
+
+        rewriteIssue() {
+            document.getElementById('step1-suggestion').classList.add('hidden');
+            document.getElementById('problem-text').value = '';
+            this.data.usedChip = false;
+            document.getElementById('step1-continue').disabled = true;
+            document.getElementById('problem-text').focus();
+        },
+
+        proceedToStep2(val) {
             this.data.problem = val;
             this.renderStep2Grid();
             const contextText = `These traits can all help you make a difference with ${val}.`;
