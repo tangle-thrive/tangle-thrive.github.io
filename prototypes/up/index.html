@@ -1554,6 +1554,15 @@
                 return;
             }
 
+            // Quick client-side check before calling AI
+            const vague = ['bad','good','sad','ugly','stuff','things','people','kids','world','life','everything','nothing','someone','help','big','small','fun','cool','nice','mean'];
+            const words = val.toLowerCase().split(/\s+/);
+            if (val.length < 6 || (words.length === 1 && vague.includes(words[0]))) {
+                document.getElementById('step1-error').textContent = 'Try describing a real problem — like "kids being left out" or "trash in my neighborhood."';
+                document.getElementById('step1-error').classList.remove('hidden');
+                return;
+            }
+
             // Show loading state
             const btn = document.getElementById('step1-continue');
             btn.textContent = 'Checking…';
