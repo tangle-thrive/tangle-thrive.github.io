@@ -1216,14 +1216,6 @@
     const db = getFirestore(firebaseApp);
     const COLLECTION = 'goals-up';
     const VERSION = new URLSearchParams(window.location.search).get('v') || '1';
-    function getClaudeApiKey() {
-        let key = localStorage.getItem('claude_api_key');
-        if (!key) {
-            key = prompt('Enter Claude API key (one-time setup):');
-            if (key) localStorage.setItem('claude_api_key', key.trim());
-        }
-        return key;
-    }
 
     const app = {
 
@@ -1572,13 +1564,10 @@
                 : `A 4th or 5th grade student says their strength is being ${trait.title} — meaning they ${trait.description}. They care about this issue: ${issue}. In exactly 2 sentences (under 35 words total), explain specifically how being ${trait.grammarName} can help them make a difference with ${issue}. Start with "${trait.title} people" or "Being ${trait.grammarName}". Be specific to their issue — don't use a generic ending.`;
 
             try {
-                const res = await fetch('https://api.anthropic.com/v1/messages', {
+                const res = await fetch('/.netlify/functions/claude-proxy', {
                     method: 'POST',
                     headers: {
-                        'x-api-key': getClaudeApiKey(),
-                        'anthropic-version': '2023-06-01',
-                        'content-type': 'application/json',
-                        'anthropic-dangerous-direct-browser-access': 'true'
+                        'content-type': 'application/json'
                     },
                     body: JSON.stringify({
                         model: 'claude-haiku-4-5-20251001',
