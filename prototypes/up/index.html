@@ -1554,7 +1554,6 @@
         selectExistingTrait(id) {
             this.data.existingTrait = id;
             this.renderStep2Grid();
-            this.revealStep2Writein(id);
         },
 
         async generateConnection(trait, issue, step) {
@@ -1649,7 +1648,6 @@
         selectGrowthTrait(id) {
             this.data.growthTrait = id;
             this.renderStep3Grid();
-            this.revealStep3Writein(id);
         },
 
         async revealStep3Writein(id) {
