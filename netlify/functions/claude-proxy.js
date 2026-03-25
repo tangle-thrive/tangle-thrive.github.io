@@ -13,6 +13,7 @@ exports.handler = async (event) => {
             body: event.body
         });
         const data = await response.json();
+        console.log('Claude API status:', response.status, 'body:', JSON.stringify(data).slice(0, 200));
         return {
             statusCode: response.status,
             headers: { 'Content-Type': 'application/json' },
