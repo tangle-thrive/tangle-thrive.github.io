@@ -621,6 +621,20 @@
             color: var(--text-dark);
             line-height: 1.5;
         }
+        .fgb-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--text-mid);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .fgb-text {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
 
         /* ── Strategy section ── */
         /* ── Goal reminder bar ── */
@@ -967,21 +981,48 @@
     ══════════════════════════════════ -->
     <div id="goal-classroom-screen" class="activity-screen hidden">
         <div class="step-indicator">My Goal — In Class</div>
-        <p id="classroom-goal-intro" class="subheading-text" style="margin-bottom:4px;"></p>
-        <div id="classroom-trait-connection" class="goal-connection-reveal hidden" style="margin-bottom:16px;"></div>
-        <h2 class="main-question">Your class goal this week</h2>
+        <p id="classroom-goal-intro" class="subheading-text" style="margin-bottom:12px;"></p>
+        <div id="classroom-trait-connection" class="goal-connection-reveal hidden"></div>
+
+        <h2 class="main-question" style="margin-top:16px;">Your class goal this week</h2>
 
         <div class="fixed-goal-box">
-            <div class="fg-label">YOUR CLASS GOAL THIS WEEK</div>
-            <div class="fg-text">
-                After my teacher gives instructions, I will start working right away — without being asked again.
-                <button class="tts-btn" data-speak="After my teacher gives instructions, I will start working right away — without being asked again." onclick="app.speakFromBtn(this)" title="Read aloud">🔊</button>
+            <div class="fgb-label">YOUR GOAL:</div>
+            <div id="classroom-goal-text" class="fgb-text"></div>
+        </div>
+
+        <!-- Version 1 only: strategy chips -->
+        <div id="v1-strategy-section" class="hidden">
+            <h3 style="margin-top:24px;margin-bottom:4px;">How will <em>you</em> do this?</h3>
+            <p style="color:var(--green-mid);font-size:0.9rem;margin-bottom:12px;">Pick all that apply.</p>
+            <div class="strategy-chips">
+                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Think about the beginning, middle, and end')">
+                    Think about the beginning, middle, and end
+                    <button class="tts-btn chip-tts" data-speak="Think about the beginning, middle, and end" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
+                </div>
+                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Use my own words — don\'t copy from the text')">
+                    Use my own words — don't copy from the text
+                    <button class="tts-btn chip-tts" data-speak="Use my own words, don't copy from the text" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
+                </div>
+                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Include the most important details')">
+                    Include the most important details
+                    <button class="tts-btn chip-tts" data-speak="Include the most important details" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
+                </div>
+                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Tell it like I\'m explaining to a friend')">
+                    Tell it like I'm explaining to a friend
+                    <button class="tts-btn chip-tts" data-speak="Tell it like I'm explaining to a friend" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
+                </div>
+                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Write my first thought, then add more')">
+                    Write my first thought, then add more
+                    <button class="tts-btn chip-tts" data-speak="Write my first thought, then add more" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
+                </div>
             </div>
+            <input type="text" id="strategy-custom" class="text-input" placeholder="Or write your own..." oninput="app.onCustomStrategy(this.value)" style="margin-top:12px;">
         </div>
 
         <div class="button-group">
             <button class="btn btn-secondary" onclick="app.showScreen('step3-screen'); app.currentStep='step3';">← Back</button>
-            <button class="btn btn-primary" onclick="app.showScreen('goal-strategy-screen'); app.currentStep='goal-strategy';">Next →</button>
+            <button class="btn btn-primary" id="classroom-goal-continue" onclick="app.submitClassroomGoal()">Next →</button>
         </div>
     </div>
 
@@ -1013,7 +1054,7 @@
 
         <div class="button-group">
             <button class="btn btn-secondary" onclick="app.showScreen('goal-classroom-screen'); app.currentStep='goal-classroom';">← Back</button>
-            <button class="btn btn-primary" id="classroom-goal-continue" disabled onclick="app.submitClassroomGoal()">Continue →</button>
+            <button class="btn btn-primary" id="strategy-screen-continue" disabled onclick="app.submitClassroomGoal()">Continue →</button>
         </div>
     </div>
 
@@ -1174,6 +1215,7 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
     const COLLECTION = 'goals-up';
+    const VERSION = new URLSearchParams(window.location.search).get('v') || '1';
     function getClaudeApiKey() {
         let key = localStorage.getItem('claude_api_key');
         if (!key) {
@@ -1203,58 +1245,13 @@
 
         traits: [
             {
-                id: 'curious',
-                icon: '🔍',
-                title: 'Curious',
-                description: 'I ask questions until I understand why.',
-                grammarName: 'curious',
-                buildingPhrase: 'curiosity',
-                connection: 'Curious people ask the questions others are afraid to ask. Digging into "why" is often the first step toward real change.',
-                starters: {
-                    existing: ['I showed this when I', 'One example is', 'A teacher or friend noticed this when I'],
-                    growth:   ['I want to build this because', 'I tend to stop asking questions when', 'Asking more questions would help me because']
-                },
-                quotes: {
-                    existing: { text: '"I always want to know WHY something is the way it is. Once I started writing down my questions in class, my essays got way more specific."', attribution: '— Jordan, 8th grade' },
-                    growth:   { text: '"I used to just read and move on. Practicing curiosity made me slow down and actually wonder about what I was reading."', attribution: '— Alex, 8th grade' }
-                },
-                goals: [
-                    'I will write down 2 questions I have about our reading before or during class.',
-                    'I will ask my teacher or a classmate one genuine question about the text each day.',
-                    'I will write a "why" or "what if" question about the theme or the author\'s choices in what we\'re studying.',
-                    'I will find one thing in our reading that surprises or confuses me and write about why.'
-                ]
-            },
-            {
-                id: 'determined',
-                icon: '💪',
-                title: 'Determined',
-                description: 'I keep going even when it gets hard.',
-                grammarName: 'determined',
-                buildingPhrase: 'determination',
-                connection: 'Determined people don\'t stop at the first barrier. That\'s exactly what it takes to keep pushing on something you care about.',
-                starters: {
-                    existing: ['I showed this when I', 'One time I kept going was', 'I didn\'t give up when'],
-                    growth:   ['I want to build this because', 'I tend to give up when', 'Staying with hard things is difficult for me because']
-                },
-                quotes: {
-                    existing: { text: '"My first draft was terrible. But I kept going. The final version was actually something I was proud of."', attribution: '— Sofia, 7th grade' },
-                    growth:   { text: '"Writing used to feel pointless when it got hard. I\'m learning to keep going — and the hard moments are usually where the good ideas show up."', attribution: '— Maya, 7th grade' }
-                },
-                goals: [
-                    'I will try at least one different approach whenever my first idea for writing or analysis doesn\'t work.',
-                    'I will not delete my first draft — I will keep it, try again, and compare what changed.',
-                    'I will go back to one part of a writing assignment I gave up on and try it again before the end of class.',
-                    'I will write down what I tried and what I\'ll do differently on any piece of writing I didn\'t finish.'
-                ]
-            },
-            {
                 id: 'organized',
                 icon: '🗂️',
                 title: 'Organized',
                 description: 'I break big problems into smaller steps.',
                 grammarName: 'organized',
                 buildingPhrase: 'organization',
+                classroomGoal: 'I will start my work right away and make a plan before I begin writing.',
                 connection: 'Organized people turn big ideas into real plans. That\'s what makes change actually happen instead of just staying a feeling.',
                 starters: {
                     existing: ['I showed this when I', 'I use organization to help me when', 'A time I broke something big into steps was'],
@@ -1278,6 +1275,7 @@
                 description: 'I try new approaches and look for unexpected solutions.',
                 grammarName: 'creative',
                 buildingPhrase: 'creativity',
+                classroomGoal: 'I will try at least one new strategy when I respond to the reading today.',
                 connection: 'Creative people find solutions no one else has tried. The most powerful writing and ideas often come from angles others missed.',
                 starters: {
                     existing: ['I showed this when I', 'I came up with a new idea when', 'I surprised myself by thinking of'],
@@ -1301,6 +1299,7 @@
                 description: 'I speak up and act even when it feels uncomfortable.',
                 grammarName: 'brave',
                 buildingPhrase: 'bravery',
+                classroomGoal: 'I will share my thinking out loud at least once today, even if I feel nervous.',
                 connection: 'Brave people say what others are afraid to say. That\'s often what moves a conversation — or a movement — forward.',
                 starters: {
                     existing: ['I showed this when I', 'I spoke up even though I was nervous when', 'I did something uncomfortable and it turned out'],
@@ -1324,6 +1323,7 @@
                 description: 'I listen to others and do my part.',
                 grammarName: 'a team player',
                 buildingPhrase: 'team player skills',
+                classroomGoal: 'I will listen to my partner and add my own idea to the discussion before we finish.',
                 connection: 'Being a team player means you bring people together. No one figures out something hard completely on their own.',
                 starters: {
                     existing: ['I showed this when I worked with my team', 'Working with others helped me when', 'I helped my group when'],
@@ -1354,18 +1354,6 @@
         ],
 
         goalConnections: {
-            curious: {
-                initiation:    'Curious people dive in fast — they start right away because they can\'t wait to discover what\'s in the text.',
-                participation: 'Curious people love to share what they notice. Raising your hand is how your curiosity shows up in class.',
-                focus:         'Curious people follow ideas all the way through. Staying focused gives you the time to really understand what you\'re reading.',
-                home:          'Curious people are always learning, even outside of school. Time on Lexia or Epic is how you feed your curiosity.'
-            },
-            determined: {
-                initiation:    'Determined people don\'t wait for the perfect moment. Starting on your own — every time — is how determination becomes a habit.',
-                participation: 'Determined people keep trying even when they\'re unsure. Raising your hand, even if you\'re not 100% sure, is exactly that.',
-                focus:         'Determined people push through when it gets hard. Staying focused when you\'d rather stop is determination in action.',
-                home:          'Determined people keep going even when they don\'t feel like it. Logging in on a day you\'d rather not — that\'s exactly what determination looks like.'
-            },
             organized: {
                 initiation:    'Organized people use every minute well. Starting right away is how you make the most of your class time.',
                 participation: 'Organized people think before they speak. Raising your hand shows you\'re ready to share your thinking.',
@@ -1701,19 +1689,15 @@
         },
 
         submitStep3() {
-            // Reset strategy chips
-            document.querySelectorAll('.strategy-chip').forEach(c => c.classList.remove('selected'));
-            const customInput = document.getElementById('strategy-custom-input');
-            if (customInput) customInput.value = '';
-            this.data.strategies = [];
-            document.getElementById('classroom-goal-continue').disabled = true;
-            // Populate intro line with growth trait name
             const growth = this.traits.find(t => t.id === this.data.growthTrait);
+
+            // Trait connection intro
             if (growth) {
                 document.getElementById('classroom-goal-intro').textContent =
                     `There are different ways to practice being ${growth.grammarName}.`;
             }
-            // Show trait connection for initiation goal
+
+            // Show trait connection sentence
             const conn = this.goalConnections[this.data.growthTrait];
             if (conn) {
                 const el = document.getElementById('classroom-trait-connection');
@@ -1721,6 +1705,35 @@
                 el.querySelector('.tts-btn').dataset.speak = conn.initiation;
                 el.classList.remove('hidden');
             }
+
+            // Set goal text based on version
+            const goalText = VERSION === '2' && growth
+                ? growth.classroomGoal
+                : 'After I read, I will retell what I read in my own words so others can understand the story.';
+            this.data.classroomGoal = goalText;
+            document.getElementById('classroom-goal-text').textContent = goalText;
+
+            // Show/hide strategy section
+            const v1Section = document.getElementById('v1-strategy-section');
+            const continueBtn = document.getElementById('classroom-goal-continue');
+            if (VERSION === '1') {
+                v1Section.classList.remove('hidden');
+                continueBtn.disabled = true; // require at least one chip
+                // Reset chips
+                document.querySelectorAll('.strategy-chip').forEach(c => c.classList.remove('selected'));
+                const stratCustom = document.getElementById('strategy-custom');
+                if (stratCustom) stratCustom.value = '';
+                this.data.strategies = [];
+            } else {
+                v1Section.classList.add('hidden');
+                continueBtn.disabled = false;
+                this.data.strategies = [];
+            }
+
+            // Reset old classroom goal state that may exist
+            const oldConnection = document.getElementById('classroom-goal-connection');
+            if (oldConnection) oldConnection.classList.add('hidden');
+
             this.showScreen('goal-classroom-screen');
             this.currentStep = 'goal-classroom';
         },
@@ -1738,7 +1751,23 @@
         // ── Strategy selection ─────────────────────────
         toggleStrategy(el, text) {
             el.classList.toggle('selected');
-            this.updateStrategies();
+            const selected = [...document.querySelectorAll('.strategy-chip.selected')].map(c => {
+                return [...c.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim();
+            });
+            this.data.strategies = selected;
+            const customVal = (document.getElementById('strategy-custom')?.value || document.getElementById('strategy-custom-input')?.value || '').trim();
+            const anySelected = this.data.strategies.length > 0 ||
+                (customVal.length > 0);
+            document.getElementById('classroom-goal-continue').disabled = !anySelected;
+        },
+
+        onCustomStrategy(val) {
+            if (val.trim().length > 0) {
+                document.getElementById('classroom-goal-continue').disabled = false;
+            } else {
+                const anyChip = this.data.strategies && this.data.strategies.length > 0;
+                document.getElementById('classroom-goal-continue').disabled = !anyChip;
+            }
         },
 
         onStrategyCustomInput() {
@@ -1785,8 +1814,16 @@
         },
 
         submitClassroomGoal() {
-            this.data.classroomGoal = 'initiation';
-            this.data.classroomGoalKey = 'initiation';
+            // Collect custom strategy if filled (Version 1)
+            if (VERSION === '1') {
+                const custom = document.getElementById('strategy-custom');
+                if (custom && custom.value.trim()) {
+                    if (!this.data.strategies) this.data.strategies = [];
+                    if (!this.data.strategies.includes(custom.value.trim())) {
+                        this.data.strategies.push(custom.value.trim());
+                    }
+                }
+            }
             // Populate home connection sentence
             const conn = this.goalConnections[this.data.growthTrait];
             if (conn) document.getElementById('home-goal-connection').textContent = conn.home;
@@ -1812,9 +1849,9 @@
 
         submitHomeGoal() {
             if (!this.data.homeGoalMinutes) return;
-            // Class goal — fixed initiation text
+            // Class goal
             document.getElementById('peer-classroom-goal-display').textContent =
-                'After my teacher gives instructions, I will start working right away — without being asked again.';
+                this.data.classroomGoal || '';
             document.getElementById('peer-home-goal-display').textContent =
                 `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week.`;
             // Strategies
@@ -1847,7 +1884,11 @@
 
         async saveGoal() {
             try {
-                const docRef = await addDoc(collection(db, COLLECTION), this.data);
+                const docRef = await addDoc(collection(db, COLLECTION), {
+                    ...this.data,
+                    version: VERSION,
+                    strategies: this.data.strategies || []
+                });
                 this._lastSavedDocId = docRef.id;
             } catch (e) { console.error('Error saving goal:', e); }
         },
@@ -1882,7 +1923,7 @@
                 </div>
                 <div class="summary-row">
                     <span class="sr-label">Class goal</span>
-                    <span class="sr-value">After my teacher gives instructions, I will start working right away — without being asked again.</span>
+                    <span class="sr-value">${this.data.classroomGoal || ''}</span>
                 </div>
                 ${strategiesRow}
                 <div class="summary-row">
