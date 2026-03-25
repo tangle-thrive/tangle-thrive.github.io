@@ -1568,11 +1568,16 @@
                         max_tokens: 150,
                         messages: [{
                             role: 'user',
-                            content: `A student wrote this as a world issue they care about: "${val}".
-Is this a real social, environmental, or community issue a student might genuinely care about?
-If yes and it's clear enough, respond: {"valid":true,"needsRevision":false}
-If yes but it's vague or unclear, rewrite it as a clear 3-8 word issue and respond: {"valid":true,"needsRevision":true,"suggestion":"your rewrite here"}
-If no (nonsense, off-topic, inappropriate), respond: {"valid":false,"message":"A short friendly message telling them to try again"}
+                            content: `A 4th or 5th grade student typed this as a world/community issue they care about: "${val}".
+
+A valid issue must be a specific social, environmental, health, or community problem (e.g. "pollution in rivers", "kids going hungry", "bullying at school", "homelessness in my city").
+
+Single adjectives (like "ugly", "bad", "sad"), single nouns without context (like "dogs", "food", "weather"), random words, personal complaints, or vague feelings are NOT valid issues.
+
+If it is a clear, specific, valid issue: {"valid":true,"needsRevision":false}
+If it describes a real issue but is too vague or unclear (e.g. "pollution", "hunger"): {"valid":true,"needsRevision":true,"suggestion":"a clearer 4-8 word version of their issue"}
+If it is not a valid issue at all: {"valid":false,"message":"Friendly 1-sentence prompt asking them to describe a real problem in their school, community, or world — keep it encouraging, no more than 15 words"}
+
 Respond with JSON only, no explanation.`
                         }]
                     })
