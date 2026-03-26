@@ -1589,8 +1589,9 @@ or
                     })
                 });
                 const data = await res.json();
-                const text = data.content?.[0]?.text?.trim() || '';
-                console.log('Reframe raw response:', text);
+                const raw = data.content?.[0]?.text?.trim() || '';
+                const text = raw.replace(/```json\n?/gi, '').replace(/```/g, '').trim();
+                console.log('Reframe parsed text:', text);
                 let result;
                 try { result = JSON.parse(text); }
                 catch(e) { result = { valid: true, reframe: val }; }
