@@ -1541,14 +1541,12 @@
             this.data.usedChip = false;
             document.getElementById('step1-suggestion').classList.add('hidden');
             document.getElementById('step1-error').classList.add('hidden');
-            const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
-            document.getElementById('step1-continue').disabled = wordCount < 2;
+            document.getElementById('step1-continue').disabled = text.length < 3;
         },
 
         async submitStep1() {
             const val = document.getElementById('problem-text').value.trim();
-            const wordCount = val.split(/\s+/).filter(w => w.length > 0).length;
-            if (wordCount < 2) return;
+            if (val.length < 3) return;
 
             // Chips are pre-validated — skip AI reframe
             if (this.data.usedChip) {
