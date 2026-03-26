@@ -908,7 +908,7 @@
         </div>
         <div id="setup-error" class="error-message hidden"></div>
         <div class="button-group">
-            <button class="btn btn-secondary" onclick="app.goHome()">← Back</button>
+            <button class="btn btn-secondary" onclick="app.showScreen('intro-screen'); app.currentStep='intro';">← Back</button>
             <button class="btn btn-primary" onclick="app.submitName()">Let's Go →</button>
         </div>
     </div>
@@ -1002,7 +1002,7 @@
             </div>
         </div>
         <div class="button-group">
-            <button class="btn btn-secondary" onclick="app.goHome()">← Back</button>
+            <button class="btn btn-secondary" onclick="app.showScreen('class-select-screen'); app.currentStep='class-select';">← Back</button>
             <button class="btn btn-primary" id="step1-continue" disabled onclick="app.submitStep1()">Continue →</button>
         </div>
     </div>
@@ -1444,7 +1444,7 @@
                 goals: [
                     'I will work with at least one classmate to discuss a text and share what we notice or wonder.',
                     'I will compare my interpretation of a reading with a partner\'s and write down one thing that was different.',
-                    'I will give a classmate one specific piece of feedback on their writing.',
+                    'I will give a classmate a specific piece of feedback on their work.',
                     'I will listen carefully when a classmate shares their thinking and write down one new idea I got from them.'
                 ]
             }
@@ -1918,7 +1918,7 @@ or
             if (h3) h3.textContent = `You want to work on being ${growth ? growth.grammarName : 'your best'}. What would ${growth ? growth.readerPhrase : 'a good reader'} do to retell the story?`;
             // Update v2 strategy heading
             const traitPhrase = growth ? growth.grammarName : 'your best';
-            const stratHeading = `How will you practice being ${traitPhrase} in class today?`;
+            const stratHeading = `How will you practice being ${traitPhrase} in class?`;
             const stratBridge = problem
                 ? `Building these skills is how you start making a difference with <strong>${problem}</strong>.`
                 : 'Pick all that apply.';
@@ -1971,7 +1971,7 @@ or
                 // Set heading
                 const traitPhrase = growth ? growth.grammarName : 'yourself';
                 document.getElementById('v2-goal-heading').textContent =
-                    `How will you practice being ${traitPhrase} in class today?`;
+                    `How will you practice being ${traitPhrase} in class?`;
                 // Populate goal option cards (first 3 from trait.goals)
                 const goalOpts = (growth && growth.goals) ? growth.goals.slice(0, 3) : [];
                 document.getElementById('goal-options-list').innerHTML = goalOpts.map((g, i) =>
