@@ -1088,6 +1088,7 @@
                 <input type="text" id="goal-writein" class="problem-input" placeholder="write your own goal..."
                     oninput="app.onGoalWritein(this.value)" autocomplete="off">
             </div>
+            <div id="goal-writein-error" class="error-message hidden" style="margin-top:8px;"></div>
         </div>
 
         <!-- Version 1 only: strategy chips -->
@@ -1991,9 +1992,12 @@ or
                     </div>`
                 ).join('');
                 this.data.classroomGoal = '';
+                this.data.usedGoalCard = false;
                 this.data.strategies = [];
                 const gw = document.getElementById('goal-writein');
                 if (gw) gw.value = '';
+                const ge = document.getElementById('goal-writein-error');
+                if (ge) ge.classList.add('hidden');
                 continueBtn.disabled = true; // require a selection
             }
 
@@ -2010,15 +2014,21 @@ or
             const growth = this.traits.find(t => t.id === this.data.growthTrait);
             const idx = parseInt(card.dataset.goalIndex);
             this.data.classroomGoal = growth.goals[idx];
+            this.data.usedGoalCard = true;
             document.querySelectorAll('.goal-option-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             const writein = document.getElementById('goal-writein');
             if (writein) writein.value = '';
+            const err = document.getElementById('goal-writein-error');
+            if (err) err.classList.add('hidden');
             document.getElementById('classroom-goal-continue').disabled = false;
         },
 
         onGoalWritein(val) {
             const trimmed = val.trim();
+            this.data.usedGoalCard = false;
+            const err = document.getElementById('goal-writein-error');
+            if (err) err.classList.add('hidden');
             if (trimmed.length > 0) {
                 this.data.classroomGoal = 'I will ' + trimmed;
                 document.querySelectorAll('.goal-option-card').forEach(c => c.classList.remove('selected'));
@@ -2104,7 +2114,36 @@ or
             document.getElementById('classroom-goal-continue').disabled = false;
         },
 
-        submitClassroomGoal() {
+        async submitClassroomGoal() {
+            // v2 write-in: run AI validation first
+            if (VERSION !== '1' && !this.data.usedGoalCard) {
+                const writeinVal = (document.getElementById('goal-writein')?.value || '').trim();
+                if (writeinVal.length > 0) {
+                    const btn = document.getElementById('classroom-goal-continue');
+                    btn.textContent = 'Checking…'; btn.disabled = true;
+                    try {
+                        const res = await fetch('/.netlify/functions/claude-proxy', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                model: 'claude-haiku-4-5-20251001',
+                                max_tokens: 200,
+                                messages: [{ role: 'user', content: `A 4th–6th grade student wrote this as their class goal: "I will ${writeinVal}". Does this sound like a real, specific classroom goal — something they could actually do during class? Reply with JSON only: {"valid": true} or {"valid": false, "message": "one friendly sentence telling them what's missing and nudging them to try again"}` }]
+                            })
+                        });
+                        const data = await res.json();
+                        const raw = (data.content?.[0]?.text || '').replace(/```json\n?/gi,'').replace(/```/g,'').trim();
+                        let result;
+                        try { result = JSON.parse(raw); } catch(e) { result = { valid: true }; }
+                        btn.textContent = 'Next →'; btn.disabled = false;
+                        if (!result.valid) {
+                            const err = document.getElementById('goal-writein-error');
+                            if (err) { err.textContent = result.message || 'That doesn\'t quite sound like a goal. Try describing something specific you\'ll do in class.'; err.classList.remove('hidden'); }
+                            return;
+                        }
+                    } catch(e) { document.getElementById('classroom-goal-continue').textContent = 'Next →'; document.getElementById('classroom-goal-continue').disabled = false; }
+                }
+            }
             // Collect custom strategy if filled (Version 1)
             if (VERSION === '1') {
                 const custom = document.getElementById('strategy-custom');
