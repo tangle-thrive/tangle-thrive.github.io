@@ -1085,26 +1085,8 @@
 
         <!-- Version 1 only: strategy chips -->
         <div id="v1-strategy-section" class="hidden">
-            <h3 id="strategy-heading-v1" style="margin-top:24px;margin-bottom:4px;">How will <em>you</em> do this?</h3>
-            <p id="strategy-bridge-v1" class="strategy-bridge">Pick all that apply.</p>
-            <div class="strategy-chips">
-                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Think about the beginning, middle, and end')">
-                    Think about the beginning, middle, and end
-                    <button class="tts-btn chip-tts" data-speak="Think about the beginning, middle, and end" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
-                </div>
-                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Include the most important details')">
-                    Include the most important details
-                    <button class="tts-btn chip-tts" data-speak="Include the most important details" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
-                </div>
-                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Use words like first, then, and finally')">
-                    Use words like "first," "then," and "finally"
-                    <button class="tts-btn chip-tts" data-speak="Use words like first, then, and finally" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
-                </div>
-                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Picture the story in my head as I read')">
-                    Picture the story in my head as I read
-                    <button class="tts-btn chip-tts" data-speak="Picture the story in my head as I read" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
-                </div>
-            </div>
+            <h3 id="strategy-heading-v1" style="margin-top:24px;margin-bottom:4px;font-size:1.2rem;">What would a reader do to retell the story?</h3>
+            <div class="strategy-chips" id="v1-strategy-chips"></div>
             <input type="text" id="strategy-custom" class="text-input" placeholder="Or write your own..." oninput="app.onCustomStrategy(this.value)" style="margin-top:12px;">
         </div>
 
@@ -1281,6 +1263,7 @@
 
         <!-- Class filter chips -->
         <div class="db-class-filters" id="db-class-filters">
+            <button class="db-filter-chip" data-class="__all__" onclick="app.filterByClass('__all__', this)">All Classes</button>
             <button class="db-filter-chip active" data-class="Ms. Cleaveland" onclick="app.filterByClass('Ms. Cleaveland', this)">Ms. Cleaveland</button>
             <button class="db-filter-chip" data-class="Mr. Gomez" onclick="app.filterByClass('Mr. Gomez', this)">Mr. Gomez</button>
             <button class="db-filter-chip" data-class="Ms. Lee" onclick="app.filterByClass('Ms. Lee', this)">Ms. Lee</button>
@@ -1320,9 +1303,10 @@
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
     const COLLECTION = 'goals-up';
-    const VERSION = new URLSearchParams(window.location.search).get('v') || '1';
+    let   VERSION = new URLSearchParams(window.location.search).get('v') || '2';
     const ROLE    = new URLSearchParams(window.location.search).get('role') || '';
     const CLASSES = ['Ms. Cleaveland', 'Mr. Gomez', 'Ms. Lee'];
+    const CLASS_VERSIONS = { 'Ms. Lee': '1', 'Ms. Cleaveland': '2', 'Mr. Gomez': '2' };
 
     const app = {
 
@@ -1351,6 +1335,12 @@
                 description: 'I break big problems into smaller steps.',
                 grammarName: 'organized',
                 buildingPhrase: 'organization',
+                readerPhrase: 'an organized reader',
+                retellStrategies: [
+                    'Think about the beginning, middle, and end',
+                    'Use words like "first," "then," and "finally"',
+                    'Include only the most important details'
+                ],
                 classroomGoal: 'I will start my work right away and make a plan before I begin writing.',
                 connection: 'Organized people turn big ideas into real plans. That\'s what makes change actually happen instead of just staying a feeling.',
                 starters: {
@@ -1375,6 +1365,12 @@
                 description: 'I try new approaches and look for unexpected solutions.',
                 grammarName: 'creative',
                 buildingPhrase: 'creativity',
+                readerPhrase: 'a creative reader',
+                retellStrategies: [
+                    'Tell the story as if you\'re the main character',
+                    'Imagine the story like a movie playing in your head',
+                    'Tell the part that surprised you most'
+                ],
                 classroomGoal: 'I will try at least one new strategy when I respond to the reading today.',
                 connection: 'Creative people find solutions no one else has tried. The most powerful writing and ideas often come from angles others missed.',
                 starters: {
@@ -1399,6 +1395,12 @@
                 description: 'I speak up and act even when it feels uncomfortable.',
                 grammarName: 'brave',
                 buildingPhrase: 'bravery',
+                readerPhrase: 'a brave reader',
+                retellStrategies: [
+                    'Share my retelling out loud, even if it\'s not perfect',
+                    'Try to retell even when it feels hard',
+                    'Use my own words, even if I\'m not sure they\'re right'
+                ],
                 classroomGoal: 'I will share my thinking out loud at least once today, even if I feel nervous.',
                 connection: 'Brave people say what others are afraid to say. That\'s often what moves a conversation — or a movement — forward.',
                 starters: {
@@ -1423,6 +1425,12 @@
                 description: 'I listen to others and do my part.',
                 grammarName: 'a team player',
                 buildingPhrase: 'team player skills',
+                readerPhrase: 'a team player',
+                retellStrategies: [
+                    'Listen to my partner\'s retelling before I share mine',
+                    'Take turns — I share one part, my partner shares the next',
+                    'Add on to something my partner said'
+                ],
                 classroomGoal: 'I will listen to my partner and add my own idea to the discussion before we finish.',
                 connection: 'Being a team player means you bring people together. No one figures out something hard completely on their own.',
                 starters: {
@@ -1623,6 +1631,7 @@
         // ── Class Selection ────────────────────────────
         selectClass(className) {
             this.data.selectedClass = className;
+            VERSION = CLASS_VERSIONS[className] || '2';
             this.showScreen('step1-screen');
             this.currentStep = 'step1';
         },
@@ -1903,16 +1912,16 @@ or
                     `There are different ways to practice being ${growth.grammarName}.`;
             }
 
-            // Update strategy headings to connect trait + cause
+            // Update strategy heading for v1 with trait-specific reader phrase
+            const readerPhrase = growth ? growth.readerPhrase : 'a good reader';
+            const h3 = document.getElementById('strategy-heading-v1');
+            if (h3) h3.textContent = `What would ${readerPhrase} do to retell the story?`;
+            // Update v2 strategy heading
             const traitPhrase = growth ? growth.grammarName : 'your best';
             const stratHeading = `How will you practice being ${traitPhrase} in class today?`;
             const stratBridge = problem
                 ? `Building these skills is how you start making a difference with <strong>${problem}</strong>.`
                 : 'Pick all that apply.';
-            const h3 = document.getElementById('strategy-heading-v1');
-            if (h3) h3.innerHTML = stratHeading;
-            const p1 = document.getElementById('strategy-bridge-v1');
-            if (p1) p1.innerHTML = stratBridge;
             const h2 = document.getElementById('strategy-heading-v2');
             if (h2) h2.innerHTML = stratHeading;
             const p2 = document.getElementById('strategy-bridge-v2');
@@ -1929,6 +1938,11 @@ or
 
             const continueBtn = document.getElementById('classroom-goal-continue');
 
+            // Hide cause badge and connection sentence for all versions
+            document.getElementById('cause-badge').classList.add('hidden');
+            document.getElementById('classroom-goal-intro').classList.add('hidden');
+            document.getElementById('classroom-trait-connection').classList.add('hidden');
+
             if (VERSION === '1') {
                 // v1: fixed retelling goal + strategy chips
                 const goalText = 'After I read, I will retell the story in my own words.';
@@ -1938,7 +1952,14 @@ or
                 document.getElementById('v2-goal-section').classList.add('hidden');
                 document.getElementById('v1-strategy-section').classList.remove('hidden');
                 continueBtn.disabled = true;
-                document.querySelectorAll('.strategy-chip').forEach(c => c.classList.remove('selected'));
+                // Populate trait-specific retell strategy chips
+                const strategies = (growth && growth.retellStrategies) ? growth.retellStrategies : [];
+                document.getElementById('v1-strategy-chips').innerHTML = strategies.map(s =>
+                    `<div class="strategy-chip" onclick="app.toggleStrategy(this, '${s.replace(/'/g,"\\'")}')">
+                        ${s}
+                        <button class="tts-btn chip-tts" data-speak="${s.replace(/"/g, '')}" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
+                    </div>`
+                ).join('');
                 const stratCustom = document.getElementById('strategy-custom');
                 if (stratCustom) stratCustom.value = '';
                 this.data.strategies = [];
@@ -2459,8 +2480,10 @@ or
             try {
                 const snap = await getDocs(collection(db, COLLECTION));
                 this._allGoals = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
-                // Default to first class
-                this._activeClass = CLASSES[0];
+                // Default to All Classes so existing data is always visible
+                this._activeClass = '__all__';
+                document.querySelectorAll('.db-filter-chip').forEach(c => c.classList.remove('active'));
+                document.querySelector('.db-filter-chip[data-class="__all__"]').classList.add('active');
                 this.renderDashboard();
             } catch (e) {
                 document.getElementById('dashboard-table').innerHTML = '<div class="no-data">Error loading data.</div>';
@@ -2476,7 +2499,10 @@ or
         },
 
         renderDashboard() {
-            const filtered = (this._allGoals || []).filter(g => g.selectedClass === this._activeClass);
+            const all = this._allGoals || [];
+            const filtered = this._activeClass === '__all__'
+                ? all
+                : all.filter(g => (g.selectedClass || '') === this._activeClass);
 
             // Word cloud
             const wc = document.getElementById('word-cloud');
@@ -2503,19 +2529,23 @@ or
 
             // Roster
             document.getElementById('db-count').textContent = filtered.length;
+            const showClass = this._activeClass === '__all__';
             document.getElementById('dashboard-table').innerHTML = `
                 <table>
-                    <thead><tr><th>Name</th><th>Cause</th><th>Strength</th><th>Growing</th><th>Class Goal</th></tr></thead>
-                    <tbody>${this.renderDashboardRows(filtered)}</tbody>
+                    <thead><tr><th>Name</th>${showClass ? '<th>Class</th>' : ''}<th>Cause</th><th>Strength</th><th>Growing</th><th>Class Goal</th></tr></thead>
+                    <tbody>${this.renderDashboardRows(filtered, showClass)}</tbody>
                 </table>`;
         },
 
-        renderDashboardRows(goals) {
+        renderDashboardRows(goals, showClass = false) {
             return goals.map(g => {
                 const growth   = this.traits.find(t => t.id === g.growthTrait);
                 const existing = this.traits.find(t => t.id === g.existingTrait);
+                const classCell = showClass
+                    ? `<td style="font-size:0.85rem;color:var(--text-mid)">${g.selectedClass || '—'}</td>` : '';
                 return `<tr>
                     <td>${g.studentName || ''}</td>
+                    ${classCell}
                     <td>${(g.problem||'').substring(0,45)}${(g.problem||'').length>45?'…':''}</td>
                     <td>${existing ? existing.icon + ' ' + existing.title : '—'}</td>
                     <td>${growth   ? growth.icon   + ' ' + growth.title   : '—'}</td>
