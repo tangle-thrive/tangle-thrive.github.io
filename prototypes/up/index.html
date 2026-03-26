@@ -1541,25 +1541,18 @@
             this.data.usedChip = false;
             document.getElementById('step1-suggestion').classList.add('hidden');
             document.getElementById('step1-error').classList.add('hidden');
-            document.getElementById('step1-continue').disabled = text.length < 3;
+            const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
+            document.getElementById('step1-continue').disabled = wordCount < 2;
         },
 
         async submitStep1() {
             const val = document.getElementById('problem-text').value.trim();
-            if (val.length < 3) return;
+            const wordCount = val.split(/\s+/).filter(w => w.length > 0).length;
+            if (wordCount < 2) return;
 
-            // Chips are pre-validated — skip AI check
+            // Chips are pre-validated — skip AI reframe
             if (this.data.usedChip) {
                 this.proceedToStep2(val);
-                return;
-            }
-
-            // Quick client-side check before calling AI
-            const words = val.toLowerCase().split(/\s+/);
-            const isSingleShortWord = words.length === 1 && val.length < 10;
-            if (isSingleShortWord) {
-                document.getElementById('step1-error').textContent = 'Try describing a real problem — like "kids being left out" or "trash in my neighborhood."';
-                document.getElementById('step1-error').classList.remove('hidden');
                 return;
             }
 
@@ -1574,27 +1567,24 @@
                     headers: { 'content-type': 'application/json' },
                     body: JSON.stringify({
                         model: 'claude-haiku-4-5-20251001',
-                        max_tokens: 150,
+                        max_tokens: 100,
                         messages: [{
                             role: 'user',
-                            content: `A student typed this: "${val}"
+                            content: `A student in grades 1–6 typed this as a world issue they care about: "${val}"
 
-Is this a real problem in the world, community, or school that someone could try to fix?
+Your job: reframe it as a clear, specific world/community/school problem in 3–8 words.
 
-VALID: "pollution in rivers", "kids going hungry", "bullying at school", "homelessness", "animals losing their homes", "people being treated unfairly"
+Rules:
+- If it already describes a real problem clearly, return it cleaned up (fix spelling, make it lowercase)
+- If it's vague, make it more specific (e.g. "people being mean" → "bullying and unkindness at school")
+- If it truly cannot be interpreted as any real-world problem (random words, personal activities like "eating cake", food, hobbies, entertainment), set valid to false
 
-NOT VALID — reject these types:
-- Personal activities or hobbies: "eating cake", "playing games", "watching TV"
-- Food or entertainment: "cake", "pizza", "movies"
-- Vague feelings or adjectives: "bad things", "sad stuff"
-- Random phrases with no connection to a real problem
-- Anything a person DOES rather than a problem that EXISTS in the world
+Examples of real problems: litter in the park, kids going hungry, animals losing their homes, bullying at school, families without homes, pollution in rivers
 
-If it clearly describes a real world/community problem and is specific enough: {"valid":true,"needsRevision":false}
-If it hints at a real issue but is too vague (e.g. just "pollution" or "hunger"): {"valid":true,"needsRevision":true,"suggestion":"rewrite as a clear 4-8 word problem"}
-If it is NOT a real world issue: {"valid":false,"message":"One encouraging sentence asking them to describe a real problem in their school or community. Max 15 words."}
-
-Respond with JSON only.`
+Respond ONLY with JSON, no other text:
+{"valid": true, "reframe": "the reframed issue in 3-8 words"}
+or
+{"valid": false}`
                         }]
                     })
                 });
@@ -1603,24 +1593,21 @@ Respond with JSON only.`
                 const result = JSON.parse(text);
 
                 if (!result.valid) {
-                    document.getElementById('step1-error').textContent = result.message || 'That doesn\'t look like a world issue. Try something like "pollution in my neighborhood" or "kids not having enough to eat."';
+                    document.getElementById('step1-error').textContent = 'That doesn\'t sound like a world issue. Try something like "kids going hungry" or "trash in my neighborhood."';
                     document.getElementById('step1-error').classList.remove('hidden');
                     btn.textContent = 'Continue →';
                     btn.disabled = false;
                     return;
                 }
 
-                if (result.needsRevision && result.suggestion) {
-                    document.getElementById('suggestion-text').textContent = result.suggestion;
-                    document.getElementById('step1-suggestion').classList.remove('hidden');
-                    btn.textContent = 'Continue →';
-                    btn.disabled = false;
-                    return;
-                }
+                // Always show the reframe as a suggestion
+                document.getElementById('suggestion-text').textContent = result.reframe;
+                document.getElementById('step1-suggestion').classList.remove('hidden');
+                btn.textContent = 'Continue →';
+                btn.disabled = false;
 
-                this.proceedToStep2(val);
             } catch (e) {
-                // If AI check fails, just proceed
+                // If AI check fails, just proceed with what they wrote
                 this.proceedToStep2(val);
             }
         },
