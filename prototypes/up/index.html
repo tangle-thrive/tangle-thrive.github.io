@@ -1073,6 +1073,7 @@
             <div class="fixed-goal-box">
                 <div class="fgb-label">YOUR GOAL:</div>
                 <div id="classroom-goal-text" class="fgb-text"></div>
+                <button class="tts-btn" data-speak="After I read, I will retell the story in my own words." onclick="app.speakFromBtn(this)" title="Read aloud" style="margin-top:8px;">🔊</button>
             </div>
         </div>
 
@@ -1683,17 +1684,18 @@
                             role: 'user',
                             content: `A student in grades 1–6 typed this as a world issue they care about: "${val}"
 
-Your job: reframe it as a clear, specific world/community/school problem in 3–8 words.
+Your job: reframe it as a short, simple problem that a 1st grader could easily read and understand. Use everyday words. Keep it to 3–7 words.
 
 Rules:
+- Use simple, common words a 6-year-old would know (e.g. "animals" not "wildlife", "not enough food" not "food insecurity", "pets without homes" not "abandoned animals")
 - If it already describes a real problem clearly, return it cleaned up (fix spelling, make it lowercase)
-- If it's vague, make it more specific (e.g. "people being mean" → "bullying and unkindness at school")
+- If it's vague, make it more specific but still simple (e.g. "puppy" → "puppies without homes", "people being mean" → "kids being mean to each other")
 - If it truly cannot be interpreted as any real-world problem (random words, personal activities like "eating cake", food, hobbies, entertainment), set valid to false
 
-Examples of real problems: litter in the park, kids going hungry, animals losing their homes, bullying at school, families without homes, pollution in rivers
+Examples of good reframes: litter at school, kids not having enough food, animals losing their homes, people being unkind, families without a home, dirty water in rivers
 
 Respond ONLY with JSON, no other text:
-{"valid": true, "reframe": "the reframed issue in 3-8 words"}
+{"valid": true, "reframe": "the reframed issue in 3-7 words"}
 or
 {"valid": false}`
                         }]
@@ -2546,7 +2548,7 @@ or
                 return `<tr>
                     <td>${g.studentName || ''}</td>
                     ${classCell}
-                    <td>${(g.problem||'').substring(0,45)}${(g.problem||'').length>45?'…':''}</td>
+                    <td>${g.problem||''}</td>
                     <td>${existing ? existing.icon + ' ' + existing.title : '—'}</td>
                     <td>${growth   ? growth.icon   + ' ' + growth.title   : '—'}</td>
                     <td style="font-size:0.85rem">${(g.classroomGoal||'').substring(0,60)}${(g.classroomGoal||'').length>60?'…':''}</td>
