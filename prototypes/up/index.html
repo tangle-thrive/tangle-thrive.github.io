@@ -1529,11 +1529,11 @@
         insertChip(topicLower) {
             const input = document.getElementById('problem-text');
             input.value = topicLower;
-            this.data.usedChip = true;
             document.getElementById('ideas-panel').classList.remove('open');
             document.getElementById('step1-suggestion').classList.add('hidden');
             input.focus();
             this.onProblemInput();
+            this.data.usedChip = true; // set AFTER onProblemInput so it isn't reset
         },
 
         onProblemInput() {
