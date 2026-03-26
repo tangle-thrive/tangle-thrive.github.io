@@ -1083,13 +1083,17 @@
             <h2 id="v2-goal-heading" class="main-question" style="margin-top:8px;">How will you practice in class today?</h2>
             <p class="strategy-bridge" style="margin-bottom:14px;">Choose one goal:</p>
             <div id="goal-options-list"></div>
+            <div class="problem-input-wrap" style="margin-top:14px;">
+                <span class="input-prefix">I will</span>
+                <input type="text" id="goal-writein" class="problem-input" placeholder="write your own goal..."
+                    oninput="app.onGoalWritein(this.value)" autocomplete="off">
+            </div>
         </div>
 
         <!-- Version 1 only: strategy chips -->
         <div id="v1-strategy-section" class="hidden">
             <h3 id="strategy-heading-v1" style="margin-top:24px;margin-bottom:4px;font-size:1.2rem;">What would a reader do to retell the story?</h3>
             <div class="strategy-chips" id="v1-strategy-chips"></div>
-            <input type="text" id="strategy-custom" class="text-input" placeholder="Or write your own..." oninput="app.onCustomStrategy(this.value)" style="margin-top:12px;">
         </div>
 
         <div class="button-group">
@@ -1988,6 +1992,8 @@ or
                 ).join('');
                 this.data.classroomGoal = '';
                 this.data.strategies = [];
+                const gw = document.getElementById('goal-writein');
+                if (gw) gw.value = '';
                 continueBtn.disabled = true; // require a selection
             }
 
@@ -2006,7 +2012,21 @@ or
             this.data.classroomGoal = growth.goals[idx];
             document.querySelectorAll('.goal-option-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
+            const writein = document.getElementById('goal-writein');
+            if (writein) writein.value = '';
             document.getElementById('classroom-goal-continue').disabled = false;
+        },
+
+        onGoalWritein(val) {
+            const trimmed = val.trim();
+            if (trimmed.length > 0) {
+                this.data.classroomGoal = 'I will ' + trimmed;
+                document.querySelectorAll('.goal-option-card').forEach(c => c.classList.remove('selected'));
+                document.getElementById('classroom-goal-continue').disabled = false;
+            } else {
+                this.data.classroomGoal = '';
+                document.getElementById('classroom-goal-continue').disabled = true;
+            }
         },
 
         // ── Shared: starter chip insert ────────────────
@@ -2138,7 +2158,7 @@ or
             const strategiesBox = document.getElementById('peer-strategies-box');
             const strategiesDisplay = document.getElementById('peer-strategies-display');
             if (this.data.strategies && this.data.strategies.length > 0) {
-                strategiesDisplay.textContent = this.data.strategies.join(', ');
+                strategiesDisplay.innerHTML = '<ul style="margin:4px 0 0 16px;padding:0;">' + this.data.strategies.map(s => `<li>${s}</li>`).join('') + '</ul>';
                 strategiesBox.classList.remove('hidden');
             } else {
                 strategiesBox.classList.add('hidden');
@@ -2184,7 +2204,7 @@ or
             const strategiesRow = (this.data.strategies && this.data.strategies.length > 0)
                 ? `<div class="summary-row">
                     <span class="sr-label">My strategies</span>
-                    <span class="sr-value">${this.data.strategies.join(', ')}</span>
+                    <ul style="margin:4px 0 0 16px;padding:0;">${this.data.strategies.map(s => `<li class="sr-value">${s}</li>`).join('')}</ul>
                 </div>`
                 : '';
 
