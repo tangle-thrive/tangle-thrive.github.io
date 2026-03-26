@@ -235,7 +235,6 @@
 
         /* ── Trait Grid (shared) ── */
         .trait-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-        @media (min-width: 520px) { .trait-grid { grid-template-columns: 1fr 1fr 1fr; } }
 
         .trait-card {
             background: white; border: 2px solid #e8e8e8; border-radius: 16px;
@@ -471,6 +470,15 @@
             margin: 4px 0 16px; animation: slideDown .3s ease; line-height: 1.6;
         }
         .goal-connection-reveal.purple { background: var(--purple-pale); color: var(--purple-dark); }
+        .cause-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #f0faf4; border: 1.5px solid var(--green-mid);
+            color: var(--green-dark); border-radius: 20px;
+            padding: 6px 14px; font-size: 0.85rem; font-weight: 600;
+            margin-bottom: 14px;
+        }
+        .cause-badge .cause-badge-issue { font-style: italic; font-weight: 400; }
+        .strategy-bridge { color: var(--green-mid); font-size: 0.9rem; margin-bottom: 12px; }
         .minutes-options { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; }
         .minutes-card {
             flex: 1; min-width: 80px; background: white; border: 2px solid #e8e8e8;
@@ -998,6 +1006,7 @@
     ══════════════════════════════════ -->
     <div id="goal-classroom-screen" class="activity-screen hidden">
         <div class="step-indicator">My Goal — In Class</div>
+        <div id="cause-badge" class="cause-badge hidden">🌍 Your cause: <span id="cause-badge-text" class="cause-badge-issue"></span></div>
         <p id="classroom-goal-intro" class="subheading-text" style="margin-bottom:12px;"></p>
         <div id="classroom-trait-connection" class="goal-connection-reveal hidden"></div>
 
@@ -1010,28 +1019,24 @@
 
         <!-- Version 1 only: strategy chips -->
         <div id="v1-strategy-section" class="hidden">
-            <h3 style="margin-top:24px;margin-bottom:4px;">How will <em>you</em> do this?</h3>
-            <p style="color:var(--green-mid);font-size:0.9rem;margin-bottom:12px;">Pick all that apply.</p>
+            <h3 id="strategy-heading-v1" style="margin-top:24px;margin-bottom:4px;">How will <em>you</em> do this?</h3>
+            <p id="strategy-bridge-v1" class="strategy-bridge">Pick all that apply.</p>
             <div class="strategy-chips">
                 <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Think about the beginning, middle, and end')">
                     Think about the beginning, middle, and end
                     <button class="tts-btn chip-tts" data-speak="Think about the beginning, middle, and end" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
                 </div>
-                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Use my own words — don\'t copy from the text')">
-                    Use my own words — don't copy from the text
-                    <button class="tts-btn chip-tts" data-speak="Use my own words, don't copy from the text" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
-                </div>
                 <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Include the most important details')">
                     Include the most important details
                     <button class="tts-btn chip-tts" data-speak="Include the most important details" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
                 </div>
-                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Tell it like I\'m explaining to a friend')">
-                    Tell it like I'm explaining to a friend
-                    <button class="tts-btn chip-tts" data-speak="Tell it like I'm explaining to a friend" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
+                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Use words like first, then, and finally')">
+                    Use words like "first," "then," and "finally"
+                    <button class="tts-btn chip-tts" data-speak="Use words like first, then, and finally" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
                 </div>
-                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Write my first thought, then add more')">
-                    Write my first thought, then add more
-                    <button class="tts-btn chip-tts" data-speak="Write my first thought, then add more" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
+                <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Picture the story in my head as I read')">
+                    Picture the story in my head as I read
+                    <button class="tts-btn chip-tts" data-speak="Picture the story in my head as I read" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
                 </div>
             </div>
             <input type="text" id="strategy-custom" class="text-input" placeholder="Or write your own..." oninput="app.onCustomStrategy(this.value)" style="margin-top:12px;">
@@ -1055,8 +1060,8 @@
             After my teacher gives instructions, I will start working right away — without being asked again.
         </div>
 
-        <h2 class="main-question" style="margin-top:16px;">How will <em>you</em> do this?</h2>
-        <p class="strategy-sub">Pick all that apply.</p>
+        <h2 id="strategy-heading-v2" class="main-question" style="margin-top:16px;">How will <em>you</em> do this?</h2>
+        <p id="strategy-bridge-v2" class="strategy-bridge">Pick all that apply.</p>
 
         <div class="strategy-chips" id="strategy-chips">
             <div class="strategy-chip" onclick="app.toggleStrategy(this, 'Read the instructions before starting')">Read the instructions before starting <button class="tts-btn chip-tts" data-speak="Read the instructions before starting" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button></div>
@@ -1081,7 +1086,7 @@
     <div id="goal-home-screen" class="activity-screen purple-screen hidden">
         <div class="step-indicator">My Goal — At Home</div>
         <div id="home-goal-connection" class="goal-connection-reveal purple" style="margin-bottom:20px;"></div>
-        <h2 class="main-question">How many minutes will you read on Lexia or Epic this week?</h2>
+        <h2 class="main-question" id="home-goal-heading">How many minutes will you read on Lexia or Epic this week?</h2>
 
         <div class="minutes-options" id="minutes-options">
             <div class="minutes-card" onclick="app.selectHomeMinutes(20)">
@@ -1367,25 +1372,29 @@
                 initiation:    'Organized people use every minute well. Starting right away is how you make the most of your class time.',
                 participation: 'Organized people think before they speak. Raising your hand shows you\'re ready to share your thinking.',
                 focus:         'Organized people finish what they start. Staying focused from beginning to end is what being organized really looks like.',
-                home:          'Organized people stick to their plan. Setting aside time for Lexia or Epic and actually doing it is you being organized outside of school.'
+                home:          'Organized people stick to their plan. Setting aside time for Lexia or Epic and actually doing it is you being organized outside of school.',
+                homeV1:        'Organized people stick to their plan. Setting aside time to read at home and actually doing it is what being organized looks like outside of school.'
             },
             creative: {
                 initiation:    'Creative people are always ready to explore. Starting quickly gives you more time to think, imagine, and create.',
                 participation: 'Creative people bring ideas no one else thinks of. Raising your hand is how you share what only you can contribute.',
                 focus:         'Creative people go deep with ideas. Staying focused gives your thinking room to grow in unexpected directions.',
-                home:          'Creative people fill their minds with stories and ideas. Reading on Lexia or Epic is how you fuel your creativity.'
+                home:          'Creative people fill their minds with stories and ideas. Reading on Lexia or Epic is how you fuel your creativity.',
+                homeV1:        'Creative people fill their minds with stories and ideas. Reading a book at home is how you fuel your creativity.'
             },
             brave: {
                 initiation:    'Brave people act before they feel fully ready. Starting on your own — without being asked — is a brave move.',
                 participation: 'Brave people speak up even when it feels uncomfortable. Raising your hand is practice for being brave every single day.',
                 focus:         'Brave people do hard things without backing down. Staying focused when you want to quit takes real courage.',
-                home:          'Brave people do hard things even when no one is watching. Choosing to read outside of class, when no one is making you, takes real courage.'
+                home:          'Brave people do hard things even when no one is watching. Choosing to read outside of class, when no one is making you, takes real courage.',
+                homeV1:        'Brave people do hard things even when no one is watching. Choosing to read at home, when no one is making you, takes real courage.'
             },
             'team-player': {
                 initiation:    'Team players show up ready to contribute. Starting on time means you\'re prepared to do your part.',
                 participation: 'Team players add their voice so the group gets stronger. Raising your hand is how you show up for your class.',
                 focus:         'Team players take their work seriously. Staying focused is how you make sure you\'re ready to contribute.',
-                home:          'Team players always come prepared. Building your skills outside school means you show up ready to give your best.'
+                home:          'Team players always come prepared. Building your skills outside school means you show up ready to give your best.',
+                homeV1:        'Team players always come prepared. Reading at home builds your skills so you show up ready to give your best.'
             },
         },
 
@@ -1783,11 +1792,36 @@ or
         submitStep3() {
             const growth = this.traits.find(t => t.id === this.data.growthTrait);
 
+            // Show cause badge
+            const problem = this.data.problem;
+            const causeBadge = document.getElementById('cause-badge');
+            if (problem) {
+                document.getElementById('cause-badge-text').textContent = problem;
+                causeBadge.classList.remove('hidden');
+            } else {
+                causeBadge.classList.add('hidden');
+            }
+
             // Trait connection intro
             if (growth) {
                 document.getElementById('classroom-goal-intro').textContent =
                     `There are different ways to practice being ${growth.grammarName}.`;
             }
+
+            // Update strategy headings to connect trait + cause
+            const traitPhrase = growth ? growth.grammarName : 'your best';
+            const stratHeading = `How will you practice being ${traitPhrase} in class today?`;
+            const stratBridge = problem
+                ? `Building these skills is how you start making a difference with <strong>${problem}</strong>.`
+                : 'Pick all that apply.';
+            const h3 = document.getElementById('strategy-heading-v1');
+            if (h3) h3.innerHTML = stratHeading;
+            const p1 = document.getElementById('strategy-bridge-v1');
+            if (p1) p1.innerHTML = stratBridge;
+            const h2 = document.getElementById('strategy-heading-v2');
+            if (h2) h2.innerHTML = stratHeading;
+            const p2 = document.getElementById('strategy-bridge-v2');
+            if (p2) p2.innerHTML = stratBridge;
 
             // Show trait connection sentence
             const conn = this.goalConnections[this.data.growthTrait];
@@ -1801,7 +1835,7 @@ or
             // Set goal text based on version
             const goalText = VERSION === '2' && growth
                 ? growth.classroomGoal
-                : 'After I read, I will retell what I read in my own words so others can understand the story.';
+                : 'After I read, I will retell the story in my own words.';
             this.data.classroomGoal = goalText;
             document.getElementById('classroom-goal-text').textContent = goalText;
 
@@ -1916,9 +1950,15 @@ or
                     }
                 }
             }
-            // Populate home connection sentence
+            // Populate home connection sentence + heading (version-aware)
             const conn = this.goalConnections[this.data.growthTrait];
-            if (conn) document.getElementById('home-goal-connection').textContent = conn.home;
+            if (conn) {
+                const homeText = VERSION === '1' ? (conn.homeV1 || conn.home) : conn.home;
+                document.getElementById('home-goal-connection').textContent = homeText;
+            }
+            document.getElementById('home-goal-heading').textContent = VERSION === '1'
+                ? 'How many minutes will you read at home this week?'
+                : 'How many minutes will you read on Lexia or Epic this week?';
             // Reset minutes selection
             document.querySelectorAll('.minutes-card').forEach(c => c.classList.remove('selected'));
             document.getElementById('home-goal-continue').disabled = true;
@@ -1944,8 +1984,11 @@ or
             // Class goal
             document.getElementById('peer-classroom-goal-display').textContent =
                 this.data.classroomGoal || '';
-            document.getElementById('peer-home-goal-display').textContent =
-                `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week.`;
+            const homeGoalText = VERSION === '1'
+                ? `Read a book for ${this.data.homeGoalMinutes} minutes this week.`
+                : `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week.`;
+            this.data.homeGoalText = homeGoalText;
+            document.getElementById('peer-home-goal-display').textContent = homeGoalText;
             // Strategies
             const strategiesBox = document.getElementById('peer-strategies-box');
             const strategiesDisplay = document.getElementById('peer-strategies-display');
@@ -2020,7 +2063,7 @@ or
                 ${strategiesRow}
                 <div class="summary-row">
                     <span class="sr-label">Home goal</span>
-                    <span class="sr-value">Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week</span>
+                    <span class="sr-value">${this.data.homeGoalText || (VERSION === '1' ? `Read a book for ${this.data.homeGoalMinutes} minutes this week` : `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week`)}</span>
                 </div>
                 <div class="completion-bridge">
                     Once you're more ${growth ? growth.grammarName : 'skilled'} day-to-day, you'll be more ${growth ? growth.grammarName : 'skilled'} when it comes to big problems like <strong>${issue}</strong>.
