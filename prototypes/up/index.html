@@ -1179,13 +1179,13 @@
             <span class="gd-label">Class goal</span>
             <span class="gd-value" id="peer-classroom-goal-display"></span>
         </div>
+        <div class="goal-display-box" style="margin-top:10px;" id="peer-strategies-box">
+            <span class="gd-label">My strategies for the class goal</span>
+            <span class="gd-value" id="peer-strategies-display"></span>
+        </div>
         <div class="goal-display-box" style="margin-top:10px;">
             <span class="gd-label">Home goal</span>
             <span class="gd-value" id="peer-home-goal-display"></span>
-        </div>
-        <div class="goal-display-box" style="margin-top:10px;" id="peer-strategies-box">
-            <span class="gd-label">My strategies</span>
-            <span class="gd-value" id="peer-strategies-display"></span>
         </div>
 
         <div class="peer-talk">
@@ -1915,7 +1915,7 @@ or
             // Update strategy heading for v1 with trait-specific reader phrase
             const readerPhrase = growth ? growth.readerPhrase : 'a good reader';
             const h3 = document.getElementById('strategy-heading-v1');
-            if (h3) h3.textContent = `What would ${readerPhrase} do to retell the story?`;
+            if (h3) h3.textContent = `You want to work on being ${growth ? growth.grammarName : 'your best'}. What would ${growth ? growth.readerPhrase : 'a good reader'} do to retell the story?`;
             // Update v2 strategy heading
             const traitPhrase = growth ? growth.grammarName : 'your best';
             const stratHeading = `How will you practice being ${traitPhrase} in class today?`;
