@@ -192,7 +192,7 @@
             box-shadow: var(--shadow-med);
             animation: fadeIn .6s ease;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
         }
         .activity-screen::before {
             content: '🌿'; position: absolute; font-size: 120px; opacity: .03;
@@ -1590,7 +1590,10 @@ or
                 });
                 const data = await res.json();
                 const text = data.content?.[0]?.text?.trim() || '';
-                const result = JSON.parse(text);
+                console.log('Reframe raw response:', text);
+                let result;
+                try { result = JSON.parse(text); }
+                catch(e) { result = { valid: true, reframe: val }; }
 
                 if (!result.valid) {
                     document.getElementById('step1-error').textContent = 'That doesn\'t sound like a world issue. Try something like "kids going hungry" or "trash in my neighborhood."';
