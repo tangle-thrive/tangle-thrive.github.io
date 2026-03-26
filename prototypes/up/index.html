@@ -470,6 +470,17 @@
             margin: 4px 0 16px; animation: slideDown .3s ease; line-height: 1.6;
         }
         .goal-connection-reveal.purple { background: var(--purple-pale); color: var(--purple-dark); }
+        .goal-option-card {
+            background: white; border: 2px solid #e0e0e0; border-radius: 14px;
+            padding: 16px 18px; cursor: pointer; margin-bottom: 10px;
+            font-size: 0.95rem; line-height: 1.5; transition: all .2s ease;
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        }
+        .goal-option-card:hover { border-color: var(--green-mid); background: #f0faf4; }
+        .goal-option-card.selected {
+            border-color: var(--green-dark); background: var(--green-pale);
+            box-shadow: 0 0 0 2px var(--green-mid);
+        }
         .cause-badge {
             display: inline-flex; align-items: center; gap: 6px;
             background: #f0faf4; border: 1.5px solid var(--green-mid);
@@ -559,8 +570,33 @@
         .teacher-link a:hover { color: var(--green-dark); }
 
         /* ── Dashboard / Progress ── */
-        .dashboard { padding: 30px 20px; animation: fadeIn .6s ease; max-width: 1100px; margin: 0 auto; }
-        .dashboard h1 { color: var(--green-dark); font-size: 2rem; margin-bottom: 26px; }
+        /* ── Class Selection ── */
+        .class-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 24px 0; }
+        .class-card {
+            background: white; border: 2.5px solid #e0e0e0; border-radius: 20px;
+            padding: 28px 24px; cursor: pointer; text-align: center;
+            transition: all .2s ease; user-select: none;
+        }
+        .class-card:hover { border-color: var(--green-mid); background: #f0faf4; transform: translateY(-2px); box-shadow: var(--shadow-med); }
+        .class-teacher { font-size: 1.3rem; font-weight: 800; color: var(--green-dark); }
+
+        /* ── Dashboard ── */
+        .dashboard { padding: 30px 20px; animation: fadeIn .6s ease; max-width: 960px; margin: 0 auto; }
+        .db-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .db-header h1 { color: var(--green-dark); font-size: 1.8rem; margin: 0; }
+        .db-class-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+        .db-filter-chip {
+            padding: 8px 20px; border-radius: 50px; border: 2px solid #e0e0e0;
+            background: white; font-family: 'Nunito', sans-serif; font-size: 0.9rem;
+            font-weight: 700; cursor: pointer; color: var(--text-mid); transition: all .2s;
+        }
+        .db-filter-chip:hover { border-color: var(--green-mid); color: var(--green-dark); }
+        .db-filter-chip.active { background: var(--green-dark); border-color: var(--green-dark); color: white; }
+        .db-section { background: white; border-radius: 20px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-light); }
+        .db-section-title { font-size: 1.1rem; font-weight: 800; color: var(--green-dark); margin: 0 0 18px; }
+        .db-count { font-size: 0.9rem; font-weight: 600; color: var(--text-gray); background: #f0f0f0; border-radius: 10px; padding: 2px 8px; margin-left: 8px; }
+        .word-cloud { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; min-height: 80px; padding: 8px 0; }
+        .wc-word { font-weight: 700; line-height: 1.3; transition: opacity .2s; }
         .dashboard-controls { display: flex; gap: 14px; margin-bottom: 26px; flex-wrap: wrap; }
         .search-input {
             flex: 1; min-width: 200px; padding: 12px 18px;
@@ -878,6 +914,27 @@
     </div>
 
     <!-- ══════════════════════════════════
+         CLASS SELECTION
+    ══════════════════════════════════ -->
+    <div id="class-select-screen" class="activity-screen hidden">
+        <h2 class="main-question">Which class are you in?</h2>
+        <div class="class-grid">
+            <div class="class-card" onclick="app.selectClass('Ms. Cleaveland')">
+                <div class="class-teacher">Ms. Cleaveland</div>
+            </div>
+            <div class="class-card" onclick="app.selectClass('Mr. Gomez')">
+                <div class="class-teacher">Mr. Gomez</div>
+            </div>
+            <div class="class-card" onclick="app.selectClass('Ms. Lee')">
+                <div class="class-teacher">Ms. Lee</div>
+            </div>
+        </div>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="app.showScreen('setup-screen'); app.currentStep='setup';">← Back</button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
          NAME LOGIN
     ══════════════════════════════════ -->
     <div id="name-login-screen" class="activity-screen hidden">
@@ -1010,11 +1067,20 @@
         <p id="classroom-goal-intro" class="subheading-text" style="margin-bottom:12px;"></p>
         <div id="classroom-trait-connection" class="goal-connection-reveal hidden"></div>
 
-        <h2 class="main-question" style="margin-top:16px;">Your class goal this week</h2>
+        <!-- v1: fixed goal display -->
+        <div id="v1-goal-section">
+            <h2 class="main-question" style="margin-top:16px;">Your class goal this week</h2>
+            <div class="fixed-goal-box">
+                <div class="fgb-label">YOUR GOAL:</div>
+                <div id="classroom-goal-text" class="fgb-text"></div>
+            </div>
+        </div>
 
-        <div class="fixed-goal-box">
-            <div class="fgb-label">YOUR GOAL:</div>
-            <div id="classroom-goal-text" class="fgb-text"></div>
+        <!-- v2: pick-a-goal -->
+        <div id="v2-goal-section" class="hidden">
+            <h2 id="v2-goal-heading" class="main-question" style="margin-top:16px;">How will you practice in class today?</h2>
+            <p class="strategy-bridge" style="margin-bottom:14px;">Choose one goal:</p>
+            <div id="goal-options-list"></div>
         </div>
 
         <!-- Version 1 only: strategy chips -->
@@ -1208,14 +1274,31 @@
          TEACHER DASHBOARD
     ══════════════════════════════════ -->
     <div id="dashboard-screen" class="dashboard hidden">
-        <h1>Teacher Dashboard</h1>
-        <div class="dashboard-controls">
-            <input type="text" class="search-input" id="search-input" placeholder="Search by name, issue, or goal…">
-            <button class="btn btn-primary" onclick="app.exportCSV()">Export CSV</button>
-            <button class="btn btn-secondary" onclick="app.clearAllData()">Clear All Data</button>
-            <button class="btn btn-secondary" onclick="app.goHome()">← Back to Home</button>
+        <div class="db-header">
+            <h1>Teacher Dashboard</h1>
+            <button class="btn btn-secondary" onclick="app.goHome()">← Exit</button>
         </div>
-        <div class="data-table" id="dashboard-table"></div>
+
+        <!-- Class filter chips -->
+        <div class="db-class-filters" id="db-class-filters">
+            <button class="db-filter-chip active" data-class="Ms. Cleaveland" onclick="app.filterByClass('Ms. Cleaveland', this)">Ms. Cleaveland</button>
+            <button class="db-filter-chip" data-class="Mr. Gomez" onclick="app.filterByClass('Mr. Gomez', this)">Mr. Gomez</button>
+            <button class="db-filter-chip" data-class="Ms. Lee" onclick="app.filterByClass('Ms. Lee', this)">Ms. Lee</button>
+        </div>
+
+        <!-- Word cloud -->
+        <div class="db-section">
+            <h2 class="db-section-title">What your students care about</h2>
+            <div class="word-cloud" id="word-cloud">
+                <p class="no-data">Loading…</p>
+            </div>
+        </div>
+
+        <!-- Student roster -->
+        <div class="db-section">
+            <h2 class="db-section-title">Students <span class="db-count" id="db-count"></span></h2>
+            <div class="data-table" id="dashboard-table"></div>
+        </div>
     </div>
 
 </div><!-- /.container -->
@@ -1238,6 +1321,8 @@
     const db = getFirestore(firebaseApp);
     const COLLECTION = 'goals-up';
     const VERSION = new URLSearchParams(window.location.search).get('v') || '1';
+    const ROLE    = new URLSearchParams(window.location.search).get('role') || '';
+    const CLASSES = ['Ms. Cleaveland', 'Mr. Gomez', 'Ms. Lee'];
 
     const app = {
 
@@ -1245,6 +1330,7 @@
 
         data: {
             studentName:       '',
+            selectedClass:     '',
             problem:           '',  // the issue (just the topic, no "I want to help with" prefix)
             existingTrait:     '',
             existingTraitDesc: '',
@@ -1419,9 +1505,11 @@
 
         // ── Init ───────────────────────────────────────
         init() {
+            if (ROLE === 'teacher') {
+                this.showDashboard();
+                return;
+            }
             this.startTicker();
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) searchInput.addEventListener('input', () => this.filterDashboard());
         },
 
         startTicker() {
@@ -1440,7 +1528,7 @@
         },
 
         showScreen(id) {
-            ['intro-screen','homepage','setup-screen','name-login-screen',
+            ['intro-screen','homepage','setup-screen','class-select-screen','name-login-screen',
              'step1-screen','step2-screen','step3-screen','goal-classroom-screen','goal-strategy-screen','goal-home-screen',
              'peer-screen','completion-screen','progress-screen','reflection-screen','dashboard-screen']
                 .forEach(s => document.getElementById(s).classList.add('hidden'));
@@ -1489,7 +1577,7 @@
 
         resetData() {
             this.data = {
-                studentName: '', problem: '',
+                studentName: '', selectedClass: '', problem: '',
                 existingTrait: '', existingTraitDesc: '',
                 growthTrait: '', growthTraitDesc: '',
                 classroomGoal: 'initiation', classroomGoalKey: 'initiation',
@@ -1528,6 +1616,13 @@
             }
             this.data.studentName = first + ' ' + last;
             err.classList.add('hidden');
+            this.showScreen('class-select-screen');
+            this.currentStep = 'class-select';
+        },
+
+        // ── Class Selection ────────────────────────────
+        selectClass(className) {
+            this.data.selectedClass = className;
             this.showScreen('step1-screen');
             this.currentStep = 'step1';
         },
@@ -1832,28 +1927,41 @@ or
                 el.classList.remove('hidden');
             }
 
-            // Set goal text based on version
-            const goalText = VERSION === '2' && growth
-                ? growth.classroomGoal
-                : 'After I read, I will retell the story in my own words.';
-            this.data.classroomGoal = goalText;
-            document.getElementById('classroom-goal-text').textContent = goalText;
-
-            // Show/hide strategy section
-            const v1Section = document.getElementById('v1-strategy-section');
             const continueBtn = document.getElementById('classroom-goal-continue');
+
             if (VERSION === '1') {
-                v1Section.classList.remove('hidden');
-                continueBtn.disabled = true; // require at least one chip
-                // Reset chips
+                // v1: fixed retelling goal + strategy chips
+                const goalText = 'After I read, I will retell the story in my own words.';
+                this.data.classroomGoal = goalText;
+                document.getElementById('classroom-goal-text').textContent = goalText;
+                document.getElementById('v1-goal-section').classList.remove('hidden');
+                document.getElementById('v2-goal-section').classList.add('hidden');
+                document.getElementById('v1-strategy-section').classList.remove('hidden');
+                continueBtn.disabled = true;
                 document.querySelectorAll('.strategy-chip').forEach(c => c.classList.remove('selected'));
                 const stratCustom = document.getElementById('strategy-custom');
                 if (stratCustom) stratCustom.value = '';
                 this.data.strategies = [];
             } else {
-                v1Section.classList.add('hidden');
-                continueBtn.disabled = false;
+                // v2: student picks one of 3 trait-specific goals
+                document.getElementById('v1-goal-section').classList.add('hidden');
+                document.getElementById('v1-strategy-section').classList.add('hidden');
+                document.getElementById('v2-goal-section').classList.remove('hidden');
+                // Set heading
+                const traitPhrase = growth ? growth.grammarName : 'yourself';
+                document.getElementById('v2-goal-heading').textContent =
+                    `How will you practice being ${traitPhrase} in class today?`;
+                // Populate goal option cards (first 3 from trait.goals)
+                const goalOpts = (growth && growth.goals) ? growth.goals.slice(0, 3) : [];
+                document.getElementById('goal-options-list').innerHTML = goalOpts.map((g, i) =>
+                    `<div class="goal-option-card" data-goal-index="${i}" onclick="app.selectGoalOption(this)">
+                        <span>${g}</span>
+                        <button class="tts-btn" data-speak="${g.replace(/"/g, '&quot;')}" onclick="event.stopPropagation();app.speakFromBtn(this)" title="Read aloud">🔊</button>
+                    </div>`
+                ).join('');
+                this.data.classroomGoal = '';
                 this.data.strategies = [];
+                continueBtn.disabled = true; // require a selection
             }
 
             // Reset old classroom goal state that may exist
@@ -1862,6 +1970,16 @@ or
 
             this.showScreen('goal-classroom-screen');
             this.currentStep = 'goal-classroom';
+        },
+
+        // ── v2: Goal option selection ───────────────────
+        selectGoalOption(card) {
+            const growth = this.traits.find(t => t.id === this.data.growthTrait);
+            const idx = parseInt(card.dataset.goalIndex);
+            this.data.classroomGoal = growth.goals[idx];
+            document.querySelectorAll('.goal-option-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            document.getElementById('classroom-goal-continue').disabled = false;
         },
 
         // ── Shared: starter chip insert ────────────────
@@ -2327,27 +2445,69 @@ or
 
         // ── Teacher Dashboard ──────────────────────────
         async showDashboard() {
-            const password = prompt('Enter the teacher password:');
-            if (password !== 'tangleandthrive') { alert('Incorrect password.'); return; }
+            if (ROLE !== 'teacher') {
+                const password = prompt('Enter the teacher password:');
+                if (password !== 'tangleandthrive') { alert('Incorrect password.'); return; }
+            }
             this.showScreen('dashboard-screen');
             await this.loadDashboard();
         },
 
         async loadDashboard() {
-            const table = document.getElementById('dashboard-table');
-            table.innerHTML = '<div class="no-data">Loading…</div>';
+            document.getElementById('word-cloud').innerHTML = '<p class="no-data">Loading…</p>';
+            document.getElementById('dashboard-table').innerHTML = '';
             try {
                 const snap = await getDocs(collection(db, COLLECTION));
                 this._allGoals = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
-                if (!this._allGoals.length) {
-                    table.innerHTML = '<div class="no-data">No student goals yet.</div>'; return;
-                }
-                table.innerHTML = `
-                    <table>
-                        <thead><tr><th>Date</th><th>Student</th><th>Issue</th><th>Have</th><th>Building</th><th>Goal</th><th></th></tr></thead>
-                        <tbody id="dashboard-tbody">${this.renderDashboardRows(this._allGoals)}</tbody>
-                    </table>`;
-            } catch (e) { table.innerHTML = '<div class="no-data">Error loading data.</div>'; console.error(e); }
+                // Default to first class
+                this._activeClass = CLASSES[0];
+                this.renderDashboard();
+            } catch (e) {
+                document.getElementById('dashboard-table').innerHTML = '<div class="no-data">Error loading data.</div>';
+                console.error(e);
+            }
+        },
+
+        filterByClass(className, btn) {
+            this._activeClass = className;
+            document.querySelectorAll('.db-filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            this.renderDashboard();
+        },
+
+        renderDashboard() {
+            const filtered = (this._allGoals || []).filter(g => g.selectedClass === this._activeClass);
+
+            // Word cloud
+            const wc = document.getElementById('word-cloud');
+            if (!filtered.length) {
+                wc.innerHTML = '<p class="no-data">No students yet in this class.</p>';
+                document.getElementById('dashboard-table').innerHTML = '';
+                document.getElementById('db-count').textContent = '0';
+                return;
+            }
+            const freq = {};
+            filtered.forEach(g => {
+                const w = (g.problem || '').trim();
+                if (w) freq[w] = (freq[w] || 0) + 1;
+            });
+            const max = Math.max(...Object.values(freq), 1);
+            const colors = ['#1a5c3a','#2d9e6b','#4a3080','#7c5cbf','#256647'];
+            wc.innerHTML = Object.entries(freq)
+                .sort((a, b) => b[1] - a[1])
+                .map(([word, count], i) => {
+                    const size = (0.95 + (count / max) * 1.6).toFixed(2);
+                    const color = colors[i % colors.length];
+                    return `<span class="wc-word" style="font-size:${size}rem;color:${color}">${word}</span>`;
+                }).join('');
+
+            // Roster
+            document.getElementById('db-count').textContent = filtered.length;
+            document.getElementById('dashboard-table').innerHTML = `
+                <table>
+                    <thead><tr><th>Name</th><th>Cause</th><th>Strength</th><th>Growing</th><th>Class Goal</th></tr></thead>
+                    <tbody>${this.renderDashboardRows(filtered)}</tbody>
+                </table>`;
         },
 
         renderDashboardRows(goals) {
@@ -2355,26 +2515,13 @@ or
                 const growth   = this.traits.find(t => t.id === g.growthTrait);
                 const existing = this.traits.find(t => t.id === g.existingTrait);
                 return `<tr>
-                    <td>${new Date(g.timestamp).toLocaleDateString()}</td>
                     <td>${g.studentName || ''}</td>
-                    <td>${(g.problem||'').substring(0,40)}${(g.problem||'').length>40?'…':''}</td>
-                    <td>${existing ? existing.icon + ' ' + existing.title : ''}</td>
-                    <td>${growth   ? growth.icon   + ' ' + growth.title   : ''}</td>
-                    <td>${(g.goal||'').substring(0,50)}${(g.goal||'').length>50?'…':''}</td>
-                    <td><button class="btn-delete" onclick="app.deleteEntry('${g._id}')">Delete</button></td>
+                    <td>${(g.problem||'').substring(0,45)}${(g.problem||'').length>45?'…':''}</td>
+                    <td>${existing ? existing.icon + ' ' + existing.title : '—'}</td>
+                    <td>${growth   ? growth.icon   + ' ' + growth.title   : '—'}</td>
+                    <td style="font-size:0.85rem">${(g.classroomGoal||'').substring(0,60)}${(g.classroomGoal||'').length>60?'…':''}</td>
                 </tr>`;
             }).join('');
-        },
-
-        filterDashboard() {
-            const q = document.getElementById('search-input').value.toLowerCase();
-            const filtered = (this._allGoals || []).filter(g =>
-                (g.studentName||'').toLowerCase().includes(q) ||
-                (g.problem||'').toLowerCase().includes(q) ||
-                (g.goal||'').toLowerCase().includes(q)
-            );
-            const tbody = document.getElementById('dashboard-tbody');
-            if (tbody) tbody.innerHTML = this.renderDashboardRows(filtered);
         },
 
         exportCSV() {
@@ -2402,8 +2549,7 @@ or
             try {
                 await deleteDoc(doc(db, COLLECTION, id));
                 this._allGoals = (this._allGoals || []).filter(g => g._id !== id);
-                const tbody = document.getElementById('dashboard-tbody');
-                if (tbody) tbody.innerHTML = this.renderDashboardRows(this._allGoals);
+                this.renderDashboard();
             } catch (e) { alert('Error deleting entry. Please try again.'); console.error(e); }
         },
 
