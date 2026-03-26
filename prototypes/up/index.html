@@ -1079,7 +1079,8 @@
 
         <!-- v2: pick-a-goal -->
         <div id="v2-goal-section" class="hidden">
-            <h2 id="v2-goal-heading" class="main-question" style="margin-top:16px;">How will you practice in class today?</h2>
+            <p id="v2-goal-intro" class="subheading-text" style="margin-bottom:4px;"></p>
+            <h2 id="v2-goal-heading" class="main-question" style="margin-top:8px;">How will you practice in class today?</h2>
             <p class="strategy-bridge" style="margin-bottom:14px;">Choose one goal:</p>
             <div id="goal-options-list"></div>
         </div>
@@ -1972,6 +1973,9 @@ or
                 document.getElementById('v2-goal-section').classList.remove('hidden');
                 // Set heading
                 const traitPhrase = growth ? growth.grammarName : 'yourself';
+                const traitTitle = growth ? growth.title : 'your best';
+                document.getElementById('v2-goal-intro').textContent =
+                    `You can practice being ${traitPhrase} today.`;
                 document.getElementById('v2-goal-heading').textContent =
                     `How will you practice being ${traitPhrase} in class?`;
                 // Populate goal option cards (first 3 from trait.goals)
