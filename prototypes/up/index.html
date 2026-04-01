@@ -615,6 +615,27 @@
         /* ── Reflection ── */
         .reflection-screen { padding: 30px 20px; animation: fadeIn .6s ease; }
         .reflection-screen h1 { color: var(--green-dark); font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+        /* ── Reflection flow ── */
+        .emoji-meter { display: flex; justify-content: center; gap: 12px; margin: 28px 0 8px; }
+        .emoji-btn { font-size: 2rem; background: none; border: 3px solid transparent; border-radius: 50%; width: 60px; height: 60px; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 0; }
+        .emoji-btn:hover { transform: scale(1.15); }
+        .emoji-btn.selected { border-color: var(--green-mid); background: var(--green-pale); transform: scale(1.15); }
+        .emoji-labels { display: flex; justify-content: space-between; font-size: .7rem; color: var(--text-mid); font-weight: 600; margin-bottom: 24px; padding: 0 4px; }
+        .r1-connection { background: var(--green-pale); border: 2px solid var(--green-mid); border-radius: 16px; padding: 18px 22px; margin: 8px 0 20px; font-size: 1rem; font-weight: 700; color: var(--green-dark); line-height: 1.5; }
+        .r1-obstacle-label { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+        .noticed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
+        .noticed-card { background: white; border: 2.5px solid #e0e0e0; border-radius: 16px; padding: 22px 16px; cursor: pointer; text-align: center; font-size: .95rem; font-weight: 700; color: var(--text-dark); transition: all .2s; user-select: none; line-height: 1.4; }
+        .noticed-card:hover { border-color: var(--green-mid); }
+        .noticed-card.selected { border-color: var(--green-mid); background: var(--green-pale); color: var(--green-dark); }
+        .goal-check-card { background: white; border-radius: 16px; padding: 18px 20px; box-shadow: var(--shadow-light); margin-bottom: 14px; }
+        .goal-check-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-mid); margin-bottom: 6px; }
+        .goal-check-text { font-size: .95rem; font-weight: 600; color: var(--text-dark); margin-bottom: 14px; line-height: 1.45; }
+        .goal-met-buttons { display: flex; gap: 10px; }
+        .goal-met-btn { flex: 1; padding: 10px; border-radius: 50px; border: 2px solid #e0e0e0; background: white; font-family: 'Nunito', sans-serif; font-size: .9rem; font-weight: 700; cursor: pointer; color: var(--text-mid); transition: all .2s; }
+        .goal-met-btn:hover { border-color: var(--green-mid); }
+        .goal-met-btn.sel-yes   { background: #d4edda; border-color: #28a745; color: #155724; }
+        .goal-met-btn.sel-kinda { background: #fff3cd; border-color: #ffc107; color: #856404; }
+        .goal-met-btn.sel-no    { background: #f8d7da; border-color: #dc3545; color: #721c24; }
         .goal-recap-card { background: var(--green-pale); border: 2px solid var(--green-mid); border-radius: 16px; padding: 20px 22px; margin: 18px 0; }
         .goal-recap-card .recap-label { font-size: .75rem; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; display: block; }
         .goal-recap-card .recap-value { font-size: 1rem; color: var(--text-dark); font-weight: 600; margin-bottom: 12px; }
@@ -1237,25 +1258,73 @@
     <!-- ══════════════════════════════════
          REFLECTION
     ══════════════════════════════════ -->
-    <div id="reflection-screen" class="reflection-screen hidden">
-        <h1>Goal Reflection 🌱</h1>
-        <p style="color:var(--text-mid);margin-bottom:4px;font-size:.93rem;">How did it go this week?</p>
-        <div class="goal-recap-card" id="reflection-recap"></div>
-        <div class="reflection-section" id="reflection-input-section">
-            <h3 id="reflection-question"></h3>
-            <div id="reflection-input-area"></div>
+    <!-- ══════════════════════════════════
+         REFLECTION 1: Trait Meter
+    ══════════════════════════════════ -->
+    <div id="reflection-1-screen" class="activity-screen hidden">
+        <p class="screen-label">WEEKLY REFLECTION</p>
+        <h2 class="main-question">How much did you practice being <span id="r1-trait"></span> this week?</h2>
+        <div class="emoji-meter">
+            <button class="emoji-btn" onclick="app.selectTraitRating(1)">😕</button>
+            <button class="emoji-btn" onclick="app.selectTraitRating(2)">😐</button>
+            <button class="emoji-btn" onclick="app.selectTraitRating(3)">🙂</button>
+            <button class="emoji-btn" onclick="app.selectTraitRating(4)">😊</button>
+            <button class="emoji-btn" onclick="app.selectTraitRating(5)">🌟</button>
         </div>
-        <div class="reflection-section testimonial-section">
-            <div class="testimonial-week-badge" id="testimonial-week-badge"></div>
-            <h3>Pass It On ✉️</h3>
-            <p class="testimonial-prompt-text" id="testimonial-prompt-text"></p>
-            <p class="reflection-prompt">Write 2–4 sentences. Don't worry about spelling — just get your ideas across.</p>
-            <textarea class="reflection-textarea" id="testimonial-text" placeholder="Write your message here…"></textarea>
+        <div class="emoji-labels">
+            <span>Not much</span><span>A little</span><span>Some</span><span>A lot</span><span>So much!</span>
         </div>
-        <div class="reflection-saved-banner" id="reflection-saved">✅ Reflection saved!</div>
+        <div id="r1-connection" class="r1-connection hidden">
+            <p id="r1-connection-text"></p>
+        </div>
+        <div id="r1-obstacle" class="hidden">
+            <p class="r1-obstacle-label">What got in the way?</p>
+            <textarea class="reflection-textarea" id="r1-obstacle-text" placeholder="Write here…" rows="3"></textarea>
+        </div>
         <div class="button-group">
-            <button class="btn btn-secondary" onclick="app.showProgress()">← Back to My Goals</button>
-            <button class="btn btn-primary" id="save-reflection-btn" onclick="app.saveReflection()">Save Reflection</button>
+            <button class="btn btn-secondary" onclick="app.showProgress()">← Back</button>
+            <button class="btn btn-primary" id="r1-continue" disabled onclick="app.goToReflection2()">Continue →</button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         REFLECTION 2: I noticed...
+    ══════════════════════════════════ -->
+    <div id="reflection-2-screen" class="activity-screen hidden">
+        <p class="screen-label">WEEKLY REFLECTION</p>
+        <h2 class="main-question">This week, when I tried to be <span id="r2-trait"></span>, I noticed…</h2>
+        <div id="r2-cards" class="hidden">
+            <div class="noticed-grid">
+                <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="It felt hard">It felt hard</div>
+                <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="I surprised myself">I surprised myself</div>
+                <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="It helped my classmates">It helped my classmates</div>
+                <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="I forgot to try">I forgot to try</div>
+            </div>
+        </div>
+        <div id="r2-writein" class="hidden">
+            <textarea class="reflection-textarea" id="r2-text" placeholder="Write your reflection here…" rows="4"></textarea>
+        </div>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="app.showScreen('reflection-1-screen')">← Back</button>
+            <button class="btn btn-primary" onclick="app.goToReflection3()">Continue →</button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         REFLECTION 3: Goal check-in
+    ══════════════════════════════════ -->
+    <div id="reflection-3-screen" class="activity-screen hidden">
+        <p class="screen-label">WEEKLY REFLECTION</p>
+        <p class="subheading-text" id="r3-header-text" style="margin-bottom:20px;"></p>
+        <div id="r3-goals"></div>
+        <div style="margin-top:8px;">
+            <p style="font-weight:700;color:var(--text-dark);margin-bottom:8px;">What helped you work toward your goals? What could help you next week?</p>
+            <textarea class="reflection-textarea" id="r3-text" placeholder="Write here…" rows="4"></textarea>
+        </div>
+        <div class="reflection-saved-banner" id="r3-saved">✅ Reflection saved!</div>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="app.showScreen('reflection-2-screen')">← Back</button>
+            <button class="btn btn-primary" onclick="app.saveNewReflection()">Save →</button>
         </div>
     </div>
 
@@ -1545,7 +1614,7 @@
         showScreen(id) {
             ['intro-screen','homepage','setup-screen','class-select-screen','name-login-screen',
              'step1-screen','step2-screen','step3-screen','goal-classroom-screen','goal-strategy-screen','goal-home-screen',
-             'peer-screen','completion-screen','progress-screen','reflection-screen','dashboard-screen']
+             'peer-screen','completion-screen','progress-screen','reflection-1-screen','reflection-2-screen','reflection-3-screen','dashboard-screen']
                 .forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0, 0);
@@ -2349,7 +2418,7 @@ or
                                 ${mine.map((g, i) => {
                                     const growth = this.traits.find(t => t.id === g.growthTrait);
                                     const tName = growth ? `${growth.icon} ${growth.title}` : (g.growthTrait || '');
-                                    const hasRefl = g.reflection && (g.reflection.text || g.reflection.count !== undefined || (g.reflection.checks && g.reflection.checks.some(Boolean)));
+                                    const hasRefl = (Array.isArray(g.reflections) && g.reflections.length > 0) || g.reflectedAt;
                                     return `<tr class="goal-row" onclick="app.openReflection(${i})">
                                         <td>${new Date(g.timestamp).toLocaleDateString()}</td>
                                         <td>${tName}</td>
@@ -2370,43 +2439,108 @@ or
         openReflection(index) {
             const goal = (this._myGoals || [])[index];
             if (!goal) return;
-            this.currentReflectionIndex = index;
+            this._currentReflGoal = goal;
+            this._reflData = { traitRating: 0, gotInTheWay: '', noticed: [], noticedText: '', classGoalMet: '', homeGoalMet: '', reflectionText: '' };
 
-            const growth   = this.traits.find(t => t.id === goal.growthTrait);
-            const existing = this.traits.find(t => t.id === goal.existingTrait);
-            const growthName   = growth   ? `${growth.icon} ${growth.title}`   : (goal.growthTrait || '');
-            const existingName = existing ? `${existing.icon} ${existing.title}` : '';
+            const growth = this.traits.find(t => t.id === goal.growthTrait);
+            const traitGrammar = growth ? growth.grammarName : (goal.growthTrait || '');
 
-            document.getElementById('reflection-recap').innerHTML = `
-                <span class="recap-label">My Goal</span>
-                <div class="recap-value">${goal.goal || ''}</div>
-                <span class="recap-label">Strength I'm Building</span>
-                <div class="recap-value">${growthName}</div>
-                ${existingName ? `<span class="recap-label">A Strength I Have</span><div class="recap-value">${existingName}</div>` : ''}
-                <span class="recap-label">What I Care About</span>
-                <div class="recap-value">${goal.problem || ''}</div>
-            `;
+            document.getElementById('r1-trait').textContent = traitGrammar;
+            document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById('r1-connection').classList.add('hidden');
+            document.getElementById('r1-obstacle').classList.add('hidden');
+            document.getElementById('r1-obstacle-text').value = '';
+            document.getElementById('r1-continue').disabled = true;
 
-            const goalText = goal.goal || '';
-            const numberMatch = goalText.match(/\b(\d+)\b/);
-            document.getElementById('reflection-saved').classList.remove('visible');
+            this.showScreen('reflection-1-screen');
+        },
 
-            if (numberMatch) this.renderQuantifiableReflection(goal, goalText, parseInt(numberMatch[1]));
-            else this.renderQualitativeReflection(goal);
+        selectTraitRating(rating) {
+            this._reflData.traitRating = rating;
+            document.querySelectorAll('.emoji-btn').forEach((b, i) => b.classList.toggle('selected', i + 1 === rating));
+            const growth = this.traits.find(t => t.id === this._currentReflGoal.growthTrait);
+            const traitGrammar = growth ? growth.grammarName : '';
+            const issue = this._currentReflGoal.problem || 'the issues you care about';
+            if (rating >= 3) {
+                document.getElementById('r1-connection-text').textContent =
+                    `Because you practiced being ${traitGrammar} this week, you're getting closer to helping with ${issue}.`;
+                document.getElementById('r1-connection').classList.remove('hidden');
+                document.getElementById('r1-obstacle').classList.add('hidden');
+            } else {
+                document.getElementById('r1-connection').classList.add('hidden');
+                document.getElementById('r1-obstacle').classList.remove('hidden');
+            }
+            document.getElementById('r1-continue').disabled = false;
+        },
 
-            const reflectionCount = (this._myGoals || []).filter(g => g.reflectedAt).length;
-            const pd = this.testimonialPrompts[Math.min(reflectionCount, this.testimonialPrompts.length - 1)];
-            const issueSummary = (goal.problem || 'your issue').substring(0, 60);
-            const promptText = pd.prompt
-                .replace(/{growthTrait}/g, growthName)
-                .replace(/{existingTrait}/g, existingName)
-                .replace(/{issue}/g, issueSummary);
+        goToReflection2() {
+            this._reflData.gotInTheWay = document.getElementById('r1-obstacle-text').value.trim();
+            const growth = this.traits.find(t => t.id === this._currentReflGoal.growthTrait);
+            const traitGrammar = growth ? growth.grammarName : '';
+            document.getElementById('r2-trait').textContent = traitGrammar;
+            const goalVersion = this._currentReflGoal.version || '2';
+            if (goalVersion === '1') {
+                document.getElementById('r2-cards').classList.remove('hidden');
+                document.getElementById('r2-writein').classList.add('hidden');
+                document.querySelectorAll('.noticed-card').forEach(c => c.classList.remove('selected'));
+            } else {
+                document.getElementById('r2-cards').classList.add('hidden');
+                document.getElementById('r2-writein').classList.remove('hidden');
+                document.getElementById('r2-text').value = '';
+            }
+            this.showScreen('reflection-2-screen');
+        },
 
-            document.getElementById('testimonial-week-badge').textContent = pd.theme;
-            document.getElementById('testimonial-prompt-text').textContent = '"' + promptText + '"';
-            document.getElementById('testimonial-text').value = (goal.reflection && goal.reflection.testimonial) ? goal.reflection.testimonial : '';
+        toggleNoticedCard(card) { card.classList.toggle('selected'); },
 
-            this.showScreen('reflection-screen');
+        goToReflection3() {
+            const goalVersion = this._currentReflGoal.version || '2';
+            if (goalVersion === '1') {
+                this._reflData.noticed = [...document.querySelectorAll('.noticed-card.selected')].map(c => c.dataset.value);
+            } else {
+                this._reflData.noticedText = document.getElementById('r2-text').value.trim();
+            }
+            const growth = this.traits.find(t => t.id === this._currentReflGoal.growthTrait);
+            const traitGrammar = growth ? growth.grammarName : '';
+            const classGoal = this._currentReflGoal.classroomGoal || '';
+            const mins = this._currentReflGoal.homeGoalMinutes || 0;
+            const homeGoal = mins ? `Read ${mins} minutes ${goalVersion === '1' ? 'at home' : 'on Lexia or Epic'} this week.` : '';
+
+            document.getElementById('r3-header-text').textContent =
+                `Here are some ways you said you'd practice being ${traitGrammar} this week:`;
+
+            let html = '';
+            if (classGoal) html += `
+                <div class="goal-check-card">
+                    <div class="goal-check-label">Class Goal</div>
+                    <div class="goal-check-text">${classGoal}</div>
+                    <div class="goal-met-buttons">
+                        <button class="goal-met-btn" onclick="app.selectGoalMet('class','Yes',this)">Yes</button>
+                        <button class="goal-met-btn" onclick="app.selectGoalMet('class','Kinda',this)">Kinda</button>
+                        <button class="goal-met-btn" onclick="app.selectGoalMet('class','No',this)">No</button>
+                    </div>
+                </div>`;
+            if (homeGoal) html += `
+                <div class="goal-check-card">
+                    <div class="goal-check-label">Home Goal</div>
+                    <div class="goal-check-text">${homeGoal}</div>
+                    <div class="goal-met-buttons">
+                        <button class="goal-met-btn" onclick="app.selectGoalMet('home','Yes',this)">Yes</button>
+                        <button class="goal-met-btn" onclick="app.selectGoalMet('home','Kinda',this)">Kinda</button>
+                        <button class="goal-met-btn" onclick="app.selectGoalMet('home','No',this)">No</button>
+                    </div>
+                </div>`;
+            document.getElementById('r3-goals').innerHTML = html;
+            document.getElementById('r3-text').value = '';
+            document.getElementById('r3-saved').classList.remove('visible');
+            this.showScreen('reflection-3-screen');
+        },
+
+        selectGoalMet(goalType, value, btn) {
+            if (goalType === 'class') this._reflData.classGoalMet = value;
+            else this._reflData.homeGoalMet = value;
+            btn.closest('.goal-met-buttons').querySelectorAll('.goal-met-btn').forEach(b => b.className = 'goal-met-btn');
+            btn.classList.add(`sel-${value.toLowerCase()}`);
         },
 
         renderQuantifiableReflection(goal, goalText, target) {
@@ -2488,45 +2622,19 @@ or
             document.getElementById('chk-fraction').textContent = `${done} / ${this._reflectionTarget} completed`;
         },
 
-        renderQualitativeReflection(goal) {
-            document.getElementById('reflection-question').textContent = 'How did it go this week?';
-            const saved = (goal.reflection && goal.reflection.text) ? goal.reflection.text : '';
-            document.getElementById('reflection-input-area').innerHTML = `
-                <p class="reflection-prompt">Answer one or more of these:</p>
-                <ul style="font-size:.87rem;color:var(--text-mid);margin:0 0 12px 18px;line-height:1.9;">
-                    <li>What did you actually do toward your goal?</li>
-                    <li>What felt hard or easy?</li>
-                    <li>How does it connect to the issue you care about?</li>
-                    <li>What would you do differently next time?</li>
-                </ul>
-                <textarea class="reflection-textarea" id="qualitative-text" placeholder="Write your reflection here…">${saved}</textarea>`;
-            this._reflectionMode = 'qualitative';
-        },
-
-        async saveReflection() {
-            const g = (this._myGoals || [])[this.currentReflectionIndex];
-            if (!g) return;
-            let reflection;
-            if (this._reflectionMode === 'counter') {
-                reflection = { count: this._counterVal, target: this._reflectionTarget };
-            } else if (this._reflectionMode === 'checkpoints') {
-                const details = this._reflectionChecks.map((_, i) => {
-                    const el = document.getElementById(`chk-detail-${i}`);
-                    return el ? el.value.trim() : '';
-                });
-                reflection = { checks: this._reflectionChecks, details, target: this._reflectionTarget };
-            } else {
-                reflection = { text: document.getElementById('qualitative-text').value };
-            }
-            reflection.testimonial = document.getElementById('testimonial-text').value.trim();
-            const reflectedAt = new Date().toISOString();
+        async saveNewReflection() {
+            this._reflData.reflectionText = document.getElementById('r3-text').value.trim();
+            this._reflData.savedAt = new Date().toISOString();
+            const g = this._currentReflGoal;
+            if (!g || !g._id) return;
             try {
-                await updateDoc(doc(db, COLLECTION, g._id), { reflection, reflectedAt });
-                g.reflection = reflection; g.reflectedAt = reflectedAt;
-            } catch (e) { console.error('Error saving reflection:', e); }
-            document.getElementById('reflection-saved').classList.add('visible');
-            document.getElementById('save-reflection-btn').textContent = '✓ Saved!';
-            setTimeout(() => { document.getElementById('save-reflection-btn').textContent = 'Save Reflection'; }, 2500);
+                const existing = Array.isArray(g.reflections) ? g.reflections : [];
+                existing.push(this._reflData);
+                await updateDoc(doc(db, COLLECTION, g._id), { reflections: existing, reflectedAt: this._reflData.savedAt });
+                g.reflections = existing;
+                document.getElementById('r3-saved').classList.add('visible');
+                setTimeout(() => this.showProgress(), 1500);
+            } catch(e) { console.error('Error saving reflection:', e); alert('Error saving. Please try again.'); }
         },
 
         // ── Teacher Dashboard ──────────────────────────
