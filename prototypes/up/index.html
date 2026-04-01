@@ -616,11 +616,12 @@
         .reflection-screen { padding: 30px 20px; animation: fadeIn .6s ease; }
         .reflection-screen h1 { color: var(--green-dark); font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
         /* ── Reflection flow ── */
-        .emoji-meter { display: flex; justify-content: center; gap: 12px; margin: 28px 0 8px; }
-        .emoji-btn { font-size: 2rem; background: none; border: 3px solid transparent; border-radius: 50%; width: 60px; height: 60px; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 0; }
+        .emoji-meter { display: flex; justify-content: center; gap: 8px; margin: 28px 0 24px; }
+        .emoji-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .emoji-label { font-size: .68rem; color: var(--text-mid); font-weight: 600; text-align: center; }
+        .emoji-btn { font-size: 2rem; background: none; border: 3px solid transparent; border-radius: 50%; width: 58px; height: 58px; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; padding: 0; }
         .emoji-btn:hover { transform: scale(1.15); }
         .emoji-btn.selected { border-color: var(--green-mid); background: var(--green-pale); transform: scale(1.15); }
-        .emoji-labels { display: flex; justify-content: space-between; font-size: .7rem; color: var(--text-mid); font-weight: 600; margin-bottom: 24px; padding: 0 4px; }
         .r1-connection { background: var(--green-pale); border: 2px solid var(--green-mid); border-radius: 16px; padding: 18px 22px; margin: 8px 0 20px; font-size: 1rem; font-weight: 700; color: var(--green-dark); line-height: 1.5; }
         .r1-obstacle-label { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
         .noticed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
@@ -1263,16 +1264,13 @@
     ══════════════════════════════════ -->
     <div id="reflection-1-screen" class="activity-screen hidden">
         <p class="screen-label">WEEKLY REFLECTION</p>
-        <h2 class="main-question">How much did you practice being <span id="r1-trait"></span> this week?</h2>
+        <h2 class="main-question">How much did you practice being <span id="r1-trait"></span> this week? Click one!</h2>
         <div class="emoji-meter">
-            <button class="emoji-btn" onclick="app.selectTraitRating(1)">😕</button>
-            <button class="emoji-btn" onclick="app.selectTraitRating(2)">😐</button>
-            <button class="emoji-btn" onclick="app.selectTraitRating(3)">🙂</button>
-            <button class="emoji-btn" onclick="app.selectTraitRating(4)">😊</button>
-            <button class="emoji-btn" onclick="app.selectTraitRating(5)">🌟</button>
-        </div>
-        <div class="emoji-labels">
-            <span>Not much</span><span>A little</span><span>Some</span><span>A lot</span><span>So much!</span>
+            <div class="emoji-col"><button class="emoji-btn" onclick="app.selectTraitRating(1)">😕</button><span class="emoji-label">Not much</span></div>
+            <div class="emoji-col"><button class="emoji-btn" onclick="app.selectTraitRating(2)">😐</button><span class="emoji-label">A little</span></div>
+            <div class="emoji-col"><button class="emoji-btn" onclick="app.selectTraitRating(3)">🙂</button><span class="emoji-label">Some</span></div>
+            <div class="emoji-col"><button class="emoji-btn" onclick="app.selectTraitRating(4)">😊</button><span class="emoji-label">A lot</span></div>
+            <div class="emoji-col"><button class="emoji-btn" onclick="app.selectTraitRating(5)">🌟</button><span class="emoji-label">So much!</span></div>
         </div>
         <div id="r1-connection" class="r1-connection hidden">
             <p id="r1-connection-text"></p>
