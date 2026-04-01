@@ -1264,7 +1264,7 @@
     ══════════════════════════════════ -->
     <div id="reflection-1-screen" class="activity-screen hidden">
         <p class="screen-label">WEEKLY REFLECTION</p>
-        <h2 class="main-question">How much did you practice being <span id="r1-trait"></span> this week? Click one!</h2>
+        <h2 class="main-question">How much did you practice being <span id="r1-trait"></span> this week? Click one! <button class="tts-btn" id="r1-tts" data-speak="" onclick="app.speakFromBtn(this)">🔊</button></h2>
         <div class="emoji-meter">
             <div class="emoji-col"><button class="emoji-btn" onclick="app.selectTraitRating(1)">😕</button><span class="emoji-label">Not much</span></div>
             <div class="emoji-col"><button class="emoji-btn" onclick="app.selectTraitRating(2)">😐</button><span class="emoji-label">A little</span></div>
@@ -1290,7 +1290,7 @@
     ══════════════════════════════════ -->
     <div id="reflection-2-screen" class="activity-screen hidden">
         <p class="screen-label">WEEKLY REFLECTION</p>
-        <h2 class="main-question">This week, when I tried to be <span id="r2-trait"></span>, I noticed…</h2>
+        <h2 class="main-question">This week, when I tried to be <span id="r2-trait"></span>, I noticed… <button class="tts-btn" id="r2-tts" data-speak="" onclick="app.speakFromBtn(this)">🔊</button></h2>
         <div id="r2-cards" class="hidden">
             <div class="noticed-grid">
                 <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="I felt proud of myself">I felt proud of myself</div>
@@ -1316,7 +1316,7 @@
         <p class="subheading-text" id="r3-header-text" style="margin-bottom:20px;"></p>
         <div id="r3-goals"></div>
         <div style="margin-top:8px;">
-            <p style="font-weight:700;color:var(--text-dark);margin-bottom:8px;">What helped you work toward your goals? What could help you next week?</p>
+            <p style="font-weight:700;color:var(--text-dark);margin-bottom:8px;">What helped you work toward your goals? What could help you next week? <button class="tts-btn" data-speak="What helped you work toward your goals? What could help you next week?" onclick="app.speakFromBtn(this)">🔊</button></p>
             <textarea class="reflection-textarea" id="r3-text" placeholder="Write here…" rows="4"></textarea>
         </div>
         <div class="reflection-saved-banner" id="r3-saved">✅ Reflection saved!</div>
@@ -2444,6 +2444,7 @@ or
             const traitGrammar = growth ? growth.grammarName : (goal.growthTrait || '');
 
             document.getElementById('r1-trait').textContent = traitGrammar;
+            document.getElementById('r1-tts').dataset.speak = `How much did you practice being ${traitGrammar} this week? Click one!`;
             document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
             document.getElementById('r1-connection').classList.add('hidden');
             document.getElementById('r1-obstacle').classList.add('hidden');
@@ -2476,6 +2477,7 @@ or
             const growth = this.traits.find(t => t.id === this._currentReflGoal.growthTrait);
             const traitGrammar = growth ? growth.grammarName : '';
             document.getElementById('r2-trait').textContent = traitGrammar;
+            document.getElementById('r2-tts').dataset.speak = `This week, when I tried to be ${traitGrammar}, I noticed…`;
             const goalVersion = this._currentReflGoal.version || '2';
             if (goalVersion === '1') {
                 document.getElementById('r2-cards').classList.remove('hidden');
