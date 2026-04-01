@@ -1295,8 +1295,8 @@
         <h2 class="main-question">This week, when I tried to be <span id="r2-trait"></span>, I noticed…</h2>
         <div id="r2-cards" class="hidden">
             <div class="noticed-grid">
+                <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="I felt proud of myself">I felt proud of myself</div>
                 <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="It felt hard">It felt hard</div>
-                <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="I surprised myself">I surprised myself</div>
                 <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="It helped my classmates">It helped my classmates</div>
                 <div class="noticed-card" onclick="app.toggleNoticedCard(this)" data-value="I forgot to try">I forgot to try</div>
             </div>
@@ -2514,6 +2514,7 @@ or
                 <div class="goal-check-card">
                     <div class="goal-check-label">Class Goal</div>
                     <div class="goal-check-text">${classGoal}</div>
+                    <p style="font-size:.85rem;font-weight:700;color:var(--text-mid);margin-bottom:8px;">Did you meet this goal?</p>
                     <div class="goal-met-buttons">
                         <button class="goal-met-btn" onclick="app.selectGoalMet('class','Yes',this)">Yes</button>
                         <button class="goal-met-btn" onclick="app.selectGoalMet('class','Kinda',this)">Kinda</button>
@@ -2524,6 +2525,7 @@ or
                 <div class="goal-check-card">
                     <div class="goal-check-label">Home Goal</div>
                     <div class="goal-check-text">${homeGoal}</div>
+                    <p style="font-size:.85rem;font-weight:700;color:var(--text-mid);margin-bottom:8px;">Did you meet this goal?</p>
                     <div class="goal-met-buttons">
                         <button class="goal-met-btn" onclick="app.selectGoalMet('home','Yes',this)">Yes</button>
                         <button class="goal-met-btn" onclick="app.selectGoalMet('home','Kinda',this)">Kinda</button>
