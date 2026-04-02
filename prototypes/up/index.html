@@ -611,6 +611,26 @@
         .no-data { text-align: center; padding: 60px 20px; color: var(--text-mid); }
         .btn-delete { background: none; border: 1px solid #d9534f; color: #d9534f; border-radius: 8px; padding: 5px 12px; font-family: 'Nunito', sans-serif; font-size: .85rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
         .btn-delete:hover { background: #d9534f; color: white; }
+        .student-row { cursor: pointer; }
+        .student-row:hover td { background: #f0faf4; }
+        .student-row td:first-child::before { content: '▶'; font-size: .7rem; color: var(--text-gray); margin-right: 6px; display: inline-block; transition: transform .2s; }
+        .student-row.open td:first-child::before { transform: rotate(90deg); }
+        .student-detail-row { display: none; }
+        .student-detail-row.open { display: table-row; }
+        .student-detail-row td { background: #f8fdf9; padding: 0 !important; border-bottom: 2px solid #e0f0e8; }
+        .refl-detail-inner { padding: 16px 20px; }
+        .refl-week { background: white; border: 1.5px solid #d4edda; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+        .refl-week-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .refl-week-date { font-size: .78rem; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: .05em; }
+        .refl-rating { font-size: 1.1rem; }
+        .refl-goals { display: flex; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+        .refl-goal-chip { font-size: .8rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+        .refl-goal-chip.yes { background: #d4edda; color: #1a5c3a; }
+        .refl-goal-chip.kinda { background: #fff3cd; color: #856404; }
+        .refl-goal-chip.no { background: #f8d7da; color: #721c24; }
+        .refl-noticed { font-size: .85rem; color: var(--text-mid); margin-bottom: 6px; font-style: italic; }
+        .refl-text { font-size: .88rem; color: var(--text-dark); line-height: 1.5; }
+        .no-reflections { font-size: .88rem; color: var(--text-gray); font-style: italic; padding: 8px 0; }
 
         /* ── Reflection ── */
         .reflection-screen { padding: 30px 20px; animation: fadeIn .6s ease; }
@@ -2713,21 +2733,63 @@ or
         },
 
         renderDashboardRows(goals, showClass = false) {
+            const ratingEmojis = ['', '😕', '😐', '🙂', '😊', '🌟'];
             return goals.map(g => {
                 const growth   = this.traits.find(t => t.id === g.growthTrait);
                 const existing = this.traits.find(t => t.id === g.existingTrait);
                 const classCell = showClass
                     ? `<td style="font-size:0.85rem;color:var(--text-mid)">${g.selectedClass || '—'}</td>` : '';
-                return `<tr>
-                    <td style="white-space:nowrap">${g.studentName || ''}</td>
+                const reflCount = Array.isArray(g.reflections) ? g.reflections.length : 0;
+                const reflBadge = reflCount > 0
+                    ? `<span style="font-size:.75rem;background:#d4edda;color:#1a5c3a;border-radius:10px;padding:2px 7px;margin-left:6px;font-weight:700">${reflCount} week${reflCount>1?'s':''}</span>` : '';
+
+                // Build reflection history HTML
+                const reflections = Array.isArray(g.reflections) ? g.reflections : [];
+                const reflHtml = reflections.length === 0
+                    ? '<p class="no-reflections">No reflections yet.</p>'
+                    : [...reflections].reverse().map((r, i) => {
+                        const date = r.savedAt ? new Date(r.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : `Week ${reflections.length - i}`;
+                        const rating = r.traitRating ? `${ratingEmojis[r.traitRating]} ${r.traitRating}/5` : '';
+                        const classChip = r.classGoalMet ? `<span class="refl-goal-chip ${r.classGoalMet}">Class: ${r.classGoalMet}</span>` : '';
+                        const homeChip  = r.homeGoalMet  ? `<span class="refl-goal-chip ${r.homeGoalMet}">Home: ${r.homeGoalMet}</span>` : '';
+                        const noticed = Array.isArray(r.noticed) && r.noticed.length
+                            ? `<p class="refl-noticed">Noticed: ${r.noticed.join(', ')}</p>`
+                            : (r.noticedText ? `<p class="refl-noticed">Noticed: ${r.noticedText}</p>` : '');
+                        const obstacle = r.gotInTheWay ? `<p class="refl-noticed">Got in the way: ${r.gotInTheWay}</p>` : '';
+                        const text = r.reflectionText ? `<p class="refl-text">"${r.reflectionText}"</p>` : '';
+                        return `<div class="refl-week">
+                            <div class="refl-week-header">
+                                <span class="refl-week-date">${date}</span>
+                                <span class="refl-rating">${rating}</span>
+                            </div>
+                            <div class="refl-goals">${classChip}${homeChip}</div>
+                            ${noticed}${obstacle}${text}
+                        </div>`;
+                    }).join('');
+
+                return `
+                <tr class="student-row" onclick="app.toggleStudentRow('${g._id}')">
+                    <td style="white-space:nowrap">${g.studentName || ''}${reflBadge}</td>
                     ${classCell}
                     <td>${g.problem||''}</td>
                     <td style="white-space:nowrap">${existing ? existing.icon + ' ' + existing.title : '—'}</td>
                     <td style="white-space:nowrap">${growth   ? growth.icon   + ' ' + growth.title   : '—'}</td>
                     <td style="font-size:0.85rem">${g.classroomGoal||''}</td>
-                    <td><button class="btn-delete" onclick="app.deleteEntry('${g._id}')">Delete</button></td>
+                    <td><button class="btn-delete" onclick="event.stopPropagation();app.deleteEntry('${g._id}')">Delete</button></td>
+                </tr>
+                <tr class="student-detail-row" id="detail-${g._id}">
+                    <td colspan="7"><div class="refl-detail-inner">${reflHtml}</div></td>
                 </tr>`;
             }).join('');
+        },
+
+        toggleStudentRow(id) {
+            const row    = document.querySelector(`.student-row[onclick*="${id}"]`);
+            const detail = document.getElementById(`detail-${id}`);
+            if (!row || !detail) return;
+            const isOpen = row.classList.contains('open');
+            row.classList.toggle('open', !isOpen);
+            detail.classList.toggle('open', !isOpen);
         },
 
         exportCSV() {
