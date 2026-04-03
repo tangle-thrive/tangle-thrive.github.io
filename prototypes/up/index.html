@@ -2764,11 +2764,30 @@
                 const reflBadge = reflCount > 0
                     ? `<span style="font-size:.75rem;background:#d4edda;color:#1a5c3a;border-radius:10px;padding:2px 7px;margin-left:6px;font-weight:700">${reflCount} week${reflCount>1?'s':''}</span>` : '';
 
+                // Build mid-week check-in HTML
+                const midweeks = Array.isArray(g.midweekReflections) ? g.midweekReflections : [];
+                const mwHtml = midweeks.length === 0 ? '' : `
+                    <p style="font-size:.75rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.05em;margin:0 0 6px;">Mid-week check-ins</p>
+                    ${[...midweeks].reverse().map((r, i) => {
+                        const date = r.savedAt ? new Date(r.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : `Check-in ${midweeks.length - i}`;
+                        const rating = r.traitRating ? `${ratingEmojis[r.traitRating]} ${r.traitRating}/5` : '';
+                        const text = r.text ? `<p class="refl-text">"${r.text}"</p>` : '';
+                        return `<div class="refl-week" style="background:#f0f4ff;border-left-color:#7b93ff">
+                            <div class="refl-week-header">
+                                <span class="refl-week-date">${date}</span>
+                                <span class="refl-rating">${rating}</span>
+                            </div>
+                            ${text}
+                        </div>`;
+                    }).join('')}`;
+
                 // Build reflection history HTML
                 const reflections = Array.isArray(g.reflections) ? g.reflections : [];
-                const reflHtml = reflections.length === 0
+                const reflHtml = (reflections.length === 0 && midweeks.length === 0)
                     ? '<p class="no-reflections">No reflections yet.</p>'
-                    : [...reflections].reverse().map((r, i) => {
+                    : `${mwHtml}${reflections.length > 0 ? `
+                    <p style="font-size:.75rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.05em;margin:${midweeks.length > 0 ? '14px' : '0'} 0 6px;">Weekly reflections</p>
+                    ${[...reflections].reverse().map((r, i) => {
                         const date = r.savedAt ? new Date(r.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : `Week ${reflections.length - i}`;
                         const rating = r.traitRating ? `${ratingEmojis[r.traitRating]} ${r.traitRating}/5` : '';
                         const classChip = r.classGoalMet ? `<span class="refl-goal-chip ${r.classGoalMet}">Class: ${r.classGoalMet}</span>` : '';
@@ -2787,7 +2806,7 @@
                             <div class="refl-goals">${classChip}${homeChip}</div>
                             ${noticed}${obstacle}${continueDoing}${text}
                         </div>`;
-                    }).join('');
+                    }).join('')}` : ''}`;
 
                 const isV2 = g.selectedClass === 'Ms. Cleaveland' || g.selectedClass === 'Mr. Gomez';
                 const homeGoalCell = isV2 && g.homeGoalMinutes
