@@ -1277,6 +1277,37 @@
     </div>
 
     <!-- ══════════════════════════════════
+         MID-WEEK CHECK-IN
+    ══════════════════════════════════ -->
+    <div id="midweek-screen" class="activity-screen hidden">
+        <p class="screen-label">MID-WEEK CHECK-IN</p>
+        <h2 class="main-question">How much did you practice being <span id="mw-trait"></span> today? Click one! <button class="tts-btn" id="mw-tts" data-speak="" onclick="app.speakFromBtn(this)">🔊</button></h2>
+        <div class="emoji-meter">
+            <div class="emoji-col"><button class="emoji-btn mw-emoji" onclick="app.selectMidweekRating(1)">😕</button><span class="emoji-label">Not much</span></div>
+            <div class="emoji-col"><button class="emoji-btn mw-emoji" onclick="app.selectMidweekRating(2)">😐</button><span class="emoji-label">A little</span></div>
+            <div class="emoji-col"><button class="emoji-btn mw-emoji" onclick="app.selectMidweekRating(3)">🙂</button><span class="emoji-label">Some</span></div>
+            <div class="emoji-col"><button class="emoji-btn mw-emoji" onclick="app.selectMidweekRating(4)">😊</button><span class="emoji-label">A lot</span></div>
+            <div class="emoji-col"><button class="emoji-btn mw-emoji" onclick="app.selectMidweekRating(5)">🌟</button><span class="emoji-label">So much!</span></div>
+        </div>
+
+        <div class="goal-recap-card" style="margin-top:20px;">
+            <span class="recap-label">Class goal</span>
+            <span class="recap-value" id="mw-class-goal"></span>
+            <span class="recap-label">Home goal</span>
+            <span class="recap-value" id="mw-home-goal"></span>
+        </div>
+
+        <p style="font-weight:700;color:var(--text-dark);margin:18px 0 8px;">What progress have you made so far? What's working? What do you want to try next? <button class="tts-btn" data-speak="What progress have you made so far? What's working? What do you want to try next?" onclick="app.speakFromBtn(this)">🔊</button></p>
+        <textarea class="reflection-textarea" id="mw-text" placeholder="Write here…" rows="4"></textarea>
+
+        <div class="reflection-saved-banner" id="mw-saved">✅ Check-in saved!</div>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="app.showProgress()">← Back</button>
+            <button class="btn btn-primary" id="mw-save" onclick="app.saveMidweekReflection()">Save →</button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
          REFLECTION
     ══════════════════════════════════ -->
     <!-- ══════════════════════════════════
@@ -1294,6 +1325,10 @@
         </div>
         <div id="r1-connection" class="r1-connection hidden">
             <p id="r1-connection-text"></p>
+        </div>
+        <div id="r1-continue-doing" class="hidden" style="margin-top:14px;">
+            <p class="r1-obstacle-label">What do you want to continue doing?</p>
+            <textarea class="reflection-textarea" id="r1-continue-doing-text" placeholder="Write here…" rows="3"></textarea>
         </div>
         <div id="r1-obstacle" class="hidden">
             <p class="r1-obstacle-label">What got in the way?</p>
@@ -1632,7 +1667,7 @@
         showScreen(id) {
             ['intro-screen','homepage','setup-screen','class-select-screen','name-login-screen',
              'step1-screen','step2-screen','step3-screen','goal-classroom-screen','goal-strategy-screen','goal-home-screen',
-             'peer-screen','completion-screen','progress-screen','reflection-1-screen','reflection-2-screen','reflection-3-screen','dashboard-screen']
+             'peer-screen','completion-screen','progress-screen','midweek-screen','reflection-1-screen','reflection-2-screen','reflection-3-screen','dashboard-screen']
                 .forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0, 0);
@@ -1751,75 +1786,10 @@
             document.getElementById('step1-continue').disabled = text.length < 3;
         },
 
-        async submitStep1() {
+        submitStep1() {
             const val = document.getElementById('problem-text').value.trim();
             if (val.length < 3) return;
-
-            // Chips are pre-validated — skip AI reframe
-            if (this.data.usedChip) {
-                this.proceedToStep2(val);
-                return;
-            }
-
-            // Show loading state
-            const btn = document.getElementById('step1-continue');
-            btn.textContent = 'Checking…';
-            btn.disabled = true;
-
-            try {
-                const res = await fetch('/.netlify/functions/claude-proxy', {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({
-                        model: 'claude-haiku-4-5-20251001',
-                        max_tokens: 100,
-                        messages: [{
-                            role: 'user',
-                            content: `A student in grades 1–6 typed this as a world issue they care about: "${val}"
-
-Your job: reframe it as a short, simple problem that a 1st grader could easily read and understand. Use everyday words. Keep it to 3–7 words.
-
-Rules:
-- Use simple, common words a 6-year-old would know (e.g. "animals" not "wildlife", "not enough food" not "food insecurity", "pets without homes" not "abandoned animals")
-- If it already describes a real problem clearly, return it cleaned up (fix spelling, make it lowercase)
-- If it's vague, make it more specific but still simple (e.g. "puppy" → "puppies without homes", "people being mean" → "kids being mean to each other")
-- If it truly cannot be interpreted as any real-world problem (random words, personal activities like "eating cake", food, hobbies, entertainment), set valid to false
-
-Examples of good reframes: litter at school, kids not having enough food, animals losing their homes, people being unkind, families without a home, dirty water in rivers
-
-Respond ONLY with JSON, no other text:
-{"valid": true, "reframe": "the reframed issue in 3-7 words"}
-or
-{"valid": false}`
-                        }]
-                    })
-                });
-                const data = await res.json();
-                const raw = data.content?.[0]?.text?.trim() || '';
-                const text = raw.replace(/```json\n?/gi, '').replace(/```/g, '').trim();
-                console.log('Reframe parsed text:', text);
-                let result;
-                try { result = JSON.parse(text); }
-                catch(e) { result = { valid: true, reframe: val }; }
-
-                if (!result.valid) {
-                    document.getElementById('step1-error').textContent = 'That doesn\'t sound like a world issue. Try something like "kids going hungry" or "trash in my neighborhood."';
-                    document.getElementById('step1-error').classList.remove('hidden');
-                    btn.textContent = 'Continue →';
-                    btn.disabled = false;
-                    return;
-                }
-
-                // Always show the reframe as a suggestion
-                document.getElementById('suggestion-text').textContent = result.reframe;
-                document.getElementById('step1-suggestion').classList.remove('hidden');
-                btn.textContent = 'Continue →';
-                btn.disabled = false;
-
-            } catch (e) {
-                // If AI check fails, just proceed with what they wrote
-                this.proceedToStep2(val);
-            }
+            this.proceedToStep2(val);
         },
 
         acceptSuggestion() {
@@ -2247,8 +2217,10 @@ or
                 const homeText = VERSION === '1' ? (conn.homeV1 || conn.home) : conn.home;
                 document.getElementById('home-goal-connection').textContent = homeText;
             }
+            const isGomez = this.data.selectedClass === 'Mr. Gomez';
             document.getElementById('home-goal-heading').textContent = VERSION === '1'
                 ? 'How many minutes will you read at home this week?'
+                : isGomez ? 'How many minutes will you spend reading this week?'
                 : 'How many minutes will you read on Lexia or Epic this week?';
             // Reset minutes selection
             document.querySelectorAll('.minutes-card').forEach(c => c.classList.remove('selected'));
@@ -2277,6 +2249,8 @@ or
                 this.data.classroomGoal || '';
             const homeGoalText = VERSION === '1'
                 ? `Read a book for ${this.data.homeGoalMinutes} minutes this week.`
+                : this.data.selectedClass === 'Mr. Gomez'
+                ? `Read for ${this.data.homeGoalMinutes} minutes this week.`
                 : `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week.`;
             this.data.homeGoalText = homeGoalText;
             document.getElementById('peer-home-goal-display').textContent = homeGoalText;
@@ -2354,7 +2328,7 @@ or
                 ${strategiesRow}
                 <div class="summary-row">
                     <span class="sr-label">Home goal</span>
-                    <span class="sr-value">${this.data.homeGoalText || (VERSION === '1' ? `Read a book for ${this.data.homeGoalMinutes} minutes this week` : `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week`)}</span>
+                    <span class="sr-value">${this.data.homeGoalText || (VERSION === '1' ? `Read a book for ${this.data.homeGoalMinutes} minutes this week` : this.data.selectedClass === 'Mr. Gomez' ? `Read for ${this.data.homeGoalMinutes} minutes this week` : `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week`)}</span>
                 </div>
                 <div class="completion-bridge">
                     Once you're more ${growth ? growth.grammarName : 'skilled'} day-to-day, you'll be more ${growth ? growth.grammarName : 'skilled'} when it comes to big problems like <strong>${issue}</strong>.
@@ -2429,19 +2403,20 @@ or
                     table.innerHTML = '<div class="no-data">You haven\'t set any goals yet. Go ahead and set your first one!</div>';
                 } else {
                     table.innerHTML = `
-                        <p style="font-size:.86rem;color:var(--text-mid);padding:12px 14px 0;font-style:italic;">Click a goal row to do a reflection check-in.</p>
                         <table>
-                            <thead><tr><th>Date</th><th>Building</th><th>Goal</th><th></th></tr></thead>
+                            <thead><tr><th>Date</th><th>Building</th><th>Goal</th><th>Mid-Week</th><th>Weekly</th></tr></thead>
                             <tbody>
                                 ${mine.map((g, i) => {
                                     const growth = this.traits.find(t => t.id === g.growthTrait);
                                     const tName = growth ? `${growth.icon} ${growth.title}` : (g.growthTrait || '');
                                     const hasRefl = (Array.isArray(g.reflections) && g.reflections.length > 0) || g.reflectedAt;
-                                    return `<tr class="goal-row" onclick="app.openReflection(${i})">
+                                    const hasMW = Array.isArray(g.midweekReflections) && g.midweekReflections.length > 0;
+                                    return `<tr>
                                         <td>${new Date(g.timestamp).toLocaleDateString()}</td>
                                         <td>${tName}</td>
-                                        <td>${(g.goal||'').substring(0,55)}${(g.goal||'').length>55?'…':''}</td>
-                                        <td style="white-space:nowrap">${hasRefl ? '<span class="reflect-badge">✓ Reflected</span>' : '<span class="reflect-badge" style="opacity:.5;border-style:dashed;">Reflect →</span>'}</td>
+                                        <td>${(g.classroomGoal||g.goal||'').substring(0,55)}${(g.classroomGoal||g.goal||'').length>55?'…':''}</td>
+                                        <td><button class="reflect-badge" style="cursor:pointer;border:none;background:none;padding:0;" onclick="app.openMidweekReflection(${i})">${hasMW ? '✓ Check-in' : 'Check in →'}</button></td>
+                                        <td><button class="reflect-badge" style="cursor:pointer;border:none;background:none;padding:0;" onclick="app.openReflection(${i})">${hasRefl ? '✓ Reflected' : 'Reflect →'}</button></td>
                                     </tr>`;
                                 }).join('')}
                             </tbody>
@@ -2450,6 +2425,47 @@ or
             } catch (e) {
                 table.innerHTML = '<div class="no-data">Error loading goals. Please try again.</div>';
                 console.error(e);
+            }
+        },
+
+        // ── Mid-week Reflection ─────────────────────────────────
+        openMidweekReflection(index) {
+            const goal = (this._myGoals || [])[index];
+            if (!goal) return;
+            this._currentReflGoal = goal;
+            this._mwData = { traitRating: 0, text: '', savedAt: '' };
+            const growth = this.traits.find(t => t.id === goal.growthTrait);
+            const traitGrammar = growth ? growth.grammarName : '';
+            document.getElementById('mw-trait').textContent = traitGrammar;
+            document.getElementById('mw-tts').dataset.speak = `How much did you practice being ${traitGrammar} today? Click one!`;
+            document.getElementById('mw-class-goal').textContent = goal.classroomGoal || goal.goal || '';
+            document.getElementById('mw-home-goal').textContent = goal.homeGoalText || '';
+            document.querySelectorAll('.mw-emoji').forEach(b => b.classList.remove('selected'));
+            document.getElementById('mw-text').value = '';
+            document.getElementById('mw-saved').classList.remove('visible');
+            this.showScreen('midweek-screen');
+        },
+
+        selectMidweekRating(rating) {
+            this._mwData.traitRating = rating;
+            document.querySelectorAll('.mw-emoji').forEach((b, i) => b.classList.toggle('selected', i + 1 === rating));
+        },
+
+        async saveMidweekReflection() {
+            this._mwData.text = document.getElementById('mw-text').value.trim();
+            this._mwData.savedAt = new Date().toISOString();
+            const g = this._currentReflGoal;
+            if (!g || !g._id) return;
+            try {
+                const existing = Array.isArray(g.midweekReflections) ? g.midweekReflections : [];
+                existing.push({ ...this._mwData });
+                await updateDoc(doc(db, COLLECTION, g._id), { midweekReflections: existing });
+                g.midweekReflections = existing;
+                document.getElementById('mw-saved').classList.add('visible');
+                setTimeout(() => this.showProgress(), 1500);
+            } catch(e) {
+                console.error('Error saving mid-week reflection:', e);
+                alert('Error saving. Please try again.');
             }
         },
 
@@ -2467,6 +2483,8 @@ or
             document.getElementById('r1-tts').dataset.speak = `How much did you practice being ${traitGrammar} this week? Click one!`;
             document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
             document.getElementById('r1-connection').classList.add('hidden');
+            document.getElementById('r1-continue-doing').classList.add('hidden');
+            document.getElementById('r1-continue-doing-text').value = '';
             document.getElementById('r1-obstacle').classList.add('hidden');
             document.getElementById('r1-obstacle-text').value = '';
             document.getElementById('r1-continue').disabled = true;
@@ -2484,9 +2502,11 @@ or
                 document.getElementById('r1-connection-text').textContent =
                     `Because you practiced being ${traitGrammar} this week, you're getting closer to helping with ${issue}.`;
                 document.getElementById('r1-connection').classList.remove('hidden');
+                document.getElementById('r1-continue-doing').classList.remove('hidden');
                 document.getElementById('r1-obstacle').classList.add('hidden');
             } else {
                 document.getElementById('r1-connection').classList.add('hidden');
+                document.getElementById('r1-continue-doing').classList.add('hidden');
                 document.getElementById('r1-obstacle').classList.remove('hidden');
             }
             document.getElementById('r1-continue').disabled = false;
@@ -2494,6 +2514,7 @@ or
 
         goToReflection2() {
             this._reflData.gotInTheWay = document.getElementById('r1-obstacle-text').value.trim();
+            this._reflData.continueDoing = document.getElementById('r1-continue-doing-text').value.trim();
             const growth = this.traits.find(t => t.id === this._currentReflGoal.growthTrait);
             const traitGrammar = growth ? growth.grammarName : '';
             document.getElementById('r2-trait').textContent = traitGrammar;
@@ -2524,7 +2545,7 @@ or
             const traitGrammar = growth ? growth.grammarName : '';
             const classGoal = this._currentReflGoal.classroomGoal || '';
             const mins = this._currentReflGoal.homeGoalMinutes || 0;
-            const homeGoal = mins ? `Read ${mins} minutes ${goalVersion === '1' ? 'at home' : 'on Lexia or Epic'} this week.` : '';
+            const homeGoal = mins ? `Read ${mins} minutes ${goalVersion === '1' ? 'at home' : (this._currentReflGoal.selectedClass === 'Mr. Gomez' ? '' : 'on Lexia or Epic ')}this week.` : '';
 
             document.getElementById('r3-header-text').textContent =
                 `Here are some ways you said you'd practice being ${traitGrammar} this week:`;
@@ -2756,6 +2777,7 @@ or
                             ? `<p class="refl-noticed">Noticed: ${r.noticed.join(', ')}</p>`
                             : (r.noticedText ? `<p class="refl-noticed">Noticed: ${r.noticedText}</p>` : '');
                         const obstacle = r.gotInTheWay ? `<p class="refl-noticed">Got in the way: ${r.gotInTheWay}</p>` : '';
+                        const continueDoing = r.continueDoing ? `<p class="refl-noticed">Want to continue: ${r.continueDoing}</p>` : '';
                         const text = r.reflectionText ? `<p class="refl-text">"${r.reflectionText}"</p>` : '';
                         return `<div class="refl-week">
                             <div class="refl-week-header">
@@ -2763,7 +2785,7 @@ or
                                 <span class="refl-rating">${rating}</span>
                             </div>
                             <div class="refl-goals">${classChip}${homeChip}</div>
-                            ${noticed}${obstacle}${text}
+                            ${noticed}${obstacle}${continueDoing}${text}
                         </div>`;
                     }).join('');
 
