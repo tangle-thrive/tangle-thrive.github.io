@@ -581,7 +581,8 @@
         .class-teacher { font-size: 1.3rem; font-weight: 800; color: var(--green-dark); }
 
         /* ── Dashboard ── */
-        .dashboard { padding: 30px 40px; animation: fadeIn .6s ease; width: calc(100vw - 40px); max-width: 1400px; margin: 0 auto; box-sizing: border-box; }
+        .dashboard { padding: 30px 40px; animation: fadeIn .6s ease; width: 100vw; max-width: 1400px; margin-left: 50%; transform: translateX(-50%); box-sizing: border-box; }
+        .progress-page { padding: 30px 20px; animation: fadeIn .6s ease; max-width: 860px; margin: 0 auto; box-sizing: border-box; }
         .db-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
         .db-header h1 { color: var(--green-dark); font-size: 1.8rem; margin: 0; }
         .db-class-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
@@ -639,9 +640,11 @@
         .emoji-meter { display: flex; justify-content: center; gap: 8px; margin: 28px 0 24px; }
         .emoji-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
         .emoji-label { font-size: .68rem; color: var(--text-mid); font-weight: 600; text-align: center; }
-        .emoji-btn { font-size: 2rem; background: none; border: 3px solid transparent; border-radius: 50%; width: 58px; height: 58px; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; padding: 0; }
-        .emoji-btn:hover { transform: scale(1.15); }
-        .emoji-btn.selected { border-color: var(--green-mid); background: var(--green-pale); transform: scale(1.15); }
+        .emoji-btn { font-size: 2rem; background: none; border: 3px solid transparent; border-radius: 50%; width: 58px; height: 58px; cursor: pointer; transition: transform .15s ease, border-color .15s, background .15s; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .emoji-btn:hover { transform: scale(1.2); }
+        .emoji-btn.selected { border-color: var(--green-mid); background: var(--green-pale); transform: scale(1.45); }
+        @keyframes emoji-pop { 0% { transform: scale(1); } 50% { transform: scale(1.6); } 100% { transform: scale(1.45); } }
+        .emoji-btn.selected { animation: emoji-pop .2s ease forwards; }
         .r1-connection { background: var(--green-pale); border: 2px solid var(--green-mid); border-radius: 16px; padding: 18px 22px; margin: 8px 0 20px; font-size: 1rem; font-weight: 700; color: var(--green-dark); line-height: 1.5; }
         .r1-obstacle-label { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
         .noticed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
@@ -1268,7 +1271,7 @@
     <!-- ══════════════════════════════════
          STUDENT PROGRESS
     ══════════════════════════════════ -->
-    <div id="progress-screen" class="dashboard hidden">
+    <div id="progress-screen" class="progress-page hidden">
         <h1>My Goals</h1>
         <div class="dashboard-controls">
             <button class="btn btn-secondary" onclick="app.goHome()">← Back to Home</button>
@@ -2415,8 +2418,8 @@
                                         <td>${new Date(g.timestamp).toLocaleDateString()}</td>
                                         <td>${tName}</td>
                                         <td>${(g.classroomGoal||g.goal||'').substring(0,55)}${(g.classroomGoal||g.goal||'').length>55?'…':''}</td>
-                                        <td><button class="reflect-badge" style="cursor:pointer;border:none;background:none;padding:0;" onclick="app.openMidweekReflection(${i})">${hasMW ? '✓ Check-in' : 'Check in →'}</button></td>
-                                        <td><button class="reflect-badge" style="cursor:pointer;border:none;background:none;padding:0;" onclick="app.openReflection(${i})">${hasRefl ? '✓ Reflected' : 'Reflect →'}</button></td>
+                                        <td><button class="reflect-badge" style="cursor:pointer;border:none;background:none;padding:0;" onclick="app.openMidweekReflection(${i})">Check in →</button></td>
+                                        <td><button class="reflect-badge" style="cursor:pointer;border:none;background:none;padding:0;" onclick="app.openReflection(${i})">Reflect →</button></td>
                                     </tr>`;
                                 }).join('')}
                             </tbody>
