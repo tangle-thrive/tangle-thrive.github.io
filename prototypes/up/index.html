@@ -2751,7 +2751,7 @@
             const showClass = this._activeClass === '__all__';
             document.getElementById('dashboard-table').innerHTML = `
                 <table>
-                    <thead><tr><th>Name</th>${showClass ? '<th>Class</th>' : ''}<th>Cause</th><th>Strength</th><th>Growing</th><th>Class Goal</th><th>Home Goal</th><th></th></tr></thead>
+                    <thead><tr><th>Name</th>${showClass ? '<th>Class</th>' : ''}<th>Cause</th><th>Strength</th><th>Growing</th><th>Class Goal</th><th>Home Goal</th><th>Date</th><th></th></tr></thead>
                     <tbody>${this.renderDashboardRows(filtered, showClass)}</tbody>
                 </table>`;
         },
@@ -2825,10 +2825,11 @@
                     <td style="white-space:nowrap">${growth   ? growth.icon   + ' ' + growth.title   : '—'}</td>
                     <td style="font-size:0.85rem">${g.classroomGoal||''}</td>
                     ${homeGoalCell}
+                    <td style="white-space:nowrap;font-size:0.85rem;color:var(--text-mid)">${g.timestamp ? new Date(g.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</td>
                     <td><button class="btn-delete" onclick="event.stopPropagation();app.deleteEntry('${g._id}')">Delete</button></td>
                 </tr>
                 <tr class="student-detail-row" id="detail-${g._id}">
-                    <td colspan="8"><div class="refl-detail-inner">${reflHtml}</div></td>
+                    <td colspan="9"><div class="refl-detail-inner">${reflHtml}</div></td>
                 </tr>`;
             }).join('');
         },
