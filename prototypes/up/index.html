@@ -505,6 +505,28 @@
         .minutes-num { font-size: 2rem; font-weight: 800; color: var(--purple-dark); }
         .minutes-label { font-size: .8rem; color: var(--text-gray); margin-top: 4px; }
 
+        /* ── Home activity suggestion cards ── */
+        .suggestion-cards { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+        .activity-suggestion-card {
+            border: 2px solid #e8e8e8; border-radius: 16px; padding: 16px 18px;
+            cursor: pointer; transition: all .2s; background: white; position: relative;
+        }
+        .activity-suggestion-card:hover { border-color: var(--purple-mid); background: #f5f3ff; }
+        .activity-suggestion-card.selected { border-color: var(--purple-mid); background: #ede9fe; box-shadow: 0 0 0 2px var(--purple-mid); }
+        .suggestion-type { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--purple-mid); margin-bottom: 4px; }
+        .suggestion-title { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; }
+        .suggestion-site { font-size: .8rem; color: var(--text-mid); margin-bottom: 8px; }
+        .suggestion-summary { font-size: .9rem; color: var(--text-dark); line-height: 1.45; }
+        .suggestion-checkmark {
+            position: absolute; top: 14px; right: 14px; width: 22px; height: 22px;
+            border-radius: 50%; background: var(--purple-mid); color: white;
+            display: none; align-items: center; justify-content: center; font-size: .8rem;
+        }
+        .activity-suggestion-card.selected .suggestion-checkmark { display: flex; }
+        .suggestion-loading { text-align: center; padding: 30px 0; color: var(--text-mid); font-size: .95rem; }
+        .suggestion-loading-spinner { font-size: 1.6rem; animation: spin 1.2s linear infinite; display: inline-block; margin-bottom: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         /* ── Goal context banner ── */
         .goal-context-banner {
             background: var(--green-pale); border: 2px solid var(--green-mid);
@@ -1181,26 +1203,39 @@
     </div>
 
     <!-- ══════════════════════════════════
-         GOAL: HOME (minutes)
+         GOAL: HOME
     ══════════════════════════════════ -->
     <div id="goal-home-screen" class="activity-screen purple-screen hidden">
         <div class="step-indicator">My Goal — At Home</div>
         <div id="home-goal-connection" class="goal-connection-reveal purple" style="margin-bottom:20px;"></div>
-        <h2 class="main-question" id="home-goal-heading">How many minutes will you read on Lexia or Epic this week?</h2>
 
-        <div class="minutes-options" id="minutes-options">
-            <div class="minutes-card" onclick="app.selectHomeMinutes(20)">
-                <div class="minutes-num">20</div>
-                <div class="minutes-label">minutes</div>
+        <!-- V1: minutes (Ms. Lee) -->
+        <div id="home-v1-section" class="hidden">
+            <h2 class="main-question">How many minutes will you read at home this week?</h2>
+            <div class="minutes-options">
+                <div class="minutes-card" onclick="app.selectHomeMinutes(10)">
+                    <div class="minutes-num">10</div>
+                    <div class="minutes-label">minutes</div>
+                </div>
+                <div class="minutes-card" onclick="app.selectHomeMinutes(15)">
+                    <div class="minutes-num">15</div>
+                    <div class="minutes-label">minutes</div>
+                </div>
+                <div class="minutes-card" onclick="app.selectHomeMinutes(20)">
+                    <div class="minutes-num">20</div>
+                    <div class="minutes-label">minutes</div>
+                </div>
             </div>
-            <div class="minutes-card" onclick="app.selectHomeMinutes(30)">
-                <div class="minutes-num">30</div>
-                <div class="minutes-label">minutes</div>
+        </div>
+
+        <!-- V2: AI article/activity suggestions (Cleaveland & Gomez) -->
+        <div id="home-v2-section" class="hidden">
+            <h2 class="main-question">Here's something you can do at home this week! Pick one. 👇</h2>
+            <div id="home-suggestions-loading" class="suggestion-loading hidden">
+                <div class="suggestion-loading-spinner">🔍</div>
+                <p>Finding activities for you…</p>
             </div>
-            <div class="minutes-card" onclick="app.selectHomeMinutes(45)">
-                <div class="minutes-num">45</div>
-                <div class="minutes-label">minutes</div>
-            </div>
+            <div id="home-suggestions-cards" class="suggestion-cards hidden"></div>
         </div>
 
         <div class="button-group">
@@ -2214,25 +2249,82 @@
                     }
                 }
             }
-            // Populate home connection sentence + heading (version-aware)
+            // Transition to home goal screen
+            this.showHomeGoalScreen();
+        },
+
+        // ── Goal: Home ─────────────────────────────────
+        async showHomeGoalScreen() {
+            // Connection sentence
             const conn = this.goalConnections[this.data.growthTrait];
             if (conn) {
                 const homeText = VERSION === '1' ? (conn.homeV1 || conn.home) : conn.home;
                 document.getElementById('home-goal-connection').textContent = homeText;
             }
-            const isGomez = this.data.selectedClass === 'Mr. Gomez';
-            document.getElementById('home-goal-heading').textContent = VERSION === '1'
-                ? 'How many minutes will you read at home this week?'
-                : isGomez ? 'How many minutes will you spend reading this week?'
-                : 'How many minutes will you read on Lexia or Epic this week?';
-            // Reset minutes selection
-            document.querySelectorAll('.minutes-card').forEach(c => c.classList.remove('selected'));
             document.getElementById('home-goal-continue').disabled = true;
-            this.showScreen('goal-home-screen');
-            this.currentStep = 'goal-home';
+
+            if (VERSION === '1') {
+                // Ms. Lee — minutes flow
+                document.getElementById('home-v1-section').classList.remove('hidden');
+                document.getElementById('home-v2-section').classList.add('hidden');
+                document.querySelectorAll('.minutes-card').forEach(c => c.classList.remove('selected'));
+                this.showScreen('goal-home-screen');
+                this.currentStep = 'goal-home';
+            } else {
+                // Cleaveland / Gomez — AI suggestions
+                document.getElementById('home-v1-section').classList.add('hidden');
+                document.getElementById('home-v2-section').classList.remove('hidden');
+                document.getElementById('home-suggestions-loading').classList.remove('hidden');
+                document.getElementById('home-suggestions-cards').classList.add('hidden');
+                document.getElementById('home-suggestions-cards').innerHTML = '';
+                this.data.homeActivity = null;
+                this.showScreen('goal-home-screen');
+                this.currentStep = 'goal-home';
+                try {
+                    const res = await fetch('/.netlify/functions/home-activity', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ topic: this.data.problem, studentClass: this.data.selectedClass })
+                    });
+                    const data = await res.json();
+                    this._homeActivitySuggestions = data.suggestions || [];
+                    this.renderHomeActivitySuggestions();
+                } catch(e) {
+                    console.error('home-activity fetch error:', e);
+                    document.getElementById('home-suggestions-loading').innerHTML = '<p style="color:var(--red)">Could not load suggestions. Please try again.</p>';
+                }
+            }
         },
 
-        // ── Goal: Home ─────────────────────────────────
+        renderHomeActivitySuggestions() {
+            const suggestions = this._homeActivitySuggestions || [];
+            const container = document.getElementById('home-suggestions-cards');
+            container.innerHTML = suggestions.map((s, i) => {
+                const typeLabel = s.type === 'article' ? '📰 Article' : '✏️ Activity';
+                const siteLine  = s.siteName ? `<div class="suggestion-site">${s.siteName}</div>` : '';
+                const safeSpeak = (s.summary || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                return `<div class="activity-suggestion-card" onclick="app.selectHomeActivity(${i})" id="home-suggestion-${i}">
+                    <div class="suggestion-checkmark">✓</div>
+                    <div class="suggestion-type">${typeLabel}</div>
+                    <div class="suggestion-title">${s.title}</div>
+                    ${siteLine}
+                    <div class="suggestion-summary">${s.summary} <button class="tts-btn" data-speak="${safeSpeak}" onclick="event.stopPropagation();app.speakFromBtn(this)">🔊</button></div>
+                </div>`;
+            }).join('');
+            document.getElementById('home-suggestions-loading').classList.add('hidden');
+            container.classList.remove('hidden');
+        },
+
+        selectHomeActivity(index) {
+            const s = (this._homeActivitySuggestions || [])[index];
+            if (!s) return;
+            this.data.homeActivity = s;
+            document.querySelectorAll('.activity-suggestion-card').forEach((c, i) => {
+                c.classList.toggle('selected', i === index);
+            });
+            document.getElementById('home-goal-continue').disabled = false;
+        },
+
         selectHomeMinutes(minutes) {
             this.data.homeGoalMinutes = minutes;
 
@@ -2246,16 +2338,24 @@
         },
 
         submitHomeGoal() {
-            if (!this.data.homeGoalMinutes) return;
+            if (VERSION === '1' && !this.data.homeGoalMinutes) return;
+            if (VERSION !== '1' && !this.data.homeActivity) return;
+
+            // Build home goal display text
+            let homeGoalText = '';
+            if (VERSION === '1') {
+                homeGoalText = `Read a book for ${this.data.homeGoalMinutes} minutes this week.`;
+            } else {
+                const act = this.data.homeActivity;
+                homeGoalText = act.type === 'article'
+                    ? `Read: "${act.title}" on ${act.siteName}`
+                    : `Activity: ${act.title}`;
+            }
+            this.data.homeGoalText = homeGoalText;
+
             // Class goal
             document.getElementById('peer-classroom-goal-display').textContent =
                 this.data.classroomGoal || '';
-            const homeGoalText = VERSION === '1'
-                ? `Read a book for ${this.data.homeGoalMinutes} minutes this week.`
-                : this.data.selectedClass === 'Mr. Gomez'
-                ? `Read for ${this.data.homeGoalMinutes} minutes this week.`
-                : `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week.`;
-            this.data.homeGoalText = homeGoalText;
             document.getElementById('peer-home-goal-display').textContent = homeGoalText;
             // Strategies
             const strategiesBox = document.getElementById('peer-strategies-box');
@@ -2330,8 +2430,18 @@
                 </div>
                 ${strategiesRow}
                 <div class="summary-row">
-                    <span class="sr-label">Home goal</span>
-                    <span class="sr-value">${this.data.homeGoalText || (VERSION === '1' ? `Read a book for ${this.data.homeGoalMinutes} minutes this week` : this.data.selectedClass === 'Mr. Gomez' ? `Read for ${this.data.homeGoalMinutes} minutes this week` : `Read on Lexia or Epic for ${this.data.homeGoalMinutes} minutes this week`)}</span>
+                    <span class="sr-label">At-home activity</span>
+                    <span class="sr-value">${(() => {
+                        if (VERSION !== '1' && this.data.homeActivity) {
+                            const act = this.data.homeActivity;
+                            if (act.type === 'article') {
+                                return `<a href="${act.url}" target="_blank" rel="noopener" style="color:var(--green-dark);font-weight:700">${act.title}</a><br><span style="font-size:.85rem;color:var(--text-mid)">${act.siteName}</span>`;
+                            } else {
+                                return `<strong>${act.title}</strong><br><span style="font-size:.85rem;color:var(--text-mid)">${act.instructions || ''}</span>`;
+                            }
+                        }
+                        return this.data.homeGoalText || `Read a book for ${this.data.homeGoalMinutes || ''} minutes this week`;
+                    })()}</span>
                 </div>
                 <div class="completion-bridge">
                     Once you're more ${growth ? growth.grammarName : 'skilled'} day-to-day, you'll be more ${growth ? growth.grammarName : 'skilled'} when it comes to big problems like <strong>${issue}</strong>.
@@ -2547,8 +2657,24 @@
             const growth = this.traits.find(t => t.id === this._currentReflGoal.growthTrait);
             const traitGrammar = growth ? growth.grammarName : '';
             const classGoal = this._currentReflGoal.classroomGoal || '';
+
+            // Home goal — V1 uses minutes, V2 uses homeActivity
+            const homeActivity = this._currentReflGoal.homeActivity;
             const mins = this._currentReflGoal.homeGoalMinutes || 0;
-            const homeGoal = mins ? `Read ${mins} minutes ${goalVersion === '1' ? 'at home' : (this._currentReflGoal.selectedClass === 'Mr. Gomez' ? '' : 'on Lexia or Epic ')}this week.` : '';
+            let homeGoalDisplay = '';
+            let homeGoalWritePrompt = '';
+            if (goalVersion !== '1' && homeActivity) {
+                if (homeActivity.type === 'article') {
+                    homeGoalDisplay = `Read: "${homeActivity.title}" on ${homeActivity.siteName}`;
+                    homeGoalWritePrompt = 'What did you learn from the article? What surprised you?';
+                } else {
+                    homeGoalDisplay = `Activity: ${homeActivity.title}`;
+                    homeGoalWritePrompt = 'How did the activity go? What did you make or do?';
+                }
+            } else if (mins) {
+                homeGoalDisplay = `Read a book for ${mins} minutes this week.`;
+                homeGoalWritePrompt = 'What did you read? What did you think about it?';
+            }
 
             document.getElementById('r3-header-text').textContent =
                 `Here are some ways you said you'd practice being ${traitGrammar} this week:`;
@@ -2565,16 +2691,18 @@
                         <button class="goal-met-btn" onclick="app.selectGoalMet('class','No',this)">No</button>
                     </div>
                 </div>`;
-            if (homeGoal) html += `
+            if (homeGoalDisplay) html += `
                 <div class="goal-check-card">
-                    <div class="goal-check-label">Home Goal</div>
-                    <div class="goal-check-text">${homeGoal}</div>
-                    <p style="font-size:.85rem;font-weight:700;color:var(--text-mid);margin-bottom:8px;">Did you meet this goal?</p>
+                    <div class="goal-check-label">At-Home Activity</div>
+                    <div class="goal-check-text">${homeGoalDisplay}</div>
+                    <p style="font-size:.85rem;font-weight:700;color:var(--text-mid);margin-bottom:8px;">Did you do this activity?</p>
                     <div class="goal-met-buttons">
                         <button class="goal-met-btn" onclick="app.selectGoalMet('home','Yes',this)">Yes</button>
                         <button class="goal-met-btn" onclick="app.selectGoalMet('home','Kinda',this)">Kinda</button>
                         <button class="goal-met-btn" onclick="app.selectGoalMet('home','No',this)">No</button>
                     </div>
+                    <p style="font-size:.85rem;font-weight:700;color:var(--text-mid);margin:14px 0 6px;">${homeGoalWritePrompt}</p>
+                    <textarea class="reflection-textarea" id="r3-home-text" placeholder="Write here…" rows="3" style="font-size:.9rem;"></textarea>
                 </div>`;
             document.getElementById('r3-goals').innerHTML = html;
             document.getElementById('r3-text').value = '';
@@ -2670,6 +2798,8 @@
 
         async saveNewReflection() {
             this._reflData.reflectionText = document.getElementById('r3-text').value.trim();
+            const homeTextEl = document.getElementById('r3-home-text');
+            if (homeTextEl) this._reflData.homeActivityText = homeTextEl.value.trim();
             this._reflData.savedAt = new Date().toISOString();
             const g = this._currentReflGoal;
             if (!g || !g._id) return;
@@ -2812,9 +2942,17 @@
                     }).join('')}` : ''}`;
 
                 const isV2 = g.selectedClass === 'Ms. Cleaveland' || g.selectedClass === 'Mr. Gomez';
-                const homeGoalCell = isV2 && g.homeGoalMinutes
-                    ? `<td style="white-space:nowrap;font-size:0.85rem">${g.homeGoalMinutes} min<br><span style="color:var(--text-mid);font-size:.78rem">Lexia / Epic</span></td>`
-                    : `<td style="color:var(--text-gray);font-size:0.85rem">—</td>`;
+                let homeGoalCell = `<td style="color:var(--text-gray);font-size:0.85rem">—</td>`;
+                if (isV2 && g.homeActivity) {
+                    const act = g.homeActivity;
+                    if (act.type === 'article') {
+                        homeGoalCell = `<td style="font-size:0.85rem;max-width:200px"><a href="${act.url}" target="_blank" rel="noopener" style="color:var(--green-dark);font-weight:600">${act.title}</a><br><span style="color:var(--text-mid);font-size:.78rem">${act.siteName}</span></td>`;
+                    } else {
+                        homeGoalCell = `<td style="font-size:0.85rem;max-width:200px"><strong>${act.title}</strong><br><span style="color:var(--text-mid);font-size:.78rem">Activity</span></td>`;
+                    }
+                } else if (!isV2 && g.homeGoalMinutes) {
+                    homeGoalCell = `<td style="white-space:nowrap;font-size:0.85rem">${g.homeGoalMinutes} min</td>`;
+                }
 
                 return `
                 <tr class="student-row" onclick="app.toggleStudentRow('${g._id}')">
