@@ -3,57 +3,64 @@ exports.handler = async (event) => {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
 
+    const { topic, studentClass } = JSON.parse(event.body);
+    const isCleaveland = studentClass === 'Ms. Cleaveland';
+    const isGomez      = studentClass === 'Mr. Gomez';
+    const gradeDesc    = isGomez
+        ? '6th grade students'
+        : '4th and 5th grade students who read below grade level (roughly 2nd–3rd grade reading level)';
+
+    // ── 1. Try Serper (non-fatal if it fails) ───────────────────────────
+    let searchResults = [];
     try {
-        const { topic, studentClass } = JSON.parse(event.body);
-        const isGomez      = studentClass === 'Mr. Gomez';
-        const isCleaveland = studentClass === 'Ms. Cleaveland';
-        const gradeDesc    = isGomez
-            ? '6th grade students'
-            : '4th and 5th grade students who read below grade level (roughly 2nd–3rd grade reading level)';
-
-        // ── 1. Search Serper for relevant articles ──────────────────────
-        const searchQuery = `${topic} for kids site:pbslearningmedia.org OR site:wonderopolis.org OR site:dogonews.com OR site:kids.nationalgeographic.com`;
-
         const serperRes = await fetch('https://google.serper.dev/search', {
             method: 'POST',
             headers: {
                 'X-API-KEY': process.env.SERPER_API_KEY,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ q: searchQuery, num: 8 })
+            body: JSON.stringify({
+                q: `${topic} for kids site:pbslearningmedia.org OR site:wonderopolis.org OR site:dogonews.com OR site:kids.nationalgeographic.com`,
+                num: 8
+            })
         });
-
         const serperData = await serperRes.json();
-        const results = (serperData.organic || []).slice(0, 8).map(r => {
+        searchResults = (serperData.organic || []).slice(0, 8).map(r => {
             let siteName = '';
             try { siteName = new URL(r.link).hostname.replace('www.', ''); } catch(e) {}
             return { title: r.title, url: r.link, snippet: r.snippet || '', siteName };
         });
+        console.log(`Serper returned ${searchResults.length} results for: ${topic}`);
+    } catch (e) {
+        console.error('Serper search failed (non-fatal):', e.message);
+    }
 
-        // ── 2. Build Claude prompt ───────────────────────────────────────
-        const resultsText = results.length
-            ? results.map((r, i) =>
-                `${i + 1}. ${r.title}\n   URL: ${r.url}\n   Site: ${r.siteName}\n   Snippet: ${r.snippet}`
-              ).join('\n\n')
-            : '(No search results found — please generate fallback suggestions.)';
+    // ── 2. Build Claude prompt ───────────────────────────────────────────
+    const hasResults = searchResults.length > 0;
+    const resultsText = hasResults
+        ? searchResults.map((r, i) =>
+            `${i + 1}. ${r.title}\n   URL: ${r.url}\n   Site: ${r.siteName}\n   Snippet: ${r.snippet}`
+          ).join('\n\n')
+        : null;
 
-        let prompt;
+    let prompt;
+    if (isCleaveland) {
+        prompt = `You are helping a teacher find engaging at-home content for ${gradeDesc}. The student cares about this issue: "${topic}".
 
-        if (isCleaveland) {
-            prompt = `You are helping a teacher find engaging at-home content for ${gradeDesc}. The student cares about this issue: "${topic}".
+${hasResults ? `Search results from school-appropriate websites:\n${resultsText}\n\nReturn exactly 2 suggestions:
+1. An ARTICLE — pick the best one from the search results above (most relevant, simplest language). Only use a URL from the search results above — do NOT invent URLs.
+2. An ACTIVITY — something the student can do at home connected to their specific issue.` : `No search results available. Return exactly 2 suggestions:
+1. An ACTIVITY — something the student can do at home connected to their specific issue.
+2. Another ACTIVITY — a different type connected to their specific issue.`}
 
-Search results from school-appropriate websites:
-${resultsText}
-
-Return exactly 2 suggestions as JSON:
-1. An ARTICLE from the search results (pick the simplest, most relevant one for below-grade-level readers). If no good results exist, suggest one from wonderopolis.org or dogonews.com about helping the community or the general issue.
-2. An ACTIVITY the student can do at home that connects to their issue (make a poster, write a short speech, write a letter, draw a comic strip, etc. — simple, no special materials). Claude should choose the most appropriate activity type for the specific issue.
+Activity types to choose from (pick what fits the issue best): make a poster, write a short speech, write a letter to someone who can help, draw a comic strip, create a fact card, make a "Did You Know?" sign.
 
 Rules:
-- Article summary: 1 sentence, simple words, exciting tone, appropriate for 4th/5th graders reading below level.
-- Activity summary: 1 sentence describing what they'll make/do.
-- Activity instructions: 2–3 clear sentences a child can follow on their own.
-- Never recommend anything that requires an account or login.
+- Keep language very simple — 2nd/3rd grade reading level.
+- Article summary: 1 short sentence, exciting tone.
+- Activity summary: 1 sentence saying what they'll make/do.
+- Activity instructions: 2–3 very clear sentences a child can follow alone with basic supplies.
+- NEVER invent article URLs — only use URLs from search results provided.
 
 Respond ONLY with valid JSON:
 {
@@ -73,41 +80,43 @@ Respond ONLY with valid JSON:
     }
   ]
 }`;
-        } else {
-            // Gomez — 2 articles
-            prompt = `You are helping a teacher find engaging at-home articles for ${gradeDesc}. The student cares about this issue: "${topic}".
+    } else {
+        // Gomez — 2 articles (or activities if no search results)
+        prompt = `You are helping a teacher find engaging at-home content for ${gradeDesc}. The student cares about this issue: "${topic}".
 
-Search results from school-appropriate websites:
-${resultsText}
-
-Return exactly 2 article suggestions. Pick the most appropriate ones for 6th graders. If fewer than 2 good results exist, suggest ones from pbslearningmedia.org, wonderopolis.org, or dogonews.com about the general issue or how young people can make a difference in their community.
+${hasResults ? `Search results from school-appropriate websites:\n${resultsText}\n\nReturn exactly 2 article suggestions from the search results above. Only use URLs from the search results — do NOT invent URLs.` : `No search results available. Return 2 ACTIVITY suggestions the student can do at home connected to their specific issue ("${topic}").`}
 
 Rules:
-- Summary: 1 sentence, engaging tone, explains what the student will learn.
-- Never recommend anything that requires an account or login.
+- Summary: 1 sentence, engaging tone, explains what the student will learn or do.
+- For articles: only use URLs from search results above.
+- For activities (if no search results): give clear 2–3 sentence instructions, no special materials needed.
+- NEVER invent article URLs.
 
 Respond ONLY with valid JSON:
 {
   "suggestions": [
     {
-      "type": "article",
+      "type": "article or activity",
       "title": "...",
-      "siteName": "...",
-      "url": "...",
-      "summary": "..."
+      "siteName": "...(if article)",
+      "url": "...(if article)",
+      "summary": "...",
+      "instructions": "...(if activity)"
     },
     {
-      "type": "article",
+      "type": "article or activity",
       "title": "...",
-      "siteName": "...",
-      "url": "...",
-      "summary": "..."
+      "siteName": "...(if article)",
+      "url": "...(if article)",
+      "summary": "...",
+      "instructions": "...(if activity)"
     }
   ]
 }`;
-        }
+    }
 
-        // ── 3. Call Claude ───────────────────────────────────────────────
+    // ── 3. Call Claude ───────────────────────────────────────────────────
+    try {
         const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
@@ -128,6 +137,26 @@ Respond ONLY with valid JSON:
         if (!jsonMatch) throw new Error('No JSON in Claude response');
         const parsed = JSON.parse(jsonMatch[0]);
 
+        // ── 4. Verify article URLs (HEAD request, drop 404s) ────────────
+        const verified = await Promise.all((parsed.suggestions || []).map(async s => {
+            if (s.type !== 'article' || !s.url) return s;
+            try {
+                const check = await fetch(s.url, { method: 'HEAD', redirect: 'follow' });
+                if (!check.ok) {
+                    console.warn(`URL check failed (${check.status}): ${s.url}`);
+                    // Convert broken article to a search link on the same site
+                    const domain = s.siteName || 'wonderopolis.org';
+                    const query = encodeURIComponent(topic);
+                    s.url = `https://${domain}/search/?q=${query}`;
+                    s.title = `Search results: ${topic}`;
+                }
+            } catch(e) {
+                console.warn(`URL check error for ${s.url}:`, e.message);
+            }
+            return s;
+        }));
+        parsed.suggestions = verified;
+
         return {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json' },
@@ -135,29 +164,28 @@ Respond ONLY with valid JSON:
         };
 
     } catch (err) {
-        console.error('home-activity error:', err);
-        // Fallback suggestions
+        console.error('Claude call failed:', err.message);
+
+        // Last-resort fallback: topic-aware activities (no URLs)
+        const activityFallback = [
+            {
+                type: 'activity',
+                title: `Make a "${topic}" Awareness Poster`,
+                summary: `Create a poster that teaches others about ${topic} and what people can do to help.`,
+                instructions: `Use paper and colored pencils or markers. Write the issue at the top, draw a picture that shows the problem, and add 2–3 facts or ideas for how people can help. You can hang it somewhere at home!`
+            },
+            {
+                type: 'activity',
+                title: `Write a Letter About ${topic}`,
+                summary: `Write a letter to someone — a family member, teacher, or local leader — telling them why ${topic} matters to you.`,
+                instructions: `Start with "Dear ___," and explain what the problem is and why you care. Then share one idea for how they could help. Sign your name at the end.`
+            }
+        ];
+
         return {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                suggestions: [
-                    {
-                        type: 'article',
-                        title: 'How Kids Are Changing the World',
-                        siteName: 'wonderopolis.org',
-                        url: 'https://www.wonderopolis.org/wonder/how-can-one-person-change-the-world',
-                        summary: 'Find out how young people just like you are taking action and making a real difference in their communities.'
-                    },
-                    {
-                        type: 'article',
-                        title: 'Kids Making a Difference',
-                        siteName: 'pbslearningmedia.org',
-                        url: 'https://www.pbslearningmedia.org/collection/kids-making-a-difference/',
-                        summary: 'Explore stories of kids who saw a problem in the world and found creative ways to help.'
-                    }
-                ]
-            })
+            body: JSON.stringify({ suggestions: activityFallback })
         };
     }
 };
