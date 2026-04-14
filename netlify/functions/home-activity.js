@@ -36,12 +36,12 @@ exports.handler = async (event) => {
     let searchResults = [];
     try {
         searchResults = await serperSearch(
-            `${topic} for kids site:pbslearningmedia.org OR site:wonderopolis.org OR site:dogonews.com OR site:kids.nationalgeographic.com`
+            `${topic} for kids reading article -video site:pbslearningmedia.org OR site:wonderopolis.org OR site:dogonews.com OR site:kids.nationalgeographic.com`
         );
         console.log(`Serper returned ${searchResults.length} results for: ${topic}`);
         // Broaden if too few
         if (searchResults.length < 2) {
-            const broader = await serperSearch(`${topic} kids article reading`);
+            const broader = await serperSearch(`${topic} kids reading article -video`);
             searchResults = [...searchResults, ...broader].slice(0, 8);
             console.log(`Broader search total: ${searchResults.length}`);
         }
@@ -62,12 +62,12 @@ exports.handler = async (event) => {
         prompt = `You are helping a teacher find at-home content for ${gradeDesc}. Student's issue: "${topic}".
 
 ${hasResults
-    ? `Search results:\n${resultsText}\n\nReturn 2 suggestions:\n1. ARTICLE — best from search results only. Use the exact URL from search results above.\n2. ACTIVITY — simple hands-on activity connected to "${topic}".`
+    ? `Search results:\n${resultsText}\n\nReturn 2 suggestions:\n1. ARTICLE — best TEXT article from search results only (NOT a video or film). Must be something students read, not watch. Use the exact URL from search results above.\n2. ACTIVITY — simple hands-on activity connected to "${topic}".`
     : `No search results. Return 2 ACTIVITY suggestions connected to "${topic}".`
 }
 
 Activity options (pick the best fit): make a poster, write a short speech, write a letter, draw a comic strip, create a fact card, make a "Did You Know?" sign.
-Rules: simple language (2nd–3rd grade level), 1-sentence summary, 2–3 sentence instructions, basic supplies only. NEVER invent URLs.
+Rules: simple language (2nd–3rd grade level), 1-sentence summary, 2–3 sentence instructions, basic supplies only. NEVER invent URLs. NEVER suggest videos.
 
 JSON only:
 {
@@ -80,7 +80,7 @@ JSON only:
         prompt = `You are helping a teacher find 2 at-home articles for ${gradeDesc}. Student's issue: "${topic}".
 
 ${hasResults
-    ? `Search results:\n${resultsText}\n\nReturn the 2 best articles from the search results above. Use the exact URLs from the list above only.`
+    ? `Search results:\n${resultsText}\n\nReturn the 2 best TEXT articles from the search results above (NOT videos or films — must be readable text). Use the exact URLs from the list above only.`
     : `No search results. Suggest 2 real articles from wonderopolis.org or dogonews.com that you are highly confident exist and relate to "${topic}" or community action / helping others. Use real slugs you know are correct (e.g. wonderopolis.org/wonder/[slug]).`
 }
 

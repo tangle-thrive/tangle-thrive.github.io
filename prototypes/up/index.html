@@ -528,6 +528,10 @@
         .share-btn { font-size: .8rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--purple-mid); background: white; color: var(--purple-dark); cursor: pointer; transition: all .15s; }
         .share-btn:hover { background: var(--purple-mid); color: white; }
         .share-btn.copied { background: var(--green-mid); border-color: var(--green-mid); color: white; }
+        .suggestion-qr { display: none; margin-top: 12px; align-items: center; gap: 12px; background: #f5f3ff; border-radius: 10px; padding: 10px 14px; }
+        .activity-suggestion-card.selected .suggestion-qr { display: flex; }
+        .suggestion-qr img { width: 72px; height: 72px; border-radius: 6px; border: 2px solid var(--purple-mid); }
+        .suggestion-qr-text { font-size: .8rem; color: var(--text-mid); line-height: 1.4; }
         .suggestion-loading { text-align: center; padding: 30px 0; color: var(--text-mid); font-size: .95rem; }
         .suggestion-loading-spinner { font-size: 1.6rem; animation: spin 1.2s linear infinite; display: inline-block; margin-bottom: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -2308,10 +2312,16 @@
                 const typeLabel = s.type === 'article' ? '📰 Article' : '✏️ Activity';
                 const siteLine  = s.siteName ? `<div class="suggestion-site">${s.siteName}</div>` : '';
                 const safeSpeak = (s.summary || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                const qrUrl = s.type === 'article' && s.url
+                    ? `https://api.qrserver.com/v1/create-qr-code/?size=144x144&data=${encodeURIComponent(s.url)}`
+                    : null;
                 const shareRow  = s.type === 'article' && s.url ? `
                     <div class="suggestion-share-row" onclick="event.stopPropagation()">
                         <button class="share-btn" id="copy-btn-${i}" onclick="app.copyArticleLink(${i})">📋 Copy link</button>
-                        <button class="share-btn" onclick="app.emailArticle(${i})">📧 Email to myself</button>
+                    </div>
+                    <div class="suggestion-qr" onclick="event.stopPropagation()">
+                        <img src="${qrUrl}" alt="QR code for article" loading="lazy">
+                        <div class="suggestion-qr-text"><strong>Read it at home!</strong><br>Scan this QR code with your phone to open the article.</div>
                     </div>` : '';
                 return `<div class="activity-suggestion-card" onclick="app.selectHomeActivity(${i})" id="home-suggestion-${i}">
                     <div class="suggestion-checkmark">✓</div>
@@ -2338,16 +2348,6 @@
             });
         },
 
-        emailArticle(index) {
-            const s = (this._homeActivitySuggestions || [])[index];
-            if (!s || !s.url) return;
-            const name = this.data.studentName || 'me';
-            const subject = encodeURIComponent(`My reading for this week`);
-            const body = encodeURIComponent(
-                `Hi!\n\nI chose this article to read at home this week:\n\n"${s.title}"\n${s.url}\n\n${s.summary}\n\n— ${name}`
-            );
-            window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-        },
 
         selectHomeActivity(index) {
             const s = (this._homeActivitySuggestions || [])[index];
