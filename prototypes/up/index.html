@@ -2883,7 +2883,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         topic: this._currentReflGoal.problem || '',
-                        studentClass: this._currentReflGoal.selectedClass || ''
+                        studentClass: this._currentReflGoal.selectedClass || '',
+                        excludeUrl: this._currentReflGoal.homeActivity?.url || null
                     })
                 });
                 const data = await res.json();

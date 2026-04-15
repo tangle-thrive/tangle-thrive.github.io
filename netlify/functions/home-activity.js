@@ -3,10 +3,16 @@ exports.handler = async (event) => {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
 
-    const { topic, studentClass } = JSON.parse(event.body);
+    const { topic, studentClass, excludeUrl } = JSON.parse(event.body);
     const isCleaveland = studentClass === 'Ms. Cleaveland';
     const isGomez      = studentClass === 'Mr. Gomez';
     const gradeLevel   = isGomez ? '6th grade' : '4th–5th grade (reading level closer to 2nd–3rd grade)';
+
+    // Normalize topic: strip location qualifiers so searches work better
+    // e.g. "homelessness in my city" → "homelessness"
+    const normalizedTopic = topic
+        .replace(/\s+in\s+(my|our|the)\s+\w+/gi, '')
+        .trim();
 
     // ── Step 1: Ask Claude for article titles + sites (no URLs) ──────────
     const activityFormat = `{ "type": "activity", "title": "...", "summary": "1 sentence", "steps": ["Step 1: ...", "Step 2: ...", "Step 3: ..."] }`;
@@ -14,11 +20,11 @@ exports.handler = async (event) => {
 
     let prompt;
     if (isCleaveland) {
-        prompt = `You are helping a teacher assign at-home content for ${gradeLevel} students. The student cares about the issue: "${topic}".
+        prompt = `You are helping a teacher assign at-home content for ${gradeLevel} students. The student cares about the issue: "${normalizedTopic}".
 
 Return exactly 2 suggestions:
 1. ARTICLE — suggest a real article title and the site it is on. Use only: wonderopolis.org, dogonews.com, timeforkids.com, or kids.nationalgeographic.com. The article must be DIRECTLY about the social issue or community problem (e.g. if topic is "hunger", suggest an article about food insecurity, food banks, or hunger relief — NOT cooking, recipes, or gardening). The article must be written for kids, not teachers.
-2. ACTIVITY — a simple hands-on activity a student can do at home connected to "${topic}". Good types: make an awareness poster, write a short speech, write a letter to someone who can help, draw a comic strip, create a fact card, make a "Did You Know?" sign.
+2. ACTIVITY — a simple hands-on activity a student can do at home connected to "${normalizedTopic}". Good types: make an awareness poster, write a short speech, write a letter to someone who can help, draw a comic strip, create a fact card, make a "Did You Know?" sign.
 
 Rules:
 - For the article, provide the EXACT article title as it appears on the site. Only suggest articles you have strong confidence exist on that site.
@@ -32,7 +38,7 @@ JSON only — no other text:
   ]
 }`;
     } else {
-        prompt = `You are helping a teacher assign at-home reading for ${gradeLevel} students. The student cares about the issue: "${topic}".
+        prompt = `You are helping a teacher assign at-home reading for ${gradeLevel} students. The student cares about the issue: "${normalizedTopic}".
 
 Return exactly 2 ARTICLE suggestions from: wonderopolis.org, dogonews.com, timeforkids.com, or kids.nationalgeographic.com. The articles must be:
 - DIRECTLY about the social issue or community problem (e.g. if topic is "hunger", suggest articles about food insecurity, food banks, or hunger relief — NOT cooking, recipes, or gardening)
@@ -115,9 +121,10 @@ JSON only — no other text:
 
         // Search for the exact title on the suggested site
         const query = `"${s.title}" site:${s.site}`;
-        const result = await serperSearch(query);
+        const isExcluded = (url) => excludeUrl && url && url === excludeUrl;
 
-        if (result && result.link) {
+        const result = await serperSearch(query);
+        if (result && result.link && !isExcluded(result.link)) {
             let siteName = s.site;
             try { siteName = new URL(result.link).hostname.replace('www.', ''); } catch (e) {}
             console.log('Validated:', result.link);
@@ -125,8 +132,8 @@ JSON only — no other text:
         }
 
         // Broader fallback search if exact title not found
-        const broader = await serperSearch(`${topic} social issue kids site:${s.site}`);
-        if (broader && broader.link) {
+        const broader = await serperSearch(`${normalizedTopic} social issue kids site:${s.site}`);
+        if (broader && broader.link && !isExcluded(broader.link)) {
             let siteName = s.site;
             try { siteName = new URL(broader.link).hostname.replace('www.', ''); } catch (e) {}
             console.log('Broader validated:', broader.link);
@@ -135,8 +142,8 @@ JSON only — no other text:
 
         // For Gomez (articles only), try any kid site before giving up
         if (isGomez) {
-            const anyArticle = await serperSearch(`"${topic}" social issue kids article site:wonderopolis.org OR site:dogonews.com OR site:timeforkids.com`);
-            if (anyArticle && anyArticle.link) {
+            const anyArticle = await serperSearch(`"${normalizedTopic}" social issue kids article site:wonderopolis.org OR site:dogonews.com OR site:timeforkids.com`);
+            if (anyArticle && anyArticle.link && !isExcluded(anyArticle.link)) {
                 let siteName = '';
                 try { siteName = new URL(anyArticle.link).hostname.replace('www.', ''); } catch (e) {}
                 console.log('Gomez fallback validated:', anyArticle.link);
