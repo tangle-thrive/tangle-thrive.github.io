@@ -133,7 +133,18 @@ JSON only — no other text:
             return { type: 'article', title: broader.title || s.title, siteName, url: broader.link, summary: s.summary };
         }
 
-        // Could not validate — replace with an activity
+        // For Gomez (articles only), try any kid site before giving up
+        if (isGomez) {
+            const anyArticle = await serperSearch(`"${topic}" social issue kids article site:wonderopolis.org OR site:dogonews.com OR site:timeforkids.com`);
+            if (anyArticle && anyArticle.link) {
+                let siteName = '';
+                try { siteName = new URL(anyArticle.link).hostname.replace('www.', ''); } catch (e) {}
+                console.log('Gomez fallback validated:', anyArticle.link);
+                return { type: 'article', title: anyArticle.title || s.title, siteName, url: anyArticle.link, summary: s.summary };
+            }
+        }
+
+        // Could not validate — replace with an activity (Cleaveland only)
         console.log('Could not validate URL for:', s.title, '— replacing with activity');
         return {
             type: 'activity',
