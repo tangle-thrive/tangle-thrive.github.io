@@ -1421,10 +1421,28 @@
             <p style="font-weight:700;color:var(--text-dark);margin-bottom:8px;">What helped you work toward your goals? What could help you next week? <button class="tts-btn" data-speak="What helped you work toward your goals? What could help you next week?" onclick="app.speakFromBtn(this)">🔊</button></p>
             <textarea class="reflection-textarea" id="r3-text" placeholder="Write here…" rows="4"></textarea>
         </div>
-        <div class="reflection-saved-banner" id="r3-saved">✅ Reflection saved!</div>
         <div class="button-group">
             <button class="btn btn-secondary" onclick="app.showScreen('reflection-2-screen')">← Back</button>
-            <button class="btn btn-primary" onclick="app.saveNewReflection()">Save →</button>
+            <button class="btn btn-primary" onclick="app.goToReflection4()">Continue →</button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         REFLECTION 4: NEW HOME ACTIVITY
+    ══════════════════════════════════ -->
+    <div id="reflection-4-screen" class="activity-screen hidden">
+        <p class="screen-label">WEEKLY REFLECTION</p>
+        <h2 class="main-question" style="margin-bottom:6px;">Here's something you can do at home this week!</h2>
+        <p style="color:var(--text-mid);font-size:.95rem;margin-bottom:20px;">Pick one to try this week. 👇</p>
+        <div id="r4-loading" class="suggestion-loading hidden">
+            <div class="suggestion-loading-spinner">🔍</div>
+            <p>Finding activities for you…</p>
+        </div>
+        <div id="r4-cards" class="suggestion-cards hidden"></div>
+        <div class="reflection-saved-banner" id="r4-saved">✅ Reflection saved!</div>
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="app.showScreen('reflection-3-screen')">← Back</button>
+            <button class="btn btn-primary" id="r4-save" disabled onclick="app.saveNewReflection()">Save →</button>
         </div>
     </div>
 
@@ -1714,7 +1732,7 @@
         showScreen(id) {
             ['intro-screen','homepage','setup-screen','class-select-screen','name-login-screen',
              'step1-screen','step2-screen','step3-screen','goal-classroom-screen','goal-strategy-screen','goal-home-screen',
-             'peer-screen','completion-screen','progress-screen','midweek-screen','reflection-1-screen','reflection-2-screen','reflection-3-screen','dashboard-screen']
+             'peer-screen','completion-screen','progress-screen','midweek-screen','reflection-1-screen','reflection-2-screen','reflection-3-screen','reflection-4-screen','dashboard-screen']
                 .forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0, 0);
@@ -2831,19 +2849,115 @@
             document.getElementById('chk-fraction').textContent = `${done} / ${this._reflectionTarget} completed`;
         },
 
-        async saveNewReflection() {
+        async goToReflection4() {
+            // Collect R3 data
             this._reflData.reflectionText = document.getElementById('r3-text').value.trim();
             const homeTextEl = document.getElementById('r3-home-text');
             if (homeTextEl) this._reflData.homeActivityText = homeTextEl.value.trim();
+
+            // Only show R4 for V2 (Cleaveland/Gomez); V1 saves directly
+            const goalVersion = (this._currentReflGoal && this._currentReflGoal.version) || '2';
+            if (goalVersion === '1') { await this._doSaveReflection(); return; }
+
+            // Show R4 and fetch suggestions
+            this._r4Selection = null;
+            document.getElementById('r4-cards').innerHTML = '';
+            document.getElementById('r4-cards').classList.add('hidden');
+            document.getElementById('r4-loading').classList.remove('hidden');
+            document.getElementById('r4-save').disabled = true;
+            document.getElementById('r4-saved').classList.remove('visible');
+            this.showScreen('reflection-4-screen');
+
+            try {
+                const res = await fetch('/.netlify/functions/home-activity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        topic: this._currentReflGoal.problem || '',
+                        studentClass: this._currentReflGoal.selectedClass || ''
+                    })
+                });
+                const data = await res.json();
+                this._r4Suggestions = data.suggestions || [];
+                this._renderR4Cards();
+            } catch(e) {
+                console.error('R4 fetch error:', e);
+                document.getElementById('r4-loading').innerHTML = '<p style="color:var(--red)">Could not load suggestions. Please try again.</p>';
+            }
+        },
+
+        _renderR4Cards() {
+            const suggestions = this._r4Suggestions || [];
+            const container = document.getElementById('r4-cards');
+            container.innerHTML = suggestions.map((s, i) => {
+                const typeLabel = s.type === 'article' ? '📰 Article' : '✏️ Activity';
+                const siteLine  = s.siteName ? `<div class="suggestion-site">${s.siteName}</div>` : '';
+                const safeSpeak = (s.summary || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                const shareRow  = s.type === 'article' && s.url ? `
+                    <div class="suggestion-share-row" onclick="event.stopPropagation()">
+                        <button class="share-btn" id="r4-copy-btn-${i}" onclick="app._copyR4Link(${i})">📋 Copy link</button>
+                    </div>` : '';
+                const stepsHtml = s.type === 'activity' && Array.isArray(s.steps) && s.steps.length
+                    ? `<div class="suggestion-steps">${s.steps.map((st, n) =>
+                        `<div class="suggestion-step"><div class="suggestion-step-num">${n+1}</div><div>${st}</div></div>`
+                      ).join('')}</div>`
+                    : '';
+                return `<div class="activity-suggestion-card" onclick="app._selectR4Activity(${i})" id="r4-suggestion-${i}">
+                    <div class="suggestion-checkmark">✓</div>
+                    <div class="suggestion-type">${typeLabel}</div>
+                    <div class="suggestion-title">${s.title}</div>
+                    ${siteLine}
+                    <div class="suggestion-summary">${s.summary} <button class="tts-btn" data-speak="${safeSpeak}" onclick="event.stopPropagation();app.speakFromBtn(this)">🔊</button></div>
+                    ${shareRow}${stepsHtml}
+                </div>`;
+            }).join('');
+            document.getElementById('r4-loading').classList.add('hidden');
+            container.classList.remove('hidden');
+        },
+
+        _selectR4Activity(index) {
+            const s = (this._r4Suggestions || [])[index];
+            if (!s) return;
+            this._r4Selection = s;
+            document.querySelectorAll('#r4-cards .activity-suggestion-card').forEach((c, i) => {
+                c.classList.toggle('selected', i === index);
+            });
+            document.getElementById('r4-save').disabled = false;
+        },
+
+        _copyR4Link(index) {
+            const s = (this._r4Suggestions || [])[index];
+            if (!s || !s.url) return;
+            navigator.clipboard.writeText(s.url).then(() => {
+                const btn = document.getElementById(`r4-copy-btn-${index}`);
+                if (btn) { btn.textContent = '✓ Copied!'; btn.classList.add('copied'); }
+                setTimeout(() => { if (btn) { btn.textContent = '📋 Copy link'; btn.classList.remove('copied'); } }, 2000);
+            });
+        },
+
+        async saveNewReflection() {
+            this._reflData.nextHomeActivity = this._r4Selection || null;
             this._reflData.savedAt = new Date().toISOString();
+            await this._doSaveReflection();
+        },
+
+        async _doSaveReflection() {
+            this._reflData.savedAt = this._reflData.savedAt || new Date().toISOString();
             const g = this._currentReflGoal;
             if (!g || !g._id) return;
             try {
                 const existing = Array.isArray(g.reflections) ? g.reflections : [];
                 existing.push(this._reflData);
-                await updateDoc(doc(db, COLLECTION, g._id), { reflections: existing, reflectedAt: this._reflData.savedAt });
+                const updates = { reflections: existing, reflectedAt: this._reflData.savedAt };
+                // Update homeActivity if student picked a new one
+                if (this._r4Selection) {
+                    updates.homeActivity = this._r4Selection;
+                    g.homeActivity = this._r4Selection;
+                }
+                await updateDoc(doc(db, COLLECTION, g._id), updates);
                 g.reflections = existing;
-                document.getElementById('r3-saved').classList.add('visible');
+                const savedEl = document.getElementById('r4-saved') || document.getElementById('r3-saved');
+                if (savedEl) savedEl.classList.add('visible');
                 setTimeout(() => this.showProgress(), 1500);
             } catch(e) { console.error('Error saving reflection:', e); alert('Error saving. Please try again.'); }
         },
