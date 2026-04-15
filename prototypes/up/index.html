@@ -2570,17 +2570,27 @@
                 } else {
                     table.innerHTML = `
                         <table>
-                            <thead><tr><th>Date</th><th>Building</th><th>Goal</th><th>Mid-Week</th><th>Weekly</th></tr></thead>
+                            <thead><tr><th>Date</th><th>Building</th><th>Goal</th><th>Home Activity</th><th>Mid-Week</th><th>Weekly</th></tr></thead>
                             <tbody>
                                 ${mine.map((g, i) => {
                                     const growth = this.traits.find(t => t.id === g.growthTrait);
                                     const tName = growth ? `${growth.icon} ${growth.title}` : (g.growthTrait || '');
-                                    const hasRefl = (Array.isArray(g.reflections) && g.reflections.length > 0) || g.reflectedAt;
-                                    const hasMW = Array.isArray(g.midweekReflections) && g.midweekReflections.length > 0;
+                                    const act = g.homeActivity;
+                                    let homeCell = '—';
+                                    if (act) {
+                                        if (act.type === 'article' && act.url) {
+                                            homeCell = `<a href="${act.url}" target="_blank" rel="noopener" style="color:var(--purple-dark);font-weight:600;">${act.title}</a>`;
+                                        } else {
+                                            homeCell = `<span style="font-weight:600;">${act.title}</span>`;
+                                        }
+                                    } else if (g.homeGoalText) {
+                                        homeCell = g.homeGoalText;
+                                    }
                                     return `<tr>
                                         <td>${new Date(g.timestamp).toLocaleDateString()}</td>
                                         <td>${tName}</td>
                                         <td>${(g.classroomGoal||g.goal||'').substring(0,55)}${(g.classroomGoal||g.goal||'').length>55?'…':''}</td>
+                                        <td style="max-width:200px;">${homeCell}</td>
                                         <td><button class="reflect-badge" style="cursor:pointer;border:none;background:none;padding:0;" onclick="app.openMidweekReflection(${i})">Check in →</button></td>
                                         <td><button class="reflect-badge" style="cursor:pointer;border:none;background:none;padding:0;" onclick="app.openReflection(${i})">Reflect →</button></td>
                                     </tr>`;
