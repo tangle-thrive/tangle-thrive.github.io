@@ -8,58 +8,76 @@ exports.handler = async (event) => {
     const isGomez      = studentClass === 'Mr. Gomez';
     const gradeLevel   = isGomez ? '6th grade' : '4th–5th grade (reading level closer to 2nd–3rd grade)';
 
+    // ── Step 1: Ask Claude for article titles + sites (no URLs) ──────────
     const activityFormat = `{ "type": "activity", "title": "...", "summary": "1 sentence", "steps": ["Step 1: ...", "Step 2: ...", "Step 3: ..."] }`;
-    const articleFormat  = `{ "type": "article", "title": "...", "siteName": "...", "url": "...", "summary": "1 sentence" }`;
+    const articleDraftFormat = `{ "type": "article", "title": "exact article title", "site": "wonderopolis.org", "summary": "1 sentence" }`;
 
     let prompt;
-
     if (isCleaveland) {
         prompt = `You are helping a teacher assign at-home content for ${gradeLevel} students. The student cares about the issue: "${topic}".
 
 Return exactly 2 suggestions:
-1. ARTICLE — a real article you are HIGHLY CONFIDENT exists and is still live at its URL. Use only these trusted kid-friendly sites: wonderopolis.org, dogonews.com, timeforkids.com, kids.nationalgeographic.com. The article must be DIRECTLY about the social issue or community problem (e.g. if topic is "hunger", pick an article about food insecurity, food banks, or hunger relief — NOT about cooking, recipes, or gardening). It must be written for kids, freely readable without any login.
+1. ARTICLE — suggest a real article title and the site it is on. Use only: wonderopolis.org, dogonews.com, timeforkids.com, or kids.nationalgeographic.com. The article must be DIRECTLY about the social issue or community problem (e.g. if topic is "hunger", suggest an article about food insecurity, food banks, or hunger relief — NOT cooking, recipes, or gardening). The article must be written for kids, not teachers.
 2. ACTIVITY — a simple hands-on activity a student can do at home connected to "${topic}". Good types: make an awareness poster, write a short speech, write a letter to someone who can help, draw a comic strip, create a fact card, make a "Did You Know?" sign.
 
 Rules:
-- ONLY suggest article URLs you are highly confident exist and are currently live. If you are not sure, choose a different article you ARE sure about.
-- Article must be at ${gradeLevel} reading level. NOT for teachers or adults.
+- For the article, provide the EXACT article title as it appears on the site. Only suggest articles you have strong confidence exist on that site.
 - Activity: basic supplies only (paper, pencil, markers). Exactly 3 steps, each starting with an action verb.
-- NEVER invent or guess URLs. NEVER suggest videos.
 
 JSON only — no other text:
 {
   "suggestions": [
-    ${articleFormat},
+    ${articleDraftFormat},
     ${activityFormat}
   ]
 }`;
     } else {
         prompt = `You are helping a teacher assign at-home reading for ${gradeLevel} students. The student cares about the issue: "${topic}".
 
-Return exactly 2 ARTICLE suggestions. Use only these trusted kid-friendly sites: wonderopolis.org, dogonews.com, timeforkids.com, kids.nationalgeographic.com. The articles must be:
-- DIRECTLY about the social issue or community problem (e.g. if topic is "hunger", pick articles about food insecurity, food banks, or hunger relief — NOT cooking, recipes, or gardening)
+Return exactly 2 ARTICLE suggestions from: wonderopolis.org, dogonews.com, timeforkids.com, or kids.nationalgeographic.com. The articles must be:
+- DIRECTLY about the social issue or community problem (e.g. if topic is "hunger", suggest articles about food insecurity, food banks, or hunger relief — NOT cooking, recipes, or gardening)
 - Written FOR KIDS at 6th grade level (not for teachers, not academic)
-- Freely readable without any login or subscription
-- Real articles you are HIGHLY CONFIDENT exist at that exact URL
+- Real articles you are confident exist on that site
 
 Rules:
-- ONLY suggest URLs you are highly confident are currently live. If you are not sure about a specific URL, choose a different article on the same site that you ARE sure about.
+- Provide the EXACT article title as it appears on the site.
 - 1-sentence summary per article, engaging tone for 6th graders.
-- NEVER suggest videos. NEVER invent or guess URLs.
 
 JSON only — no other text:
 {
   "suggestions": [
-    ${articleFormat},
-    ${articleFormat}
+    ${articleDraftFormat},
+    ${articleDraftFormat}
   ]
 }`;
     }
 
-    // ── Call Claude ───────────────────────────────────────────────────────
+    // ── Helper: Serper search with timeout ───────────────────────────────
+    const serperSearch = async (q) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3500);
+        try {
+            const res = await fetch('https://google.serper.dev/search', {
+                method: 'POST',
+                headers: { 'X-API-KEY': process.env.SERPER_API_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ q, num: 5 }),
+                signal: controller.signal
+            });
+            const data = await res.json();
+            return (data.organic || [])[0] || null;
+        } catch (e) {
+            console.error('Serper error:', e.message);
+            return null;
+        } finally {
+            clearTimeout(timer);
+        }
+    };
+
+    // ── Step 2: Call Claude ───────────────────────────────────────────────
+    let suggestions = [];
     try {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 7000);
+        const timer = setTimeout(() => controller.abort(), 6000);
         let claudeData;
         try {
             const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -71,7 +89,7 @@ JSON only — no other text:
                 },
                 body: JSON.stringify({
                     model: 'claude-haiku-4-5-20251001',
-                    max_tokens: 900,
+                    max_tokens: 800,
                     messages: [{ role: 'user', content: prompt }]
                 }),
                 signal: controller.signal
@@ -82,47 +100,87 @@ JSON only — no other text:
         }
 
         const text = claudeData.content?.[0]?.text || '';
-        console.log('Claude status:', claudeData.type, '| error:', claudeData.error?.message);
+        console.log('Claude error:', claudeData.error?.message);
         const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error('No JSON in Claude response: ' + text.slice(0, 200));
-        const parsed = JSON.parse(jsonMatch[0]);
-        console.log('Suggestions:', JSON.stringify(parsed.suggestions?.map(s => ({ type: s.type, title: s.title, url: s.url }))));
-
-        return {
-            statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(parsed)
-        };
-
+        if (!jsonMatch) throw new Error('No JSON from Claude: ' + text.slice(0, 200));
+        suggestions = JSON.parse(jsonMatch[0]).suggestions || [];
+        console.log('Claude drafts:', JSON.stringify(suggestions.map(s => ({ type: s.type, title: s.title, site: s.site }))));
     } catch (err) {
         console.error('Claude failed:', err.message);
+    }
 
-        // Last-resort fallback — activities only (no risky URLs)
+    // ── Step 3: Validate article URLs via Serper in parallel ─────────────
+    const validated = await Promise.all(suggestions.map(async (s) => {
+        if (s.type !== 'article') return s; // activities don't need validation
+
+        // Search for the exact title on the suggested site
+        const query = `"${s.title}" site:${s.site}`;
+        const result = await serperSearch(query);
+
+        if (result && result.link) {
+            let siteName = s.site;
+            try { siteName = new URL(result.link).hostname.replace('www.', ''); } catch (e) {}
+            console.log('Validated:', result.link);
+            return { type: 'article', title: result.title || s.title, siteName, url: result.link, summary: s.summary };
+        }
+
+        // Broader fallback search if exact title not found
+        const broader = await serperSearch(`${topic} social issue kids site:${s.site}`);
+        if (broader && broader.link) {
+            let siteName = s.site;
+            try { siteName = new URL(broader.link).hostname.replace('www.', ''); } catch (e) {}
+            console.log('Broader validated:', broader.link);
+            return { type: 'article', title: broader.title || s.title, siteName, url: broader.link, summary: s.summary };
+        }
+
+        // Could not validate — replace with an activity
+        console.log('Could not validate URL for:', s.title, '— replacing with activity');
+        return {
+            type: 'activity',
+            title: `Make an Awareness Poster About ${topic}`,
+            summary: `Create a colorful poster that teaches others about ${topic} and what people can do to help.`,
+            steps: [
+                `Write "${topic}" in big letters at the top of your paper.`,
+                `Draw a picture in the middle that shows the problem and how it affects people.`,
+                `Add 2–3 ideas at the bottom for how someone can help, then decorate with colors.`
+            ]
+        };
+    }));
+
+    // ── Return results ────────────────────────────────────────────────────
+    if (validated.length > 0) {
         return {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ suggestions: [
-                {
-                    type: 'activity',
-                    title: `Make an Awareness Poster About ${topic}`,
-                    summary: `Create a colorful poster that teaches others about ${topic} and what people can do to help.`,
-                    steps: [
-                        `Write the issue ("${topic}") in big letters at the top of your paper.`,
-                        `Draw a picture in the middle that shows the problem and how it affects people.`,
-                        `Add 2–3 ideas at the bottom for how someone can help. Decorate with colors!`
-                    ]
-                },
-                {
-                    type: 'activity',
-                    title: `Write a Letter About ${topic}`,
-                    summary: `Write a short letter to someone — a family member, teacher, or local leader — telling them why ${topic} matters.`,
-                    steps: [
-                        `Start with "Dear ___," and write 1–2 sentences explaining what ${topic} is.`,
-                        `Write 1–2 sentences about why this issue matters to you personally.`,
-                        `End with one idea for how they could help, then sign your name.`
-                    ]
-                }
-            ]})
+            body: JSON.stringify({ suggestions: validated })
         };
     }
+
+    // Last-resort fallback
+    return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ suggestions: [
+            {
+                type: 'activity',
+                title: `Make an Awareness Poster About ${topic}`,
+                summary: `Create a colorful poster that teaches others about ${topic} and what people can do to help.`,
+                steps: [
+                    `Write "${topic}" in big letters at the top of your paper.`,
+                    `Draw a picture in the middle that shows the problem and how it affects people.`,
+                    `Add 2–3 ideas at the bottom for how someone can help, then decorate with colors.`
+                ]
+            },
+            {
+                type: 'activity',
+                title: `Write a Letter About ${topic}`,
+                summary: `Write a short letter telling someone why ${topic} matters and how they can help.`,
+                steps: [
+                    `Start with "Dear ___," and write 1–2 sentences explaining what ${topic} is.`,
+                    `Write 1–2 sentences about why this issue matters to you personally.`,
+                    `End with one idea for how they could help, then sign your name.`
+                ]
+            }
+        ]})
+    };
 };
