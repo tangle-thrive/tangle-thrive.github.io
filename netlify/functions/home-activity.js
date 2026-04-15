@@ -132,7 +132,19 @@ JSON only — no other text:
         console.error('Claude failed:', err.message);
     }
 
-    // ── Last-resort fallback: activities only ────────────────────────────
+    // ── Last-resort fallback ─────────────────────────────────────────────
+    if (isGomez) {
+        // Gomez: ask student to find their own article
+        return {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ suggestions: [
+                { type: 'search-prompt', topic: normalizedTopic }
+            ]})
+        };
+    }
+
+    // Cleaveland: two distinct at-home activities
     return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -150,7 +162,7 @@ JSON only — no other text:
             {
                 type: 'activity',
                 title: `Write a Letter About ${normalizedTopic}`,
-                summary: `Write a short letter telling someone why ${normalizedTopic} matters and how they can help.`,
+                summary: `Write a short letter to a family member, teacher, or local leader about why ${normalizedTopic} matters.`,
                 steps: [
                     `Start with "Dear ___," and write 1–2 sentences explaining what ${normalizedTopic} is.`,
                     `Write 1–2 sentences about why this issue matters to you personally.`,
