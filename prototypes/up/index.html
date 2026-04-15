@@ -525,13 +525,13 @@
         .activity-suggestion-card.selected .suggestion-checkmark { display: flex; }
         .suggestion-share-row { display: none; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
         .activity-suggestion-card.selected .suggestion-share-row { display: flex; }
+        .suggestion-steps { display: none; margin-top: 12px; padding-top: 12px; border-top: 1.5px solid #d8d0f8; }
+        .activity-suggestion-card.selected .suggestion-steps { display: block; }
+        .suggestion-step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; font-size: .88rem; color: var(--text-dark); }
+        .suggestion-step-num { background: var(--purple-mid); color: white; border-radius: 50%; width: 22px; height: 22px; min-width: 22px; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; margin-top: 1px; }
         .share-btn { font-size: .8rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--purple-mid); background: white; color: var(--purple-dark); cursor: pointer; transition: all .15s; }
         .share-btn:hover { background: var(--purple-mid); color: white; }
         .share-btn.copied { background: var(--green-mid); border-color: var(--green-mid); color: white; }
-        .suggestion-qr { display: none; margin-top: 12px; align-items: center; gap: 12px; background: #f5f3ff; border-radius: 10px; padding: 10px 14px; }
-        .activity-suggestion-card.selected .suggestion-qr { display: flex; }
-        .suggestion-qr img { width: 72px; height: 72px; border-radius: 6px; border: 2px solid var(--purple-mid); }
-        .suggestion-qr-text { font-size: .8rem; color: var(--text-mid); line-height: 1.4; }
         .suggestion-loading { text-align: center; padding: 30px 0; color: var(--text-mid); font-size: .95rem; }
         .suggestion-loading-spinner { font-size: 1.6rem; animation: spin 1.2s linear infinite; display: inline-block; margin-bottom: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -2312,24 +2312,22 @@
                 const typeLabel = s.type === 'article' ? '📰 Article' : '✏️ Activity';
                 const siteLine  = s.siteName ? `<div class="suggestion-site">${s.siteName}</div>` : '';
                 const safeSpeak = (s.summary || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                const qrUrl = s.type === 'article' && s.url
-                    ? `https://api.qrserver.com/v1/create-qr-code/?size=144x144&data=${encodeURIComponent(s.url)}`
-                    : null;
-                const shareRow  = s.type === 'article' && s.url ? `
+                const shareRow = s.type === 'article' && s.url ? `
                     <div class="suggestion-share-row" onclick="event.stopPropagation()">
                         <button class="share-btn" id="copy-btn-${i}" onclick="app.copyArticleLink(${i})">📋 Copy link</button>
-                    </div>
-                    <div class="suggestion-qr" onclick="event.stopPropagation()">
-                        <img src="${qrUrl}" alt="QR code for article" loading="lazy">
-                        <div class="suggestion-qr-text"><strong>Read it at home!</strong><br>Scan this QR code with your phone to open the article.</div>
                     </div>` : '';
+                const stepsHtml = s.type === 'activity' && Array.isArray(s.steps) && s.steps.length
+                    ? `<div class="suggestion-steps">${s.steps.map((st, n) =>
+                        `<div class="suggestion-step"><div class="suggestion-step-num">${n+1}</div><div>${st}</div></div>`
+                      ).join('')}</div>`
+                    : '';
                 return `<div class="activity-suggestion-card" onclick="app.selectHomeActivity(${i})" id="home-suggestion-${i}">
                     <div class="suggestion-checkmark">✓</div>
                     <div class="suggestion-type">${typeLabel}</div>
                     <div class="suggestion-title">${s.title}</div>
                     ${siteLine}
                     <div class="suggestion-summary">${s.summary} <button class="tts-btn" data-speak="${safeSpeak}" onclick="event.stopPropagation();app.speakFromBtn(this)">🔊</button></div>
-                    ${shareRow}
+                    ${shareRow}${stepsHtml}
                 </div>`;
             }).join('');
             document.getElementById('home-suggestions-loading').classList.add('hidden');
@@ -2471,7 +2469,10 @@
                             if (act.type === 'article') {
                                 return `<a href="${act.url}" target="_blank" rel="noopener" style="color:var(--green-dark);font-weight:700">${act.title}</a><br><span style="font-size:.85rem;color:var(--text-mid)">${act.siteName}</span>`;
                             } else {
-                                return `<strong>${act.title}</strong><br><span style="font-size:.85rem;color:var(--text-mid)">${act.instructions || ''}</span>`;
+                                const stepsHtml = Array.isArray(act.steps) && act.steps.length
+                                    ? `<ol style="margin:8px 0 0 16px;padding:0;font-size:.85rem;color:var(--text-mid)">${act.steps.map(s => `<li style="margin-bottom:4px">${s}</li>`).join('')}</ol>`
+                                    : `<span style="font-size:.85rem;color:var(--text-mid)">${act.instructions || ''}</span>`;
+                                return `<strong>${act.title}</strong>${stepsHtml}`;
                             }
                         }
                         return this.data.homeGoalText || `Read a book for ${this.data.homeGoalMinutes || ''} minutes this week`;

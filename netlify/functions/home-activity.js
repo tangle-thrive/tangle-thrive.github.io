@@ -6,11 +6,9 @@ exports.handler = async (event) => {
     const { topic, studentClass } = JSON.parse(event.body);
     const isCleaveland = studentClass === 'Ms. Cleaveland';
     const isGomez      = studentClass === 'Mr. Gomez';
-    const gradeDesc    = isGomez
-        ? '6th grade students'
-        : '4th and 5th grade students who read below grade level (roughly 2nd–3rd grade reading level)';
+    const gradeLevel   = isGomez ? '6th grade' : '4th–5th grade (reading below level, roughly 2nd–3rd grade)';
 
-    // Helper: run Serper search with a timeout
+    // Helper: Serper search with timeout
     const serperSearch = async (q) => {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 4000);
@@ -18,11 +16,11 @@ exports.handler = async (event) => {
             const res = await fetch('https://google.serper.dev/search', {
                 method: 'POST',
                 headers: { 'X-API-KEY': process.env.SERPER_API_KEY, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ q, num: 8 }),
+                body: JSON.stringify({ q, num: 10 }),
                 signal: controller.signal
             });
             const data = await res.json();
-            return (data.organic || []).slice(0, 8).map(r => {
+            return (data.organic || []).slice(0, 10).map(r => {
                 let siteName = '';
                 try { siteName = new URL(r.link).hostname.replace('www.', ''); } catch(e) {}
                 return { title: r.title, url: r.link, snippet: r.snippet || '', siteName };
@@ -32,18 +30,22 @@ exports.handler = async (event) => {
         }
     };
 
-    // ── 1. Try Serper ────────────────────────────────────────────────────
+    // ── 1. Serper search — kid-safe sites only, no teacher resources ────
     let searchResults = [];
     try {
+        // Primary: trusted kid-reading sites
         searchResults = await serperSearch(
-            `${topic} for kids reading article -video site:pbslearningmedia.org OR site:wonderopolis.org OR site:dogonews.com OR site:kids.nationalgeographic.com`
+            `${topic} kids article site:wonderopolis.org OR site:dogonews.com OR site:kids.nationalgeographic.com OR site:scholastic.com/kids -video -lesson-plan -teacher`
         );
-        console.log(`Serper returned ${searchResults.length} results for: ${topic}`);
-        // Broaden if too few
+        console.log(`Primary Serper: ${searchResults.length} results`);
+
+        // Secondary: add PBS LearningMedia student articles if still thin
         if (searchResults.length < 2) {
-            const broader = await serperSearch(`${topic} kids reading article -video`);
-            searchResults = [...searchResults, ...broader].slice(0, 8);
-            console.log(`Broader search total: ${searchResults.length}`);
+            const pbs = await serperSearch(
+                `${topic} students reading site:pbslearningmedia.org -video`
+            );
+            searchResults = [...searchResults, ...pbs].slice(0, 10);
+            console.log(`After PBS search: ${searchResults.length} results`);
         }
     } catch (e) {
         console.error('Serper failed:', e.message);
@@ -57,45 +59,59 @@ exports.handler = async (event) => {
           ).join('\n\n')
         : null;
 
+    const activityFormat = `{ "type": "activity", "title": "...", "summary": "1 sentence", "steps": ["Step 1: ...", "Step 2: ...", "Step 3: ..."] }`;
+    const articleFormat  = `{ "type": "article", "title": "...", "siteName": "...", "url": "...", "summary": "1 sentence" }`;
+
     let prompt;
     if (isCleaveland) {
-        prompt = `You are helping a teacher find at-home content for ${gradeDesc}. Student's issue: "${topic}".
+        prompt = `You are helping a teacher assign at-home content for ${gradeLevel} students. The student cares about: "${topic}".
 
-${hasResults
-    ? `Search results:\n${resultsText}\n\nReturn 2 suggestions:\n1. ARTICLE — best TEXT article from search results only (NOT a video or film). Must be something students read, not watch. Use the exact URL from search results above.\n2. ACTIVITY — simple hands-on activity connected to "${topic}".`
-    : `No search results. Return 2 ACTIVITY suggestions connected to "${topic}".`
-}
+${hasResults ? `Search results from kid-friendly sites:\n${resultsText}` : 'No search results available.'}
 
-Activity options (pick the best fit): make a poster, write a short speech, write a letter, draw a comic strip, create a fact card, make a "Did You Know?" sign.
-Rules: simple language (2nd–3rd grade level), 1-sentence summary, 2–3 sentence instructions, basic supplies only. NEVER invent URLs. NEVER suggest videos.
+Return exactly 2 suggestions:
+1. ${hasResults ? `ARTICLE — pick the best TEXT article from the search results above that is written FOR KIDS (not teachers, not adults). It must be freely readable without login. Use the exact URL from the results. Skip any result that looks like a lesson plan, teacher guide, or adult resource.` : `ACTIVITY — connected to "${topic}"`}
+2. ACTIVITY — a simple hands-on activity a student can do at home connected to "${topic}". Choose the most fitting type: make a poster, write a short speech, write a letter to someone who can help, draw a comic strip, create a fact card, or make a "Did You Know?" sign.
 
-JSON only:
+Strict rules:
+- Article must be written for kids at ${gradeLevel} level, NOT for teachers or adults.
+- Article must be freely readable — no login, no paywall, no subscription.
+- Activity: simple language, basic supplies only (paper, pencil, markers). Exactly 3 steps, each starting with an action verb.
+- NEVER invent URLs. NEVER suggest videos.
+
+JSON only — no other text:
 {
   "suggestions": [
-    { "type": "article", "title": "...", "siteName": "...", "url": "...", "summary": "..." },
-    { "type": "activity", "title": "...", "summary": "...", "instructions": "..." }
+    ${hasResults ? articleFormat : activityFormat},
+    ${activityFormat}
   ]
 }`;
     } else {
-        prompt = `You are helping a teacher find 2 at-home articles for ${gradeDesc}. Student's issue: "${topic}".
+        prompt = `You are helping a teacher assign at-home reading for ${gradeLevel} students. The student cares about: "${topic}".
+
+${hasResults ? `Search results from kid-friendly sites:\n${resultsText}` : 'No search results available.'}
 
 ${hasResults
-    ? `Search results:\n${resultsText}\n\nReturn the 2 best TEXT articles from the search results above (NOT videos or films — must be readable text). Use the exact URLs from the list above only.`
-    : `No search results. Suggest 2 real articles from wonderopolis.org or dogonews.com that you are highly confident exist and relate to "${topic}" or community action / helping others. Use real slugs you know are correct (e.g. wonderopolis.org/wonder/[slug]).`
+    ? `Return the 2 best TEXT articles from the search results above that are:
+- Written FOR KIDS at 6th grade level (not for teachers, not for adults, not academic papers)
+- Freely readable without any login, account, or subscription
+- Actual reading articles (not videos, lesson plans, or teacher guides)
+- Directly relevant to "${topic}"
+Use the exact URLs from the results only.`
+    : `Suggest 2 real articles from wonderopolis.org or dogonews.com about "${topic}" or community action / helping others. Only suggest slugs you are highly confident exist.`
 }
 
-Rules: 1-sentence summary, engaging tone. NEVER invent URLs you are not confident exist.
+Rules: 1-sentence summary per article, engaging tone for 6th graders. NEVER suggest videos. NEVER invent URLs.
 
-JSON only:
+JSON only — no other text:
 {
   "suggestions": [
-    { "type": "article", "title": "...", "siteName": "...", "url": "...", "summary": "..." },
-    { "type": "article", "title": "...", "siteName": "...", "url": "...", "summary": "..." }
+    ${articleFormat},
+    ${articleFormat}
   ]
 }`;
     }
 
-    // ── 3. Call Claude (with timeout) ────────────────────────────────────
+    // ── 3. Call Claude ────────────────────────────────────────────────────
     try {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 7000);
@@ -110,7 +126,7 @@ JSON only:
                 },
                 body: JSON.stringify({
                     model: 'claude-haiku-4-5-20251001',
-                    max_tokens: 800,
+                    max_tokens: 900,
                     messages: [{ role: 'user', content: prompt }]
                 }),
                 signal: controller.signal
@@ -121,13 +137,11 @@ JSON only:
         }
 
         const text = claudeData.content?.[0]?.text || '';
-        console.log('Claude status:', claudeData.type, '| stop_reason:', claudeData.stop_reason, '| error:', claudeData.error?.message);
-        console.log('Claude text (first 300):', text.slice(0, 300));
+        console.log('Claude status:', claudeData.type, '| error:', claudeData.error?.message);
         const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error('No JSON in Claude response');
+        if (!jsonMatch) throw new Error('No JSON in Claude response: ' + text.slice(0, 200));
         const parsed = JSON.parse(jsonMatch[0]);
-
-        console.log('Returning suggestions:', JSON.stringify(parsed.suggestions?.map(s => ({ type: s.type, title: s.title, url: s.url }))));
+        console.log('Suggestions:', JSON.stringify(parsed.suggestions?.map(s => ({ type: s.type, title: s.title }))));
 
         return {
             statusCode: 200,
@@ -138,7 +152,7 @@ JSON only:
     } catch (err) {
         console.error('Claude failed:', err.message);
 
-        // Last-resort: topic-aware activities for both classes (no URLs = no broken links)
+        // Last-resort fallback — always activities (no broken URLs)
         return {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json' },
@@ -146,14 +160,22 @@ JSON only:
                 {
                     type: 'activity',
                     title: `Make an Awareness Poster About ${topic}`,
-                    summary: `Create a poster that teaches others about ${topic} and what people can do to help.`,
-                    instructions: `Use paper and colored pencils or markers. Write the issue at the top and draw a picture. Add 2–3 ideas for how people can help. You can hang it somewhere at home!`
+                    summary: `Create a colorful poster that teaches others about ${topic} and what people can do to help.`,
+                    steps: [
+                        `Write the issue ("${topic}") in big letters at the top of your paper.`,
+                        `Draw a picture in the middle that shows the problem and how it affects people.`,
+                        `Add 2–3 ideas at the bottom for how someone can help. Decorate with colors!`
+                    ]
                 },
                 {
                     type: 'activity',
                     title: `Write a Letter About ${topic}`,
-                    summary: `Write a short letter telling someone why ${topic} matters to you.`,
-                    instructions: `Start with "Dear ___," and explain what the problem is and why you care. Share one idea for how they could help. Sign your name at the end.`
+                    summary: `Write a short letter to someone — a family member, teacher, or local leader — telling them why ${topic} matters.`,
+                    steps: [
+                        `Start with "Dear ___," and write 1–2 sentences explaining what ${topic} is.`,
+                        `Write 1–2 sentences about why this issue matters to you personally.`,
+                        `End with one idea for how they could help, then sign your name.`
+                    ]
                 }
             ]})
         };
