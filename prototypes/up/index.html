@@ -1239,7 +1239,7 @@
 
         <!-- V2: AI article/activity suggestions (Cleaveland & Gomez) -->
         <div id="home-v2-section" class="hidden">
-            <h2 class="main-question">Here's something you can do at home this week! Pick one. 👇</h2>
+            <h2 class="main-question" id="home-v2-heading">Here's something you can do at home this week! Pick one. 👇</h2>
             <div id="home-suggestions-loading" class="suggestion-loading hidden">
                 <div class="suggestion-loading-spinner">🔍</div>
                 <p>Finding activities for you…</p>
@@ -1432,7 +1432,7 @@
     ══════════════════════════════════ -->
     <div id="reflection-4-screen" class="activity-screen hidden">
         <p class="screen-label">WEEKLY REFLECTION</p>
-        <h2 class="main-question" style="margin-bottom:6px;">Here's something you can do at home this week!</h2>
+        <h2 class="main-question" id="r4-heading" style="margin-bottom:6px;">Here's something you can do at home this week!</h2>
         <p style="color:var(--text-mid);font-size:.95rem;margin-bottom:20px;">Pick one to try this week. 👇</p>
         <div id="r4-loading" class="suggestion-loading hidden">
             <div class="suggestion-loading-spinner">🔍</div>
@@ -1660,14 +1660,14 @@
                 initiation:    'Organized people use every minute well. Starting right away is how you make the most of your class time.',
                 participation: 'Organized people think before they speak. Raising your hand shows you\'re ready to share your thinking.',
                 focus:         'Organized people finish what they start. Staying focused from beginning to end is what being organized really looks like.',
-                home:          'Organized people stick to their plan. Setting aside time for Lexia or Epic and actually doing it is you being organized outside of school.',
+                home:          'Organized people stick to their plan. Setting aside time to read at home and actually doing it is what being organized looks like outside of school.',
                 homeV1:        'Organized people stick to their plan. Setting aside time to read at home and actually doing it is what being organized looks like outside of school.'
             },
             creative: {
                 initiation:    'Creative people are always ready to explore. Starting quickly gives you more time to think, imagine, and create.',
                 participation: 'Creative people bring ideas no one else thinks of. Raising your hand is how you share what only you can contribute.',
                 focus:         'Creative people go deep with ideas. Staying focused gives your thinking room to grow in unexpected directions.',
-                home:          'Creative people fill their minds with stories and ideas. Reading on Lexia or Epic is how you fuel your creativity.',
+                home:          'Creative people fill their minds with stories and ideas. Reading at home is how you fuel your creativity.',
                 homeV1:        'Creative people fill their minds with stories and ideas. Reading a book at home is how you fuel your creativity.'
             },
             brave: {
@@ -2301,6 +2301,9 @@
                 // Cleaveland / Gomez — AI suggestions
                 document.getElementById('home-v1-section').classList.add('hidden');
                 document.getElementById('home-v2-section').classList.remove('hidden');
+                document.getElementById('home-v2-heading').textContent = this.data.selectedClass === 'Mr. Gomez'
+                    ? 'Here\'s something you can read at home this week! Pick one. 👇'
+                    : 'Here\'s something you can do at home this week! Pick one. 👇';
                 document.getElementById('home-suggestions-loading').classList.remove('hidden');
                 document.getElementById('home-suggestions-cards').classList.add('hidden');
                 document.getElementById('home-suggestions-cards').innerHTML = '';
@@ -2889,6 +2892,9 @@
             document.getElementById('r4-save').disabled = true;
             document.getElementById('r4-saved').classList.remove('visible');
             this.showScreen('reflection-4-screen');
+            document.getElementById('r4-heading').textContent = (this._currentReflGoal?.selectedClass === 'Mr. Gomez')
+                ? 'Here\'s something you can read at home this week!'
+                : 'Here\'s something you can do at home this week!';
 
             try {
                 const res = await fetch('/.netlify/functions/home-activity', {

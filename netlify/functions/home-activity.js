@@ -23,13 +23,20 @@ exports.handler = async (event) => {
             const res = await fetch('https://google.serper.dev/search', {
                 method: 'POST',
                 headers: { 'X-API-KEY': process.env.SERPER_API_KEY, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ q: `${normalizedTopic} site:dogonews.com`, num: 10 }),
+                body: JSON.stringify({ q: `${normalizedTopic} site:dogonews.com -video -"video of the week"`, num: 10 }),
                 signal: controller.signal
             });
             const data = await res.json();
             searchResults = (data.organic || [])
                 .map(r => ({ title: r.title, url: r.link, snippet: r.snippet || '' }))
-                .filter(r => r.url && (!excludeUrl || r.url !== excludeUrl));
+                .filter(r => {
+                    if (!r.url) return false;
+                    if (excludeUrl && r.url === excludeUrl) return false;
+                    // Skip anything that looks like a video
+                    const titleLower = (r.title || '').toLowerCase();
+                    if (titleLower.includes('video of the week') || titleLower.startsWith('video -') || titleLower.startsWith('video:')) return false;
+                    return true;
+                });
             console.log(`Serper dogonews: ${searchResults.length} results for "${normalizedTopic}"`);
         } finally {
             clearTimeout(timer);
