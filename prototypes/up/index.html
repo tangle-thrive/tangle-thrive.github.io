@@ -532,6 +532,9 @@
         .share-btn { font-size: .8rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--purple-mid); background: white; color: var(--purple-dark); cursor: pointer; transition: all .15s; }
         .share-btn:hover { background: var(--purple-mid); color: white; }
         .share-btn.copied { background: var(--green-mid); border-color: var(--green-mid); color: white; }
+        .search-alt-panel { margin-top: 8px; padding: 10px 12px; background: #faf8ff; border: 1px dashed var(--purple-light); border-radius: 12px; font-size: .82rem; color: var(--text-dark); }
+        .search-alt-link { display: inline-block; font-size: .78rem; font-weight: 600; padding: 4px 11px; border-radius: 14px; background: white; border: 1.5px solid var(--purple-mid); color: var(--purple-dark); text-decoration: none; transition: all .15s; }
+        .search-alt-link:hover { background: var(--purple-mid); color: white; }
         .suggestion-loading { text-align: center; padding: 30px 0; color: var(--text-mid); font-size: .95rem; }
         .suggestion-loading-spinner { font-size: 1.6rem; animation: spin 1.2s linear infinite; display: inline-block; margin-bottom: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -1338,10 +1341,21 @@
         </div>
 
         <div class="goal-recap-card" style="margin-top:20px;">
+            <span class="recap-label">What I care about</span>
+            <span class="recap-value" id="mw-overall-goal"></span>
+            <span class="recap-label">A strength I'm building</span>
+            <span class="recap-value" id="mw-growth-trait"></span>
             <span class="recap-label">Class goal</span>
             <span class="recap-value" id="mw-class-goal"></span>
             <span class="recap-label">Home goal</span>
             <span class="recap-value" id="mw-home-goal"></span>
+        </div>
+
+        <!-- Gomez-only: note space for the article (shown via JS) -->
+        <div id="mw-article-notes" class="hidden" style="margin-top:18px;padding:16px 18px;background:#faf8ff;border:2px dashed var(--purple-mid);border-radius:14px;">
+            <p style="font-weight:700;color:var(--purple-dark);margin-bottom:6px;">📝 Notes on your article <button class="tts-btn" data-speak="Take notes on your article. What did you read? What stood out?" onclick="app.speakFromBtn(this)">🔊</button></p>
+            <p style="font-size:.85rem;color:var(--text-mid);margin-bottom:8px;">Jot down what you read so your teacher can see what you noticed.</p>
+            <textarea class="reflection-textarea" id="mw-article-notes-text" placeholder="What did you read? What surprised you? What stood out?" rows="4"></textarea>
         </div>
 
         <p style="font-weight:700;color:var(--text-dark);margin:18px 0 8px;">What progress have you made so far? What's working? What do you want to try next? <button class="tts-btn" data-speak="What progress have you made so far? What's working? What do you want to try next?" onclick="app.speakFromBtn(this)">🔊</button></p>
@@ -2326,17 +2340,34 @@
             }
         },
 
+        // Build a multi-source search fallback. Used when the AI returns
+        // no suggestions OR returns a search-prompt. Gives students three
+        // kid-safe sources to try (Dogo News, Time for Kids, PBS NewsHour).
+        buildSearchFallbackHtml(topic) {
+            const t = topic || this.data.problem || '';
+            const dogoUrl   = `https://www.dogonews.com/?s=${encodeURIComponent(t)}`;
+            const tfkUrl    = `https://www.timeforkids.com/g56/?age=child&s=${encodeURIComponent(t)}`;
+            const pbsUrl    = `https://www.pbs.org/newshour/classroom/?s=${encodeURIComponent(t)}`;
+            return `<div style="background:#f5f3ff;border:2px solid var(--purple-mid);border-radius:16px;padding:20px 22px;line-height:1.6;">
+                <div style="font-weight:700;font-size:1rem;margin-bottom:8px;">Find your own article this week!</div>
+                <p style="margin:0 0 12px;">We couldn't find an article for <strong>${t}</strong> automatically. Try searching one of these kid-friendly sites:</p>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <a href="${dogoUrl}" target="_blank" rel="noopener" style="display:inline-block;background:var(--purple-mid);color:white;font-weight:700;padding:8px 18px;border-radius:20px;text-decoration:none;">Search Dogo News →</a>
+                    <a href="${tfkUrl}" target="_blank" rel="noopener" style="display:inline-block;background:var(--purple-mid);color:white;font-weight:700;padding:8px 18px;border-radius:20px;text-decoration:none;">Search Time for Kids →</a>
+                    <a href="${pbsUrl}" target="_blank" rel="noopener" style="display:inline-block;background:var(--purple-mid);color:white;font-weight:700;padding:8px 18px;border-radius:20px;text-decoration:none;">Search PBS NewsHour Classroom →</a>
+                </div>
+            </div>`;
+        },
+
         renderHomeActivitySuggestions() {
             const suggestions = this._homeActivitySuggestions || [];
             const container = document.getElementById('home-suggestions-cards');
-            if (suggestions.length === 1 && suggestions[0].type === 'search-prompt') {
-                const topic = suggestions[0].topic || '';
-                const searchUrl = `https://www.dogonews.com/?s=${encodeURIComponent(topic)}`;
-                container.innerHTML = `<div style="background:#f5f3ff;border:2px solid var(--purple-mid);border-radius:16px;padding:20px 22px;line-height:1.6;">
-                    <div style="font-weight:700;font-size:1rem;margin-bottom:8px;">Find your own article this week!</div>
-                    <p style="margin:0 0 12px;">We couldn't find an article for <strong>${topic}</strong> automatically. Try searching for one yourself:</p>
-                    <a href="${searchUrl}" target="_blank" rel="noopener" style="display:inline-block;background:var(--purple-mid);color:white;font-weight:700;padding:8px 18px;border-radius:20px;text-decoration:none;">Search Dogo News →</a>
-                </div>`;
+            // Show search fallback if API returned a search-prompt OR returned no usable suggestions
+            const isSearchPrompt = suggestions.length === 1 && suggestions[0].type === 'search-prompt';
+            const isEmpty = suggestions.length === 0;
+            if (isSearchPrompt || isEmpty) {
+                const topic = (isSearchPrompt && suggestions[0].topic) || this.data.problem || '';
+                container.innerHTML = this.buildSearchFallbackHtml(topic);
                 document.getElementById('home-goal-continue').disabled = false;
                 document.getElementById('home-suggestions-loading').classList.add('hidden');
                 container.classList.remove('hidden');
@@ -2349,6 +2380,10 @@
                 const shareRow = s.type === 'article' && s.url ? `
                     <div class="suggestion-share-row" onclick="event.stopPropagation()">
                         <button class="share-btn" id="copy-btn-${i}" onclick="app.copyArticleLink(${i})">📋 Copy link</button>
+                        <button class="share-btn" onclick="app.toggleSearchPanel('home-search-panel-${i}')">🔍 Link broken? Search elsewhere</button>
+                    </div>
+                    <div class="search-alt-panel hidden" id="home-search-panel-${i}" onclick="event.stopPropagation()">
+                        ${this.buildSearchLinksInline(s.searchTopic || this.data.problem || '')}
                     </div>` : '';
                 const stepsHtml = s.type === 'activity' && Array.isArray(s.steps) && s.steps.length
                     ? `<div class="suggestion-steps">${s.steps.map((st, n) =>
@@ -2366,6 +2401,25 @@
             }).join('');
             document.getElementById('home-suggestions-loading').classList.add('hidden');
             container.classList.remove('hidden');
+        },
+
+        // Toggle a per-card "search elsewhere" panel
+        toggleSearchPanel(panelId) {
+            const el = document.getElementById(panelId);
+            if (el) el.classList.toggle('hidden');
+        },
+
+        // Build inline search links for the three kid-friendly sources.
+        buildSearchLinksInline(topic) {
+            const t = (topic || '').toString();
+            const dogoUrl = `https://www.dogonews.com/?s=${encodeURIComponent(t)}`;
+            const tfkUrl  = `https://www.timeforkids.com/g56/?age=child&s=${encodeURIComponent(t)}`;
+            const pbsUrl  = `https://www.pbs.org/newshour/classroom/?s=${encodeURIComponent(t)}`;
+            return `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+                <a href="${dogoUrl}" target="_blank" rel="noopener" class="search-alt-link">Dogo News</a>
+                <a href="${tfkUrl}" target="_blank" rel="noopener" class="search-alt-link">Time for Kids</a>
+                <a href="${pbsUrl}" target="_blank" rel="noopener" class="search-alt-link">PBS NewsHour Classroom</a>
+            </div>`;
         },
 
         copyArticleLink(index) {
@@ -2625,15 +2679,33 @@
             const goal = (this._myGoals || [])[index];
             if (!goal) return;
             this._currentReflGoal = goal;
-            this._mwData = { traitRating: 0, text: '', savedAt: '' };
+            this._mwData = { traitRating: 0, text: '', articleNotes: '', savedAt: '' };
             const growth = this.traits.find(t => t.id === goal.growthTrait);
             const traitGrammar = growth ? growth.grammarName : '';
             document.getElementById('mw-trait').textContent = traitGrammar;
             document.getElementById('mw-tts').dataset.speak = `How much did you practice being ${traitGrammar} today? Click one!`;
+            // Overall goal (the issue/cause they care about) and trait being built
+            document.getElementById('mw-overall-goal').textContent = goal.problem || '—';
+            document.getElementById('mw-growth-trait').textContent = growth ? `${growth.icon} ${growth.title}` : (goal.growthTrait || '—');
             document.getElementById('mw-class-goal').textContent = goal.classroomGoal || goal.goal || '';
             document.getElementById('mw-home-goal').textContent = goal.homeGoalText || '';
             document.querySelectorAll('.mw-emoji').forEach(b => b.classList.remove('selected'));
             document.getElementById('mw-text').value = '';
+            // Article notes — Gomez only, and only when the home activity is an article
+            const notesBox = document.getElementById('mw-article-notes');
+            const notesText = document.getElementById('mw-article-notes-text');
+            const isGomez = goal.selectedClass === 'Mr. Gomez';
+            const hasArticle = goal.homeActivity && goal.homeActivity.type === 'article';
+            if (isGomez && hasArticle) {
+                // Pre-fill with any previously saved notes (latest first if multiple)
+                const prior = Array.isArray(goal.midweekReflections) ? goal.midweekReflections : [];
+                const latestWithNotes = [...prior].reverse().find(r => r && r.articleNotes);
+                notesText.value = latestWithNotes ? latestWithNotes.articleNotes : '';
+                notesBox.classList.remove('hidden');
+            } else {
+                notesText.value = '';
+                notesBox.classList.add('hidden');
+            }
             document.getElementById('mw-saved').classList.remove('visible');
             this.showScreen('midweek-screen');
         },
@@ -2645,6 +2717,12 @@
 
         async saveMidweekReflection() {
             this._mwData.text = document.getElementById('mw-text').value.trim();
+            // Persist Gomez-only article notes if the field was shown
+            const notesEl = document.getElementById('mw-article-notes-text');
+            const notesBox = document.getElementById('mw-article-notes');
+            if (notesEl && notesBox && !notesBox.classList.contains('hidden')) {
+                this._mwData.articleNotes = notesEl.value.trim();
+            }
             this._mwData.savedAt = new Date().toISOString();
             const g = this._currentReflGoal;
             if (!g || !g._id) return;
@@ -2758,7 +2836,16 @@
             document.getElementById('r3-header-text').textContent =
                 `Here are some ways you said you'd practice being ${traitGrammar} this week:`;
 
-            let html = '';
+            // Show the overall goal context (issue + trait) so the student
+            // remembers WHY they're doing the article / class goal.
+            const problem = this._currentReflGoal.problem || '';
+            const overallHtml = problem
+                ? `<div style="background:var(--green-pale);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:.9rem;">
+                    <strong style="color:var(--green-dark);">What I care about:</strong> ${problem}<br>
+                    <strong style="color:var(--green-dark);">A strength I'm building:</strong> ${traitGrammar}
+                </div>` : '';
+
+            let html = overallHtml;
             if (classGoal) html += `
                 <div class="goal-check-card">
                     <div class="goal-check-label">Class Goal</div>
@@ -2918,14 +3005,11 @@
         _renderR4Cards() {
             const suggestions = this._r4Suggestions || [];
             const container = document.getElementById('r4-cards');
-            if (suggestions.length === 1 && suggestions[0].type === 'search-prompt') {
-                const topic = suggestions[0].topic || '';
-                const searchUrl = `https://www.dogonews.com/?s=${encodeURIComponent(topic)}`;
-                container.innerHTML = `<div style="background:#f5f3ff;border:2px solid var(--purple-mid);border-radius:16px;padding:20px 22px;line-height:1.6;">
-                    <div style="font-weight:700;font-size:1rem;margin-bottom:8px;">Find your own article this week!</div>
-                    <p style="margin:0 0 12px;">We couldn't find an article for <strong>${topic}</strong> automatically. Try searching for one yourself:</p>
-                    <a href="${searchUrl}" target="_blank" rel="noopener" style="display:inline-block;background:var(--purple-mid);color:white;font-weight:700;padding:8px 18px;border-radius:20px;text-decoration:none;">Search Dogo News →</a>
-                </div>`;
+            const isSearchPrompt = suggestions.length === 1 && suggestions[0].type === 'search-prompt';
+            const isEmpty = suggestions.length === 0;
+            if (isSearchPrompt || isEmpty) {
+                const topic = (isSearchPrompt && suggestions[0].topic) || this._currentReflGoal?.problem || '';
+                container.innerHTML = this.buildSearchFallbackHtml(topic);
                 document.getElementById('r4-loading').classList.add('hidden');
                 document.getElementById('r4-save').disabled = false;
                 container.classList.remove('hidden');
@@ -2935,9 +3019,14 @@
                 const typeLabel = s.type === 'article' ? '📰 Article' : '✏️ Activity';
                 const siteLine  = s.siteName ? `<div class="suggestion-site">${s.siteName}</div>` : '';
                 const safeSpeak = (s.summary || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                const topicForSearch = s.searchTopic || this._currentReflGoal?.problem || '';
                 const shareRow  = s.type === 'article' && s.url ? `
                     <div class="suggestion-share-row" onclick="event.stopPropagation()">
                         <button class="share-btn" id="r4-copy-btn-${i}" onclick="app._copyR4Link(${i})">📋 Copy link</button>
+                        <button class="share-btn" onclick="app.toggleSearchPanel('r4-search-panel-${i}')">🔍 Link broken? Search elsewhere</button>
+                    </div>
+                    <div class="search-alt-panel hidden" id="r4-search-panel-${i}" onclick="event.stopPropagation()">
+                        ${this.buildSearchLinksInline(topicForSearch)}
                     </div>` : '';
                 const stepsHtml = s.type === 'activity' && Array.isArray(s.steps) && s.steps.length
                     ? `<div class="suggestion-steps">${s.steps.map((st, n) =>
@@ -3096,12 +3185,14 @@
                         const date = r.savedAt ? new Date(r.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : `Check-in ${midweeks.length - i}`;
                         const rating = r.traitRating ? `${ratingEmojis[r.traitRating]} ${r.traitRating}/5` : '';
                         const text = r.text ? `<p class="refl-text">"${r.text}"</p>` : '';
+                        const articleNotes = r.articleNotes
+                            ? `<p class="refl-noticed" style="margin-top:6px;"><strong>📝 Article notes:</strong> "${r.articleNotes}"</p>` : '';
                         return `<div class="refl-week" style="background:#f0f4ff;border-left-color:#7b93ff">
                             <div class="refl-week-header">
                                 <span class="refl-week-date">${date}</span>
                                 <span class="refl-rating">${rating}</span>
                             </div>
-                            ${text}
+                            ${text}${articleNotes}
                         </div>`;
                     }).join('')}`;
 
@@ -3121,6 +3212,8 @@
                             : (r.noticedText ? `<p class="refl-noticed">Noticed: ${r.noticedText}</p>` : '');
                         const obstacle = r.gotInTheWay ? `<p class="refl-noticed">Got in the way: ${r.gotInTheWay}</p>` : '';
                         const continueDoing = r.continueDoing ? `<p class="refl-noticed">Want to continue: ${r.continueDoing}</p>` : '';
+                        const articleResp = r.homeActivityText
+                            ? `<p class="refl-noticed"><strong>📰 Article response:</strong> "${r.homeActivityText}"</p>` : '';
                         const text = r.reflectionText ? `<p class="refl-text">"${r.reflectionText}"</p>` : '';
                         return `<div class="refl-week">
                             <div class="refl-week-header">
@@ -3128,7 +3221,7 @@
                                 <span class="refl-rating">${rating}</span>
                             </div>
                             <div class="refl-goals">${classChip}${homeChip}</div>
-                            ${noticed}${obstacle}${continueDoing}${text}
+                            ${noticed}${obstacle}${continueDoing}${articleResp}${text}
                         </div>`;
                     }).join('')}` : ''}`;
 
